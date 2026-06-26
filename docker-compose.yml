@@ -1,0 +1,48 @@
+services:
+  db:
+    image: postgres:18.1-bookworm
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-regexriddle}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-regexriddle_dev_password_change_me}
+      POSTGRES_DB: ${POSTGRES_DB:-regexriddle_dev}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    image: regexriddle-api:goal-00
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      NODE_ENV: production
+      API_HOST: 0.0.0.0
+      API_PORT: 4000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-regexriddle}:${POSTGRES_PASSWORD:-regexriddle_dev_password_change_me}@db:5432/${POSTGRES_DB:-regexriddle_dev}
+    ports:
+      - "4000:4000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    image: regexriddle-web:goal-00
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    environment:
+      NODE_ENV: production
+    ports:
+      - "5173:4173"
+    depends_on:
+      api:
+        condition: service_started
+
+volumes:
+  postgres-data:

@@ -1,0 +1,27 @@
+{
+  "name": "@regexriddle/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm --filter @regexriddle/shared build && vite --host 127.0.0.1 --port 5173 --strictPort",
+    "build": "pnpm --filter @regexriddle/shared build && tsc --noEmit && vite build",
+    "preview": "vite preview --host 0.0.0.0 --port 4173",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@regexriddle/shared": "workspace:*",
+    "@vitejs/plugin-react": "6.0.3",
+    "vite": "8.1.0",
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "typescript": "6.0.3",
+    "vitest": "4.1.9"
+  }
+}

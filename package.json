@@ -1,0 +1,31 @@
+{
+  "name": "regexriddle",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.7.0",
+  "engines": {
+    "node": ">=24.14.0",
+    "pnpm": ">=11.7.0"
+  },
+  "scripts": {
+    "dev:web": "pnpm --filter @regexriddle/web dev",
+    "dev:api": "pnpm --filter @regexriddle/api dev",
+    "lint": "eslint .",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --filter @regexriddle/shared --filter @regexriddle/api --filter @regexriddle/web --if-present test",
+    "build": "pnpm -r --if-present build",
+    "e2e": "pnpm --filter @regexriddle/e2e test",
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm e2e",
+    "db:migrate": "node -e \"console.log('TODO GOAL 01: database migrations are not implemented yet.')\"",
+    "db:seed": "node -e \"console.log('TODO GOAL 01: database seed is not implemented yet.')\""
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.6.0",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "eslint-plugin-react-refresh": "0.5.3",
+    "globals": "17.7.0",
+    "typescript-eslint": "8.62.0"
+  }
+}

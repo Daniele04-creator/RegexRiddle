@@ -8,6 +8,10 @@ The initial Prisma/PostgreSQL model exists in `apps/api/prisma/schema.prisma` an
 
 Public challenge APIs read from this model through explicit Prisma selects and DTO serializers. They expose public challenge fields, public author display data, and aggregate attempt/solution counts only. They do not expose `Challenge.secretPattern`, `ChallengeControl.value`, or `Attempt.proposedPattern`.
 
+## GOAL 03 status
+
+Auth APIs use the existing `User` and `Session` models without a schema migration. User passwords are stored only as Argon2id hashes. Sessions store only `sessionTokenHash`; the raw session token exists only in the `rr_session` cookie.
+
 ## Models
 
 ### User
@@ -24,7 +28,7 @@ Fields: `id`, `sessionTokenHash`, `userId`, `expiresAt`, `createdAt`.
 
 Unique constraints: `sessionTokenHash`.
 
-Auth endpoints are not implemented yet.
+Auth endpoints create and delete rows in this table. Expired sessions are rejected by `GET /api/auth/me` and can be removed during lookup.
 
 ### Challenge
 

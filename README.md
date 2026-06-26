@@ -1,6 +1,6 @@
 # RegexRiddle
 
-RegexRiddle is a Web Technologies exam project scaffold. The repository currently includes the GOAL 02 public challenge read API: PostgreSQL, Prisma schema, deterministic demo seed data, public challenge DTOs, and read-only endpoints for listing and reading challenge detail. It still has no authentication endpoints, challenge mutation API, leaderboard, attempt submission, or regex evaluation engine.
+RegexRiddle is a Web Technologies exam project scaffold. The repository currently includes the GOAL 03 backend auth API: PostgreSQL, Prisma schema, deterministic demo seed data, public challenge DTOs, read-only challenge endpoints, Argon2id password verification, and opaque server-side sessions with `HttpOnly`/`SameSite=Lax` cookies. It still has no frontend auth UI, challenge mutation API, leaderboard, attempt submission, or regex evaluation engine.
 
 ## Stack
 
@@ -46,6 +46,7 @@ Useful local URLs:
 
 - Web: http://127.0.0.1:5173
 - API health: http://127.0.0.1:4000/health
+- Auth API: http://127.0.0.1:4000/api/auth/me
 - Public challenges API: http://127.0.0.1:4000/api/challenges
 - PostgreSQL from host tools: 127.0.0.1:55432
 
@@ -61,6 +62,7 @@ Docker URLs:
 
 - Web: http://127.0.0.1:5173
 - API health: http://127.0.0.1:4000/health
+- Auth API: http://127.0.0.1:4000/api/auth/me
 - Public challenges API: http://127.0.0.1:4000/api/challenges
 - PostgreSQL from host tools: 127.0.0.1:55432
 - PostgreSQL from Compose services: `db:5432`
@@ -111,6 +113,35 @@ curl http://127.0.0.1:4000/api/challenges/aaaaaaaa-0001-4000-8000-000000000001
 ```
 
 Public challenge responses must not include `secretPattern`, `ChallengeControl.value`, or `Attempt.proposedPattern`.
+
+## Auth API smoke
+
+The backend exposes auth endpoints only; no frontend auth UI exists yet.
+
+Demo credentials:
+
+- Username: `demo_player`
+- Email: `demo_player@example.test`
+- Password: `Password123!`
+
+Use a cookie jar for local smoke tests:
+
+```powershell
+curl.exe -i -c .\.tmp-auth-cookies.txt -H "Content-Type: application/json" -d "{\"usernameOrEmail\":\"demo_player\",\"password\":\"Password123!\"}" http://127.0.0.1:4000/api/auth/login
+curl.exe -i -b .\.tmp-auth-cookies.txt http://127.0.0.1:4000/api/auth/me
+curl.exe -i -b .\.tmp-auth-cookies.txt -c .\.tmp-auth-cookies.txt -X POST http://127.0.0.1:4000/api/auth/logout
+```
+
+Auth endpoints:
+
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `POST /api/auth/logout`
+- `GET /api/auth/me`
+
+The session token is returned only as the `rr_session` cookie. API responses must not include `passwordHash`, `sessionTokenHash`, token values, or cookie values.
+
+This public review repository must never contain real secrets. `.env.example` values and demo credentials are development-only placeholders.
 
 ## Scope guard
 

@@ -107,11 +107,136 @@ Public challenge responses never include:
 - `Attempt.proposedPattern`
 - user password or session hashes
 
+## POST /api/auth/register
+
+Creates a user, creates a server-side session, sets the `rr_session` cookie, and returns the public user. This endpoint does not return the session token in JSON.
+
+Request `application/json`:
+
+```json
+{
+  "username": "student_demo",
+  "email": "student_demo@example.test",
+  "password": "Password123!",
+  "displayName": "Student Demo"
+}
+```
+
+Validation:
+
+- `username`: 3-32 lowercase letters, numbers, or underscores after normalization.
+- `email`: valid email shape, normalized lowercase.
+- `password`: 8-128 characters, at least one letter and one number.
+- `displayName`: 1-80 characters after trimming.
+
+Response `201 application/json`:
+
+```json
+{
+  "user": {
+    "id": "44444444-4444-4444-8444-444444444444",
+    "username": "student_demo",
+    "email": "student_demo@example.test",
+    "displayName": "Student Demo",
+    "createdAt": "2026-06-27T10:00:00.000Z"
+  }
+}
+```
+
+Cookie:
+
+```text
+Set-Cookie: rr_session=<opaque-token>; Path=/; HttpOnly; SameSite=Lax; Max-Age=604800; Expires=<date>
+```
+
+Errors:
+
+- `400 Bad Request`: invalid payload.
+- `409 Conflict`: username or email already exists.
+
+## POST /api/auth/login
+
+Verifies credentials with Argon2id, creates a new server-side session, sets the `rr_session` cookie, and returns the public user.
+
+Request `application/json`:
+
+```json
+{
+  "usernameOrEmail": "demo_player",
+  "password": "Password123!"
+}
+```
+
+Response `200 application/json`:
+
+```json
+{
+  "user": {
+    "id": "22222222-2222-4222-8222-222222222222",
+    "username": "demo_player",
+    "email": "demo_player@example.test",
+    "displayName": "Demo Player",
+    "createdAt": "2026-06-27T10:00:00.000Z"
+  }
+}
+```
+
+Errors:
+
+- `400 Bad Request`: invalid payload.
+- `401 Unauthorized`: invalid credentials. The message is generic and does not reveal whether username/email or password is wrong.
+
+## POST /api/auth/logout
+
+Reads the `rr_session` cookie, deletes the matching server-side session if present, clears the cookie, and returns success even when no valid session exists.
+
+Response `200 application/json`:
+
+```json
+{
+  "success": true
+}
+```
+
+Cookie clearing:
+
+```text
+Set-Cookie: rr_session=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT
+```
+
+## GET /api/auth/me
+
+Reads the `rr_session` cookie, checks for a valid non-expired server-side session, and returns the public user.
+
+Response `200 application/json`:
+
+```json
+{
+  "user": {
+    "id": "22222222-2222-4222-8222-222222222222",
+    "username": "demo_player",
+    "email": "demo_player@example.test",
+    "displayName": "Demo Player",
+    "createdAt": "2026-06-27T10:00:00.000Z"
+  }
+}
+```
+
+Errors:
+
+- `401 Unauthorized`: missing, invalid, or expired session.
+
+Auth responses never include:
+
+- `User.passwordHash`
+- `Session.sessionTokenHash`
+- raw session token
+- cookie value in JSON
+
 ## Future endpoints
 
-The following areas are intentionally TODO after GOAL 02:
+The following areas are intentionally TODO after GOAL 03:
 
-- Authentication.
 - Attempt submission.
 - Leaderboard.
 - Admin or authoring workflows.

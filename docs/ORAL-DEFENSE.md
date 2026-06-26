@@ -1,8 +1,8 @@
 # Difesa orale
 
-## Cosa contiene GOAL 02
+## Cosa contiene GOAL 03
 
-GOAL 02 aggiunge le prime API applicative read-only per le sfide. Non e' ancora l'applicazione completa, ma ora il frontend puo' leggere un catalogo pubblico e il dettaglio pubblico di una sfida.
+GOAL 03 aggiunge autenticazione backend con sessioni opache. Non c'e' ancora una UI di login, ma le API permettono registrazione, login, logout e lettura dell'utente corrente.
 
 Il repository contiene:
 
@@ -16,16 +16,18 @@ Il repository contiene:
 - una migration iniziale versionata;
 - un seed demo deterministico;
 - API pubbliche `GET /api/challenges` e `GET /api/challenges/:id`;
+- API auth `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`, `GET /api/auth/me`;
 - DTO pubblici condivisi per catalogo e dettaglio sfida;
+- DTO pubblici per utente autenticato;
 - documentazione iniziale per architettura, sicurezza, test e piano di sviluppo.
 
-La API espone `GET /health` e due endpoint pubblici read-only sulle sfide. La pagina web mostra ancora `RegexRiddle`, quindi serve come smoke test visuale senza anticipare la UI finale.
+La API espone `GET /health`, due endpoint pubblici read-only sulle sfide e quattro endpoint auth backend. La pagina web mostra ancora `RegexRiddle`, quindi serve come smoke test visuale senza anticipare la UI finale.
 
 ## Perche' serve
 
-Prima di implementare feature come login, sfide e valutazione delle regex, il progetto deve avere una base verificabile: installazione, lint, typecheck, test, build, E2E e Docker.
+Prima di implementare attempt submission e valutazione delle regex, il progetto deve avere una base verificabile di identita' utente: registrazione, login, logout e sessione corrente.
 
-In GOAL 02 questi controlli devono passare: migration, seed, verify, lint, typecheck, unit test, build ed E2E. Docker Compose avvia PostgreSQL, API e web.
+In GOAL 03 questi controlli devono passare: migration, seed, verify, lint, typecheck, unit test, build ed E2E. Docker Compose avvia PostgreSQL, API e web.
 
 Prisma e' l'ORM: descriviamo le tabelle in TypeScript/Prisma schema, generiamo un client tipizzato e applichiamo le modifiche al database con migration versionate.
 
@@ -33,9 +35,9 @@ Il seed crea utenti e sfide demo ripetibili. Serve per provare il progetto e per
 
 ## Cosa non contiene ancora
 
-Non ci sono ancora auth endpoints, creazione sfide da UI, attempt engine, leaderboard o regex evaluation.
+Non ci sono ancora frontend auth UI, creazione sfide da UI, attempt engine, leaderboard o regex evaluation.
 
-Questa scelta e' intenzionale: GOAL 02 aggiunge solo lettura pubblica sicura, senza introdurre auth, mutazioni o valutazione regex troppo presto.
+Questa scelta e' intenzionale: GOAL 03 aggiunge solo identita' backend e sessioni sicure, senza introdurre mutazioni di prodotto o valutazione regex troppo presto.
 
 ## Punto di sicurezza principale
 
@@ -44,3 +46,7 @@ Quando verra' implementata la valutazione delle regex, non bisogna usare `RegExp
 I campi sensibili come pattern segreti e controlli segreti stanno nel database/backend. Il frontend vede solo dati pubblici; regex originale e controlli segreti restano nel database/server.
 
 Gli endpoint di GOAL 02 usano DTO espliciti e select Prisma limitate. Le response pubbliche non contengono `secretPattern`, `ChallengeControl.value` o `Attempt.proposedPattern`.
+
+Per l'autenticazione non usiamo JWT e non mettiamo token in `localStorage`. Il server genera un token opaco casuale, salva nel database solo il suo hash SHA-256 e invia il token in un cookie `rr_session` con `HttpOnly` e `SameSite=Lax`.
+
+Le password sono salvate con Argon2id. Le API auth restituiscono solo l'utente pubblico e non espongono `passwordHash`, `sessionTokenHash`, token o valore del cookie.

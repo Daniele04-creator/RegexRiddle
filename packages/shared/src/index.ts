@@ -2,6 +2,8 @@ export const APP_NAME = "RegexRiddle";
 
 export const API_HEALTH_PATH = "/health";
 
+export const API_AUTH_PATH = "/api/auth";
+
 export const API_CHALLENGES_PATH = "/api/challenges";
 
 export const API_SERVICE_NAME = "regexriddle-api";
@@ -17,6 +19,24 @@ export interface HealthResponse {
   service: typeof API_SERVICE_NAME;
   appName: typeof APP_NAME;
   environment: string;
+}
+
+export interface PublicUserDTO {
+  id: string;
+  username: string;
+  email: string;
+  displayName: string;
+  createdAt: string;
+}
+
+export interface AuthUserResponseDTO {
+  user: PublicUserDTO;
+}
+
+export type AuthMeResponseDTO = AuthUserResponseDTO;
+
+export interface AuthSuccessResponseDTO {
+  success: true;
 }
 
 export interface PublicChallengeAuthorDTO {

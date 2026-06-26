@@ -14,7 +14,7 @@
 browser -> apps/web -> apps/api -> PostgreSQL
 ```
 
-GOAL 02 exposes `GET /health`, `GET /api/challenges`, and `GET /api/challenges/:id`. PostgreSQL is present in Docker Compose and Prisma manages the versioned schema under `apps/api/prisma`.
+GOAL 03 exposes `GET /health`, public challenge read endpoints, and backend auth endpoints. PostgreSQL is present in Docker Compose and Prisma manages the versioned schema under `apps/api/prisma`.
 
 ## Build shape
 
@@ -39,10 +39,13 @@ GOAL 02 exposes `GET /health`, `GET /api/challenges`, and `GET /api/challenges/:
 - Route handlers live under `apps/api/src/routes`.
 - Domain read logic lives under `apps/api/src/services`.
 - Public serializers live under `apps/api/src/dto`.
+- Session helpers live under `apps/api/src/auth`.
 - Request parsing and validation live under `apps/api/src/validation`.
 - Shared response contracts live in `packages/shared`.
 
 Challenge routes must return public DTOs only. They must not return raw Prisma challenge records.
+
+Auth routes must return public user DTOs only. They use opaque session cookies and store only hashed session tokens in PostgreSQL.
 
 ## Future architecture notes
 

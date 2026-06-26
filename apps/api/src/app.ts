@@ -11,7 +11,28 @@ import {
 } from "@regexriddle/shared";
 
 import { prisma } from "./db/prisma.js";
+import { registerAuthRoutes } from "./routes/auth-routes.js";
 import { registerChallengeRoutes } from "./routes/challenge-routes.js";
+
+function readErrorStatusCode(error: unknown): number | null {
+  if (error === null || typeof error !== "object" || !("statusCode" in error)) {
+    return null;
+  }
+
+  const statusCode = error.statusCode;
+
+  return typeof statusCode === "number" ? statusCode : null;
+}
+
+function readErrorCode(error: unknown): string | undefined {
+  if (error === null || typeof error !== "object" || !("code" in error)) {
+    return undefined;
+  }
+
+  const code = error.code;
+
+  return typeof code === "string" ? code : undefined;
+}
 
 export function buildApp(options: FastifyServerOptions = {}): FastifyInstance {
   const app = fastify({
@@ -23,7 +44,27 @@ export function buildApp(options: FastifyServerOptions = {}): FastifyInstance {
   });
 
   app.setErrorHandler((error, request, reply) => {
-    request.log.error({ error }, "Unhandled request error");
+    const errorStatusCode = readErrorStatusCode(error);
+    const statusCode =
+      errorStatusCode !== null &&
+      errorStatusCode >= 400 &&
+      errorStatusCode < 500
+        ? errorStatusCode
+        : 500;
+
+    if (statusCode === 500) {
+      request.log.error({ error }, "Unhandled request error");
+    } else {
+      request.log.warn({ code: readErrorCode(error) }, "Rejected request");
+    }
+
+    if (statusCode !== 500) {
+      return reply.status(statusCode).send({
+        error: "Bad Request",
+        message: "Invalid request."
+      });
+    }
+
     return reply.status(500).send({
       error: "Internal Server Error",
       message: "An unexpected error occurred."
@@ -39,6 +80,7 @@ export function buildApp(options: FastifyServerOptions = {}): FastifyInstance {
     };
   });
 
+  registerAuthRoutes(app);
   registerChallengeRoutes(app);
 
   return app;

@@ -40,11 +40,17 @@ pnpm check
 - E2E tests cover public challenge catalog and public challenge detail through HTTP.
 - Current E2E count: 4 tests.
 
+## GOAL 03 auth checks
+
+- Backend tests cover register, duplicate register, login, invalid login, `me`, logout, post-logout `me`, session hash storage, auth anti-leak assertions, and public challenge access without auth.
+- E2E tests cover demo login plus `me`, logout, invalid login, and auth response anti-leak behavior.
+- Auth response tests assert public JSON does not contain `passwordHash`, `sessionTokenHash`, `token`, `sessionToken`, or cookie values.
+- Current E2E count: 8 tests.
+
 ## Final delivery target
 
 The final project must include at least 10 meaningful E2E tests. Later milestones should add tests for:
 
-- Login and logout.
 - Authenticated challenge ownership/authorization.
 - Valid attempt submission.
 - Invalid attempt submission.

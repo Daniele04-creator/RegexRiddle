@@ -20,16 +20,21 @@ DONE_TECH:
 
 ## GOAL 03
 
-- Add attempt submission without unsafe JavaScript regex evaluation.
-- Use full-match semantics and a RE2-compatible engine.
+DONE_TECH:
+
+- Add backend auth APIs.
+- Use Argon2id password verification.
+- Use opaque server-side sessions with `HttpOnly` and `SameSite=Lax` cookies.
+- Store only hashed session tokens in the database.
 
 ## GOAL 04
 
-- Add basic frontend puzzle browsing and attempt UI.
+- Add regex engine without unsafe JavaScript regex evaluation.
+- Use full-match semantics and a RE2-compatible engine.
 
 ## GOAL 05
 
-- Add authentication with opaque server-side sessions and secure cookies.
+- Add protected attempt submission.
 
 ## GOAL 06
 

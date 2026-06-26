@@ -13,9 +13,21 @@
 - Use opaque server-side sessions with `HttpOnly` and `SameSite` cookies when auth is implemented.
 - Use Argon2id when passwords are implemented.
 
-## GOAL 02 security posture
+## GOAL 03 security posture
 
-GOAL 02 adds public read-only challenge endpoints, but still has no auth endpoints, no challenge mutation endpoints, no uploads, no attempt submission, and no regex evaluation.
+GOAL 03 adds backend authentication endpoints, but still has no frontend auth UI, no challenge mutation endpoints, no uploads, no attempt submission, and no regex evaluation.
+
+Authentication decisions:
+
+- Passwords are hashed with Argon2id through `argon2`.
+- Sessions are opaque server-side records.
+- The raw session token is generated with cryptographic randomness and sent only in the `rr_session` cookie.
+- The database stores only `Session.sessionTokenHash`, a SHA-256 hash of the raw token.
+- Auth cookies are `HttpOnly`, `SameSite=Lax`, `Path=/`, and have a 7-day `Max-Age`.
+- `Secure` is enabled by default when `NODE_ENV=production`, but local Docker HTTP sets `AUTH_COOKIE_SECURE=false`.
+- JWT is not used.
+- Browser `localStorage` and `sessionStorage` are not used for tokens.
+- Auth routes return explicit public user DTOs and never raw Prisma user or session records.
 
 Public challenge routes use explicit validation and DTO serializers:
 
@@ -37,7 +49,9 @@ Sensitive database fields:
 
 These fields must not be exposed through public DTOs or logs. Seed and verify scripts print counts only.
 
-Public API tests and E2E tests include anti-leak assertions for forbidden response keys including `secretPattern`, `controls`, `value`, `proposedPattern`, `passwordHash`, and `sessionTokenHash`.
+Public API tests and E2E tests include anti-leak assertions for forbidden response keys including `secretPattern`, `controls`, `value`, `proposedPattern`, `passwordHash`, `sessionTokenHash`, `token`, and `sessionToken`.
+
+CSRF is not implemented in GOAL 03 because no protected state-changing product workflows exist yet beyond auth session lifecycle. Future cookie-authenticated mutations must be reviewed for CSRF protections before release.
 
 ## Future review checklist
 

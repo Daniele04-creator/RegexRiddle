@@ -16,7 +16,7 @@ services:
       retries: 10
 
   api:
-    image: regexriddle-api:goal-01
+    image: regexriddle-api:dev
     build:
       context: .
       dockerfile: apps/api/Dockerfile
@@ -24,6 +24,7 @@ services:
       NODE_ENV: production
       API_HOST: 0.0.0.0
       API_PORT: 4000
+      AUTH_COOKIE_SECURE: "false"
       DATABASE_URL: postgresql://${POSTGRES_USER:-regexriddle}:${POSTGRES_PASSWORD:-regexriddle_dev_password_change_me}@db:5432/${POSTGRES_DB:-regexriddle_dev}
     ports:
       - "4000:4000"
@@ -32,7 +33,7 @@ services:
         condition: service_healthy
 
   web:
-    image: regexriddle-web:goal-01
+    image: regexriddle-web:dev
     build:
       context: .
       dockerfile: apps/web/Dockerfile

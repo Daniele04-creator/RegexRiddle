@@ -10,7 +10,7 @@
 - Use ESLint `10.6.0` with `typescript-eslint` `8.62.0`.
 - Use PostgreSQL Docker image `postgres:18.1-bookworm`.
 - Mount the PostgreSQL Docker volume at `/var/lib/postgresql`, which is the required layout for PostgreSQL 18+ Docker images.
-- Tag local Compose build images as `regexriddle-api:goal-00` and `regexriddle-web:goal-00` instead of relying on Compose's default `latest` tag.
+- Tag local Compose build images explicitly instead of relying on Compose's default `latest` tag.
 - Serve the production web container with a minimal Node static server in `apps/web/server.mjs`; Vite remains a build-time and dev-time tool only.
 - Allow only the `esbuild` dependency build script in `pnpm-workspace.yaml`, because Vite requires it and pnpm blocks dependency build scripts by default.
 - Keep `packages/shared` minimal: only scaffold constants and the `HealthResponse` type.
@@ -33,8 +33,7 @@
 
 ## Security decisions
 
-- No regex evaluation exists in GOAL 02.
-- No auth endpoints exist in GOAL 02.
+- No regex evaluation exists in GOAL 03.
 - Secret regex patterns and control values are stored only in the database layer and seed source, not exposed by API endpoints or logs.
 - `pnpm db:verify` and seed logs report counts only and do not print `secretPattern` or challenge control values.
 - `.env.example` contains development-only placeholder values.
@@ -48,6 +47,20 @@
 - Reject unknown public list query parameters instead of forwarding query input to Prisma.
 - Include aggregate public counts for attempts and solutions through Prisma `_count`.
 - Keep auth, challenge mutations, attempt submission, and regex evaluation out of scope.
+
+## GOAL 03 decisions
+
+- Work directly on `main` for the exam workflow and create one checkpoint commit at the end of the goal.
+- Keep the public review repository free of real secrets; demo credentials and `.env.example` values are placeholders only.
+- Use existing `User` and `Session` tables; no schema migration is needed for GOAL 03.
+- Use Argon2id for password hashing and verification.
+- Use opaque server-side sessions instead of JWT.
+- Store only SHA-256 hashes of session tokens in `Session.sessionTokenHash`.
+- Send the raw session token only in the `rr_session` cookie.
+- Use `HttpOnly`, `SameSite=Lax`, `Path=/`, and 7-day expiry for auth cookies.
+- Enable cookie `Secure` by default in production, with `AUTH_COOKIE_SECURE=false` documented for local HTTP Docker smoke tests.
+- Keep `GET /health`, `GET /api/challenges`, and `GET /api/challenges/:id` public.
+- Tag local Compose images as `regexriddle-api:dev` and `regexriddle-web:dev`.
 
 ## Rejected for GOAL 00
 

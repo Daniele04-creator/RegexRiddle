@@ -2,7 +2,7 @@
 
 ## Current milestone
 
-GOAL 00: initial repository skeleton.
+GOAL 01: PostgreSQL/Prisma data layer.
 
 ## Implemented
 
@@ -13,23 +13,31 @@ GOAL 00: initial repository skeleton.
 - `packages/shared` minimal shared constants and types.
 - Docker Compose with web, API, and PostgreSQL services.
 - Initial documentation for architecture, security, tests, API, database planning, design, decisions, plans, and oral defense.
+- Prisma schema with `User`, `Session`, `Challenge`, `ChallengeControl`, `Attempt`, and `Solution`.
+- Versioned initial migration.
+- Deterministic demo seed.
+- Database verification script.
 
 ## Not implemented
 
 - Authentication.
-- Prisma schema.
-- Database migrations.
-- Seed data.
 - Challenge model.
 - Attempt engine.
 - Leaderboard.
 - Regex evaluation.
+- Authentication endpoints.
+- Challenge API endpoints.
 
 ## Verification status
 
-Verified on 2026-06-26:
+Verified on 2026-06-27:
 
 - `pnpm install`: PASS.
+- `docker compose up -d db`: PASS.
+- `pnpm db:generate`: PASS.
+- `pnpm db:migrate`: PASS, migration `20260626222148_init`.
+- `pnpm db:seed`: PASS, 3 users, 10 challenges, 60 controls, 4 attempts, 2 solutions.
+- `pnpm db:verify`: PASS, no secret values printed.
 - `pnpm lint`: PASS.
 - `pnpm typecheck`: PASS.
 - `pnpm test`: PASS.
@@ -42,6 +50,6 @@ Verified on 2026-06-26:
 
 Docker services verified:
 
-- `db`: `postgres:18.1-bookworm`, healthy.
-- `api`: `regexriddle-api:goal-00`, running on port 4000.
-- `web`: `regexriddle-web:goal-00`, running on port 5173.
+- `db`: `postgres:18.1-bookworm`, host port `55432`, healthy.
+- `api`: `regexriddle-api:goal-01`, running on port 4000.
+- `web`: `regexriddle-web:goal-01`, running on port 5173.

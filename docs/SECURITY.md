@@ -13,9 +13,19 @@
 - Use opaque server-side sessions with `HttpOnly` and `SameSite` cookies when auth is implemented.
 - Use Argon2id when passwords are implemented.
 
-## GOAL 00 security posture
+## GOAL 01 security posture
 
-GOAL 00 has no auth, no user data, no uploads, and no regex evaluation. The only API route is `GET /health`, which returns non-sensitive service metadata.
+GOAL 01 has database tables and demo data, but still has no auth endpoints, no public challenge endpoints, no uploads, and no regex evaluation. The only API route is `GET /health`, which returns non-sensitive service metadata.
+
+Sensitive database fields:
+
+- `Challenge.secretPattern`
+- `ChallengeControl.value`
+- `Attempt.proposedPattern`
+- `Session.sessionTokenHash`
+- `User.passwordHash`
+
+These fields must not be exposed through public DTOs or logs. Seed and verify scripts print counts only.
 
 ## Future review checklist
 

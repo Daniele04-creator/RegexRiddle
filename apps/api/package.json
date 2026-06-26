@@ -5,19 +5,30 @@
   "type": "module",
   "main": "./dist/server.js",
   "scripts": {
-    "dev": "pnpm --filter @regexriddle/shared build && tsx watch src/server.ts",
-    "build": "pnpm --filter @regexriddle/shared build && tsc -p tsconfig.build.json",
+    "dev": "pnpm db:generate && pnpm --filter @regexriddle/shared build && tsx watch src/server.ts",
+    "build": "pnpm --filter @regexriddle/shared build && pnpm db:generate && tsc -p tsconfig.build.json",
     "start": "node dist/server.js",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
-    "test": "pnpm --filter @regexriddle/shared build && vitest run"
+    "typecheck": "pnpm db:generate && tsc --noEmit",
+    "test": "pnpm --filter @regexriddle/shared build && pnpm db:generate && vitest run",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev --name init",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:verify": "tsx prisma/verify.ts"
   },
   "dependencies": {
     "@regexriddle/shared": "workspace:*",
-    "fastify": "5.8.5"
+    "@prisma/adapter-pg": "7.8.0",
+    "@prisma/client": "7.8.0",
+    "argon2": "0.44.0",
+    "dotenv": "17.4.2",
+    "fastify": "5.8.5",
+    "pg": "8.22.0"
   },
   "devDependencies": {
+    "@types/pg": "8.20.0",
     "@types/node": "26.0.1",
+    "prisma": "7.8.0",
     "tsx": "4.22.4",
     "typescript": "6.0.3",
     "vitest": "4.1.9"

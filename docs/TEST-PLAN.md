@@ -11,6 +11,11 @@
 ## Required commands
 
 ```powershell
+docker compose up -d db
+pnpm db:generate
+pnpm db:migrate
+pnpm db:seed
+pnpm db:verify
 pnpm lint
 pnpm typecheck
 pnpm test
@@ -18,6 +23,15 @@ pnpm build
 pnpm e2e
 pnpm check
 ```
+
+## GOAL 01 database checks
+
+- `pnpm db:generate` validates Prisma Client generation.
+- `pnpm db:migrate` applies the versioned PostgreSQL migration.
+- `pnpm db:seed` creates deterministic demo data.
+- `pnpm db:verify` checks demo users, challenge count, controls, attempts, and solutions without printing secret patterns or control values.
+
+`pnpm test` remains independent from a running database. Database checks are explicit commands because they require PostgreSQL.
 
 ## Final delivery target
 

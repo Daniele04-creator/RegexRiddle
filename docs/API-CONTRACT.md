@@ -15,6 +15,10 @@ Response `200 application/json`:
 }
 ```
 
+## GOAL 01 note
+
+GOAL 01 adds the database layer only. It does not add public domain endpoints and does not expose `secretPattern` or `ChallengeControl.value`.
+
 ## Future endpoints
 
 The following areas are intentionally TODO after GOAL 00:

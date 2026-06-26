@@ -3,7 +3,7 @@
 ## Repository layout
 
 - `apps/web`: React, Vite, and TypeScript SPA.
-- `apps/api`: Fastify and TypeScript API.
+- `apps/api`: Fastify, TypeScript API, and Prisma data layer.
 - `apps/e2e`: Playwright smoke tests.
 - `packages/shared`: minimal shared constants and TypeScript contracts.
 - `docs`: project documentation and exam support notes.
@@ -14,15 +14,25 @@
 browser -> apps/web -> apps/api -> PostgreSQL
 ```
 
-GOAL 00 only exposes `GET /health`. PostgreSQL is present in Docker Compose so later milestones can add Prisma and deterministic seed data without changing the infrastructure shape.
+GOAL 01 still only exposes `GET /health`. PostgreSQL is present in Docker Compose and Prisma manages the versioned schema under `apps/api/prisma`.
 
 ## Build shape
 
 - The shared package builds first.
 - The API compiles TypeScript to `apps/api/dist`.
+- Prisma Client is generated into `apps/api/src/generated/prisma` and is ignored by Git.
 - The web app builds static assets to `apps/web/dist`.
 - E2E starts the API and web development servers through Playwright `webServer`.
 - The Docker web container serves `apps/web/dist` with a small Node static server, avoiding runtime dependency on Vite or pnpm.
+
+## Data layer
+
+- Prisma schema: `apps/api/prisma/schema.prisma`.
+- Migration directory: `apps/api/prisma/migrations`.
+- Seed script: `apps/api/prisma/seed.ts`.
+- Verification script: `apps/api/prisma/verify.ts`.
+- Host database URL uses port `55432`.
+- Compose services use internal host `db` and port `5432`.
 
 ## Future architecture notes
 

@@ -17,8 +17,10 @@
     "build": "pnpm -r --if-present build",
     "e2e": "pnpm --filter @regexriddle/e2e test",
     "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm e2e",
-    "db:migrate": "node -e \"console.log('TODO GOAL 01: database migrations are not implemented yet.')\"",
-    "db:seed": "node -e \"console.log('TODO GOAL 01: database seed is not implemented yet.')\""
+    "db:generate": "pnpm --filter @regexriddle/api db:generate",
+    "db:migrate": "pnpm --filter @regexriddle/api db:migrate",
+    "db:seed": "pnpm --filter @regexriddle/api db:seed",
+    "db:verify": "pnpm --filter @regexriddle/api db:verify"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

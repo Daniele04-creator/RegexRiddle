@@ -10,9 +10,15 @@ import {
   type HealthResponse
 } from "@regexriddle/shared";
 
+import { prisma } from "./db/prisma.js";
+
 export function buildApp(options: FastifyServerOptions = {}): FastifyInstance {
   const app = fastify({
     logger: options.logger ?? true
+  });
+
+  app.addHook("onClose", async () => {
+    await prisma.$disconnect();
   });
 
   app.get(API_HEALTH_PATH, async (): Promise<HealthResponse> => {

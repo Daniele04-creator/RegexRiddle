@@ -2,10 +2,12 @@
 
 ## GOAL 01
 
-- Add Prisma.
-- Create the first database model.
-- Add deterministic seed data.
-- Keep domain APIs private until authorization rules are clear.
+DONE_TECH:
+
+- Added Prisma.
+- Created the first database model.
+- Added deterministic seed data.
+- Kept domain APIs private until authorization rules are clear.
 
 ## GOAL 02
 

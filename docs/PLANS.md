@@ -11,9 +11,12 @@ DONE_TECH:
 
 ## GOAL 02
 
+DONE_TECH:
+
 - Define challenge read APIs.
 - Add validation for public request parameters.
 - Keep secret regexes and checks server-only.
+- Add backend and E2E anti-leak tests for public challenge responses.
 
 ## GOAL 03
 

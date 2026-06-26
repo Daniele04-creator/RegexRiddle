@@ -14,7 +14,7 @@
 browser -> apps/web -> apps/api -> PostgreSQL
 ```
 
-GOAL 01 still only exposes `GET /health`. PostgreSQL is present in Docker Compose and Prisma manages the versioned schema under `apps/api/prisma`.
+GOAL 02 exposes `GET /health`, `GET /api/challenges`, and `GET /api/challenges/:id`. PostgreSQL is present in Docker Compose and Prisma manages the versioned schema under `apps/api/prisma`.
 
 ## Build shape
 
@@ -34,8 +34,18 @@ GOAL 01 still only exposes `GET /health`. PostgreSQL is present in Docker Compos
 - Host database URL uses port `55432`.
 - Compose services use internal host `db` and port `5432`.
 
+## API layering
+
+- Route handlers live under `apps/api/src/routes`.
+- Domain read logic lives under `apps/api/src/services`.
+- Public serializers live under `apps/api/src/dto`.
+- Request parsing and validation live under `apps/api/src/validation`.
+- Shared response contracts live in `packages/shared`.
+
+Challenge routes must return public DTOs only. They must not return raw Prisma challenge records.
+
 ## Future architecture notes
 
 - Domain validation belongs on the server.
 - Secret regexes and secret checks must never be sent to the browser.
-- The future database layer should stay behind API services, not inside route handlers.
+- The database layer should stay behind API services, not inside route handlers.

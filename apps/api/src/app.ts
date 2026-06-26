@@ -11,6 +11,7 @@ import {
 } from "@regexriddle/shared";
 
 import { prisma } from "./db/prisma.js";
+import { registerChallengeRoutes } from "./routes/challenge-routes.js";
 
 export function buildApp(options: FastifyServerOptions = {}): FastifyInstance {
   const app = fastify({
@@ -21,6 +22,14 @@ export function buildApp(options: FastifyServerOptions = {}): FastifyInstance {
     await prisma.$disconnect();
   });
 
+  app.setErrorHandler((error, request, reply) => {
+    request.log.error({ error }, "Unhandled request error");
+    return reply.status(500).send({
+      error: "Internal Server Error",
+      message: "An unexpected error occurred."
+    });
+  });
+
   app.get(API_HEALTH_PATH, async (): Promise<HealthResponse> => {
     return {
       status: "ok",
@@ -29,6 +38,8 @@ export function buildApp(options: FastifyServerOptions = {}): FastifyInstance {
       environment: process.env.NODE_ENV ?? "development"
     };
   });
+
+  registerChallengeRoutes(app);
 
   return app;
 }

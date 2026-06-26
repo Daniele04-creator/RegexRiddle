@@ -1,6 +1,6 @@
 # RegexRiddle
 
-RegexRiddle is a Web Technologies exam project scaffold. The repository currently includes the GOAL 01 data layer: PostgreSQL, Prisma schema, a versioned initial migration, deterministic demo seed data, and a database verification script. It still has no challenge API, authentication endpoints, leaderboard, or regex evaluation engine.
+RegexRiddle is a Web Technologies exam project scaffold. The repository currently includes the GOAL 02 public challenge read API: PostgreSQL, Prisma schema, deterministic demo seed data, public challenge DTOs, and read-only endpoints for listing and reading challenge detail. It still has no authentication endpoints, challenge mutation API, leaderboard, attempt submission, or regex evaluation engine.
 
 ## Stack
 
@@ -46,6 +46,7 @@ Useful local URLs:
 
 - Web: http://127.0.0.1:5173
 - API health: http://127.0.0.1:4000/health
+- Public challenges API: http://127.0.0.1:4000/api/challenges
 - PostgreSQL from host tools: 127.0.0.1:55432
 
 ## Docker quickstart
@@ -60,6 +61,7 @@ Docker URLs:
 
 - Web: http://127.0.0.1:5173
 - API health: http://127.0.0.1:4000/health
+- Public challenges API: http://127.0.0.1:4000/api/challenges
 - PostgreSQL from host tools: 127.0.0.1:55432
 - PostgreSQL from Compose services: `db:5432`
 
@@ -97,6 +99,18 @@ The seed creates three demo users:
 All demo users use `Password123!`. This is demo-only data and must not be reused as a production credential.
 
 `pnpm db:verify` checks seeded counts and control coverage without printing secret regex patterns or secret control values.
+
+## Public API smoke
+
+After starting the API, these read-only endpoints expose only public challenge data:
+
+```powershell
+curl http://127.0.0.1:4000/health
+curl "http://127.0.0.1:4000/api/challenges?limit=20&page=1"
+curl http://127.0.0.1:4000/api/challenges/aaaaaaaa-0001-4000-8000-000000000001
+```
+
+Public challenge responses must not include `secretPattern`, `ChallengeControl.value`, or `Attempt.proposedPattern`.
 
 ## Scope guard
 

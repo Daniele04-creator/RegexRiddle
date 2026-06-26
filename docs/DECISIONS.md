@@ -33,11 +33,21 @@
 
 ## Security decisions
 
-- No regex evaluation exists in GOAL 01.
-- No auth endpoints exist in GOAL 01.
+- No regex evaluation exists in GOAL 02.
+- No auth endpoints exist in GOAL 02.
 - Secret regex patterns and control values are stored only in the database layer and seed source, not exposed by API endpoints or logs.
 - `pnpm db:verify` and seed logs report counts only and do not print `secretPattern` or challenge control values.
 - `.env.example` contains development-only placeholder values.
+
+## GOAL 02 decisions
+
+- Expose only read-only challenge endpoints: `GET /api/challenges` and `GET /api/challenges/:id`.
+- Keep challenge route handlers thin and move database reads into `challenge-service`.
+- Use explicit public DTO serializers instead of returning raw Prisma records.
+- Validate `page`, `limit`, and challenge `id` server-side.
+- Reject unknown public list query parameters instead of forwarding query input to Prisma.
+- Include aggregate public counts for attempts and solutions through Prisma `_count`.
+- Keep auth, challenge mutations, attempt submission, and regex evaluation out of scope.
 
 ## Rejected for GOAL 00
 

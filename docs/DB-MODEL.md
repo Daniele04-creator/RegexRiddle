@@ -4,6 +4,10 @@
 
 The initial Prisma/PostgreSQL model exists in `apps/api/prisma/schema.prisma` and is applied through a versioned migration.
 
+## GOAL 02 status
+
+Public challenge APIs read from this model through explicit Prisma selects and DTO serializers. They expose public challenge fields, public author display data, and aggregate attempt/solution counts only. They do not expose `Challenge.secretPattern`, `ChallengeControl.value`, or `Attempt.proposedPattern`.
+
 ## Models
 
 ### User

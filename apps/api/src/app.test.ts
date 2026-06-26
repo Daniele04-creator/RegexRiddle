@@ -20,5 +20,7 @@ describe("GET /health", () => {
       appName: APP_NAME,
       environment: "test"
     });
+
+    await app.close();
   });
 });

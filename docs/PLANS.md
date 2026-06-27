@@ -38,11 +38,16 @@ DONE_TECH:
 
 ## GOAL 05
 
+DONE_TECH:
+
 - Add protected attempt submission.
+- Correct `negativeMatched` semantics.
+- Require auth and CSRF guard v1 for attempt mutations.
+- Store attempts and create solutions without exposing secret controls or submitted patterns.
 
 ## GOAL 06
 
-- Add authorization, ownership checks, and IDOR tests.
+- Add challenge creation with author ownership checks.
 
 ## GOAL 07
 

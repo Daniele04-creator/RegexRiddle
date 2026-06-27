@@ -77,7 +77,7 @@ describe("attempt evaluator", () => {
     expect(result).toEqual({
       positiveMatched: 2,
       positiveTotal: 2,
-      negativeMatched: 2,
+      negativeMatched: 0,
       negativeTotal: 2,
       isCorrect: true
     });
@@ -100,15 +100,15 @@ describe("attempt evaluator", () => {
     expect(serialized).not.toContain(String.raw`\d+`);
   });
 
-  it("counts negative controls correctly rejected by the candidate", () => {
+  it("counts negative controls matched by the candidate", () => {
     const result = evaluateCandidateAgainstControls(
-      "[a-z]+",
+      ".*",
       "",
       controls
     );
 
-    expect(result.positiveMatched).toBe(0);
-    expect(result.negativeMatched).toBe(1);
+    expect(result.positiveMatched).toBe(2);
+    expect(result.negativeMatched).toBe(2);
     expect(result.isCorrect).toBe(false);
   });
 

@@ -72,6 +72,28 @@ export interface ChallengeDetailDTO extends ChallengeListItemDTO {
   updatedAt: string;
 }
 
+export interface AttemptSubmissionRequestDTO {
+  pattern: string;
+  flags?: string;
+}
+
+export interface AttemptResultDTO {
+  id: string;
+  challengeId: string;
+  attemptNumber: number;
+  positiveMatched: number;
+  positiveTotal: number;
+  negativeMatched: number;
+  negativeTotal: number;
+  isCorrect: boolean;
+  createdAt: string;
+}
+
+export interface AttemptSubmissionResponseDTO {
+  attempt: AttemptResultDTO;
+  solved: boolean;
+}
+
 export interface PublicApiErrorResponse {
   error: string;
   message: string;

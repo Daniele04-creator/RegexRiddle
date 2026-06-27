@@ -11,6 +11,7 @@ import {
 } from "@regexriddle/shared";
 
 import { prisma } from "./db/prisma.js";
+import { registerAttemptRoutes } from "./routes/attempt-routes.js";
 import { registerAuthRoutes } from "./routes/auth-routes.js";
 import { registerChallengeRoutes } from "./routes/challenge-routes.js";
 
@@ -82,6 +83,7 @@ export function buildApp(options: FastifyServerOptions = {}): FastifyInstance {
 
   registerAuthRoutes(app);
   registerChallengeRoutes(app);
+  registerAttemptRoutes(app);
 
   return app;
 }

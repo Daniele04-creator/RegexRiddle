@@ -9,7 +9,14 @@ function assertCondition(condition: boolean, message: string): void {
 }
 
 async function main(): Promise<void> {
-  const [users, challengeCount, controlGroups, attemptCount, solutionCount] =
+  const [
+    users,
+    challengeCount,
+    controlGroups,
+    attemptCount,
+    solutionCount,
+    correctAttempts
+  ] =
     await Promise.all([
       prisma.user.findMany({
         where: { username: { in: expectedDemoUsernames } },
@@ -21,7 +28,15 @@ async function main(): Promise<void> {
         _count: { _all: true }
       }),
       prisma.attempt.count(),
-      prisma.solution.count()
+      prisma.solution.count(),
+      prisma.attempt.findMany({
+        where: { isCorrect: true },
+        select: {
+          positiveMatched: true,
+          positiveTotal: true,
+          negativeMatched: true
+        }
+      })
     ]);
 
   const foundUsernames = new Set(users.map((user) => user.username));
@@ -58,6 +73,14 @@ async function main(): Promise<void> {
   assertCondition(
     negativeChallengeIds.size === challengeCount,
     "Every challenge must have at least one negative control."
+  );
+  assertCondition(
+    correctAttempts.every(
+      (attempt) =>
+        attempt.positiveMatched === attempt.positiveTotal &&
+        attempt.negativeMatched === 0
+    ),
+    "Correct seeded attempts must match official aggregate semantics."
   );
 
   const controlCount = await prisma.challengeControl.count();

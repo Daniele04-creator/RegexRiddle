@@ -219,7 +219,7 @@ const attempts: DemoAttempt[] = [
     proposedPattern: "\\d{2,}",
     flags: "",
     positiveMatched: 2,
-    negativeMatched: 3,
+    negativeMatched: 0,
     isCorrect: false,
     attemptNumber: 1,
     createdAt: new Date("2026-06-27T08:00:00.000Z")
@@ -231,7 +231,7 @@ const attempts: DemoAttempt[] = [
     proposedPattern: "\\d+",
     flags: "",
     positiveMatched: 3,
-    negativeMatched: 3,
+    negativeMatched: 0,
     isCorrect: true,
     attemptNumber: 2,
     createdAt: new Date("2026-06-27T08:05:00.000Z")
@@ -243,7 +243,7 @@ const attempts: DemoAttempt[] = [
     proposedPattern: "[a-z]+",
     flags: "",
     positiveMatched: 3,
-    negativeMatched: 3,
+    negativeMatched: 0,
     isCorrect: true,
     attemptNumber: 1,
     createdAt: new Date("2026-06-27T09:00:00.000Z")
@@ -255,7 +255,7 @@ const attempts: DemoAttempt[] = [
     proposedPattern: "#[0-9a-f]{6}",
     flags: "",
     positiveMatched: 2,
-    negativeMatched: 3,
+    negativeMatched: 0,
     isCorrect: false,
     attemptNumber: 1,
     createdAt: new Date("2026-06-27T10:00:00.000Z")

@@ -73,6 +73,23 @@
 - Do not return or log `secretPattern`, `ChallengeControl.value`, candidate patterns, or per-control details.
 - Treat `git grep -n "new RegExp\|RegExp(" -- . ':!node_modules' ':!dist'` as the manual security check for accidental JavaScript regex construction.
 
+## GOAL 05 decisions
+
+- Correct the official attempt feedback semantics: `negativeMatched` counts NEGATIVE controls matched by the candidate, not negative controls correctly rejected.
+- Mark an attempt correct only when `positiveMatched === positiveTotal && negativeMatched === 0`.
+- Add `POST /api/challenges/:id/attempts` as a protected cookie-authenticated mutation.
+- Keep the frontend attempt UI out of scope.
+- Reuse the existing opaque `rr_session` cookie; do not introduce JWT.
+- Add CSRF guard v1 for protected JSON mutations: require `Content-Type: application/json` and `X-RegexRiddle-CSRF: 1`.
+- Return `403 Forbidden` when the CSRF header is missing or wrong.
+- Return `422 Unprocessable Entity` for invalid or RE2-incompatible submitted regexes.
+- Do not create an `Attempt` for invalid or unsupported regexes.
+- Store `Attempt.proposedPattern` internally but never return it in the attempt submission response.
+- Use explicit Prisma `select` and DTO serialization for attempt responses.
+- Block authors from attempting their own challenges.
+- Return `409 Conflict` when the authenticated user already solved the challenge.
+- Use the current authenticated user id only; reject unknown body keys to prevent mass assignment.
+
 ## Rejected for GOAL 00
 
 - Prisma schema.

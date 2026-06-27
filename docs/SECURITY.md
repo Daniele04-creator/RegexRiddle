@@ -3,8 +3,8 @@
 ## Non-negotiable invariants
 
 - Do not use JavaScript `RegExp` to evaluate user-provided regex.
-- Future regex evaluation must use full-match semantics.
-- Future regex evaluation must use a RE2-compatible engine server-side.
+- Regex evaluation must use full-match semantics.
+- Regex evaluation must use a RE2-compatible engine server-side.
 - Do not expose original challenge regexes or secret controls to solver clients.
 - Do not log secret regexes, secret checks, passwords, tokens, session IDs, or raw sensitive payloads.
 - Validate every input on the server.
@@ -13,9 +13,9 @@
 - Use opaque server-side sessions with `HttpOnly` and `SameSite` cookies when auth is implemented.
 - Use Argon2id when passwords are implemented.
 
-## GOAL 04 security posture
+## GOAL 05 security posture
 
-GOAL 04 adds an internal server-side regex engine, but still has no frontend auth UI, no challenge mutation endpoints, no uploads, no public attempt submission endpoint, and no leaderboard.
+GOAL 05 adds protected attempt submission. The project still has no frontend auth UI, no challenge creation endpoint, no uploads, and no leaderboard.
 
 Regex engine decisions:
 
@@ -29,6 +29,19 @@ Regex engine decisions:
 - RE2-incompatible features such as backreferences and lookahead assertions are rejected with controlled errors.
 - Engine functions return aggregate counts only and never return `ChallengeControl.value`, `Challenge.secretPattern`, or candidate patterns.
 - Error messages and logs must not include secret regexes, control values, submitted candidate patterns, or input strings.
+
+Attempt endpoint decisions:
+
+- `POST /api/challenges/:id/attempts` requires a valid `rr_session` cookie.
+- The route uses CSRF guard v1: protected JSON mutations require `Content-Type: application/json` and `X-RegexRiddle-CSRF: 1`.
+- CSRF guard v1 is a lightweight custom-header guard for the current same-origin frontend plan, not a full synchronizer-token system.
+- Auth login/register behavior is unchanged.
+- The current user is derived only from the server-side session; clients cannot submit `userId`.
+- Authors cannot attempt their own challenges.
+- Already solved challenges return `409 Conflict` and do not create another attempt.
+- Invalid or RE2-incompatible candidate regexes return `422 Unprocessable Entity` and do not create an `Attempt`.
+- Successful and failed attempt responses return only aggregate counts.
+- `Attempt.proposedPattern` is stored for future private history/audit use but is not returned by the public attempt response.
 
 Authentication decisions:
 
@@ -64,7 +77,7 @@ These fields must not be exposed through public DTOs or logs. Seed and verify sc
 
 Public API tests and E2E tests include anti-leak assertions for forbidden response keys including `secretPattern`, `controls`, `value`, `proposedPattern`, `passwordHash`, `sessionTokenHash`, `token`, and `sessionToken`.
 
-CSRF is not implemented in GOAL 04 because no protected state-changing product workflows exist yet beyond auth session lifecycle. Future cookie-authenticated mutations must be reviewed for CSRF protections before release.
+CSRF guard v1 is implemented for the protected attempt mutation because it is a cookie-authenticated product write. Future protected mutations must reuse or strengthen this guard before release.
 
 ## Future review checklist
 

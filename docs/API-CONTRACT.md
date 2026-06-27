@@ -107,6 +107,85 @@ Public challenge responses never include:
 - `Attempt.proposedPattern`
 - user password or session hashes
 
+## POST /api/challenges/:id/attempts
+
+Submits a candidate regex for a challenge. This endpoint is protected and state-changing.
+
+Route parameters:
+
+- `id`: required UUID.
+
+Authentication and mutation guard:
+
+- Requires a valid `rr_session` cookie.
+- Requires `Content-Type: application/json`.
+- Requires `X-RegexRiddle-CSRF: 1`.
+- Missing, invalid, or expired auth returns `401 Unauthorized`.
+- Missing or wrong CSRF header returns `403 Forbidden`.
+- Non-JSON content type returns `400 Bad Request`.
+
+Request `application/json`:
+
+```json
+{
+  "pattern": "\\d+",
+  "flags": ""
+}
+```
+
+Validation:
+
+- `pattern`: required string, max 256 characters.
+- `flags`: optional string, default `""`; only safe regex engine flags are accepted.
+- Unknown request body keys are rejected.
+- Clients cannot pass `userId`, `challengeId`, counts, `isCorrect`, or `attemptNumber`.
+
+Response `201 application/json`:
+
+```json
+{
+  "attempt": {
+    "id": "bbbbbbbb-1000-4000-8000-000000000001",
+    "challengeId": "aaaaaaaa-0006-4000-8000-000000000006",
+    "attemptNumber": 1,
+    "positiveMatched": 3,
+    "positiveTotal": 3,
+    "negativeMatched": 0,
+    "negativeTotal": 3,
+    "isCorrect": true,
+    "createdAt": "2026-06-27T12:00:00.000Z"
+  },
+  "solved": true
+}
+```
+
+Aggregate semantics:
+
+- `positiveMatched`: number of POSITIVE secret controls matched by the submitted regex.
+- `positiveTotal`: total POSITIVE secret controls.
+- `negativeMatched`: number of NEGATIVE secret controls matched by the submitted regex.
+- `negativeTotal`: total NEGATIVE secret controls.
+- `isCorrect`: `positiveMatched === positiveTotal && negativeMatched === 0`.
+
+Errors:
+
+- `400 Bad Request`: invalid UUID, invalid body, unknown body keys, or non-JSON content type.
+- `401 Unauthorized`: missing, invalid, or expired session.
+- `403 Forbidden`: missing CSRF header or the current user is the challenge author.
+- `404 Not Found`: challenge does not exist.
+- `409 Conflict`: current user already solved the challenge.
+- `422 Unprocessable Entity`: submitted regex is syntactically invalid or RE2-incompatible.
+
+Attempt responses never include:
+
+- `Challenge.secretPattern`
+- `ChallengeControl.value`
+- secret challenge control lists
+- `Attempt.proposedPattern`
+- `User.passwordHash`
+- `Session.sessionTokenHash`
+- raw session tokens or cookie values
+
 ## POST /api/auth/register
 
 Creates a user, creates a server-side session, sets the `rr_session` cookie, and returns the public user. This endpoint does not return the session token in JSON.
@@ -235,11 +314,8 @@ Auth responses never include:
 
 ## Future endpoints
 
-GOAL 04 adds no new public API endpoints. The safe regex engine is internal backend code only.
+The following areas are intentionally TODO after GOAL 05:
 
-The following areas are intentionally TODO after GOAL 04:
-
-- Attempt submission.
 - Leaderboard.
 - Admin or authoring workflows.
 

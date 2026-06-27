@@ -14,7 +14,7 @@
 browser -> apps/web -> apps/api -> PostgreSQL
 ```
 
-GOAL 04 exposes `GET /health`, public challenge read endpoints, and backend auth endpoints. PostgreSQL is present in Docker Compose and Prisma manages the versioned schema under `apps/api/prisma`. The regex evaluation engine is internal backend code and has no public API endpoint yet.
+GOAL 05 exposes `GET /health`, public challenge read endpoints, backend auth endpoints, and protected attempt submission. PostgreSQL is present in Docker Compose and Prisma manages the versioned schema under `apps/api/prisma`. The regex evaluation engine remains backend-only and is reachable only through authorized service logic.
 
 ## Build shape
 
@@ -41,6 +41,7 @@ GOAL 04 exposes `GET /health`, public challenge read endpoints, and backend auth
 - Public serializers live under `apps/api/src/dto`.
 - Session helpers live under `apps/api/src/auth`.
 - Regex engine helpers live under `apps/api/src/regex`.
+- Mutation guards live under `apps/api/src/security`.
 - Request parsing and validation live under `apps/api/src/validation`.
 - Shared response contracts live in `packages/shared`.
 
@@ -49,6 +50,8 @@ Challenge routes must return public DTOs only. They must not return raw Prisma c
 Auth routes must return public user DTOs only. They use opaque session cookies and store only hashed session tokens in PostgreSQL.
 
 Regex helpers must return aggregate result DTOs only. They must not return secret patterns, candidate patterns, or per-control values.
+
+Attempt submission uses a route/service/DTO split. The route handles auth, CSRF v1, route/body validation, and status mapping. The service loads secret controls with explicit Prisma `select`, evaluates the candidate through `re2-wasm`, stores `Attempt`, creates `Solution` only on success, and returns an aggregate DTO that excludes `Attempt.proposedPattern`.
 
 ## Future architecture notes
 

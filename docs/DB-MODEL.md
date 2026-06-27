@@ -16,6 +16,10 @@ Auth APIs use the existing `User` and `Session` models without a schema migratio
 
 The safe regex engine uses existing challenge, control, and attempt-shaped fields without a schema migration. It reads control values only internally and returns aggregate counts only.
 
+## GOAL 05 status
+
+Protected attempt submission uses the existing `Attempt` and `Solution` models without a schema migration. The service creates attempts only for the authenticated user, blocks authors from attempting their own challenges, blocks already solved challenge attempts, and creates one solution row when the submitted regex satisfies all positive controls and zero negative controls.
+
 ## Models
 
 ### User
@@ -56,7 +60,16 @@ Fields: `id`, `userId`, `challengeId`, `proposedPattern`, `flags`, `positiveMatc
 
 Unique constraints: `userId + challengeId + attemptNumber`.
 
-GOAL 01 stores demo attempt records only. It does not evaluate regexes.
+Field semantics:
+
+- `positiveMatched`: POSITIVE secret controls matched by the submitted regex.
+- `positiveTotal`: total POSITIVE secret controls.
+- `negativeMatched`: NEGATIVE secret controls matched by the submitted regex.
+- `negativeTotal`: total NEGATIVE secret controls.
+- `isCorrect`: `positiveMatched === positiveTotal && negativeMatched === 0`.
+- `attemptNumber`: next number for the authenticated user and challenge.
+
+`proposedPattern` is sensitive. It is stored for future private history/audit use but is not returned by the public attempt response.
 
 ### Solution
 
@@ -64,7 +77,7 @@ Fields: `id`, `userId`, `challengeId`, `attemptsUsed`, `solvedAt`.
 
 Unique constraints: `userId + challengeId`.
 
-The rule that authors cannot solve their own challenges will be enforced in service logic in a later goal.
+GOAL 05 enforces the rule that authors cannot solve their own challenges in attempt service logic. A solution is created only once for `userId + challengeId`; after that, additional attempts return `409 Conflict`.
 
 ## Enums
 
@@ -81,4 +94,4 @@ The deterministic seed creates:
 - 4 demo attempts.
 - 2 demo solutions.
 
-Seed and verify logs print counts only, not secret patterns or secret control values.
+Seed demo attempts use the official GOAL 05 `negativeMatched` semantics. Correct demo attempts have `negativeMatched = 0`. Seed and verify logs print counts only, not secret patterns or secret control values.

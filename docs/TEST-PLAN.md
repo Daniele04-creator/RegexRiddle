@@ -50,19 +50,20 @@ pnpm check
 ## GOAL 04 regex engine checks
 
 - Backend tests cover full-match behavior, no partial prefix/suffix matches, multiline full-string safety, supported flags, invalid flags, duplicate flags, invalid syntax, RE2-incompatible lookahead and backreference rejection, ReDoS-shaped pattern evaluation, aggregate candidate evaluation, and challenge control verification.
-- The regex engine has no public endpoint in GOAL 04, so no new E2E tests are added.
-- Current E2E count: 8 tests.
-- New E2E coverage for regex behavior should be added with the future attempt API or frontend workflow.
+- The regex engine had no public endpoint in GOAL 04, so no E2E tests were added in that milestone.
+
+## GOAL 05 protected attempt checks
+
+- Backend tests cover unauthenticated attempt rejection, missing CSRF rejection, wrong and correct submissions, solution row creation, already solved `409`, author `403`, invalid ID `400`, missing challenge `404`, invalid regex `422`, RE2-incompatible regex `422`, no-attempt persistence on rejected regexes, anti-leak response checks, attempt number increments, unknown body key rejection, and public challenge access without auth.
+- Semantic tests confirm `negativeMatched` means NEGATIVE controls matched by the candidate, correct candidates have `negativeMatched === 0`, too-broad candidates have `negativeMatched > 0`, and `isCorrect` uses `positiveMatched === positiveTotal && negativeMatched === 0`.
+- E2E API tests cover unauthenticated attempt rejection, demo user wrong attempt with aggregate counts only, demo user correct attempt with `solved: true`, and author self-attempt rejection.
+- Current E2E count: 12 tests.
 
 ## Final delivery target
 
 The final project must include at least 10 meaningful E2E tests. Later milestones should add tests for:
 
 - Authenticated challenge ownership/authorization.
-- Valid attempt submission.
-- Invalid attempt submission.
-- Full-match behavior.
-- Rejection of unsupported regex dialect features.
 - Leaderboard visibility.
 - IDOR prevention.
 - Deterministic seed data.

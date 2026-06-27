@@ -1,6 +1,6 @@
 # RegexRiddle
 
-RegexRiddle is a Web Technologies exam project scaffold. The repository currently includes the GOAL 04 safe regex engine: PostgreSQL, Prisma schema, deterministic demo seed data, public challenge DTOs, read-only challenge endpoints, backend auth, and an internal server-side RE2-compatible evaluator. It still has no frontend auth UI, challenge mutation API, leaderboard, or attempt submission endpoint.
+RegexRiddle is a Web Technologies exam project scaffold. The repository currently includes the GOAL 05 protected attempt submission API: PostgreSQL, Prisma schema, deterministic demo seed data, public challenge DTOs, read-only challenge endpoints, backend auth, an internal server-side RE2-compatible evaluator, and `POST /api/challenges/:id/attempts`. It still has no frontend auth UI, challenge mutation API, leaderboard, or frontend attempt UI.
 
 ## Stack
 
@@ -48,6 +48,7 @@ Useful local URLs:
 - API health: http://127.0.0.1:4000/health
 - Auth API: http://127.0.0.1:4000/api/auth/me
 - Public challenges API: http://127.0.0.1:4000/api/challenges
+- Protected attempt API: http://127.0.0.1:4000/api/challenges/{id}/attempts
 - PostgreSQL from host tools: 127.0.0.1:55432
 
 ## Docker quickstart
@@ -64,6 +65,7 @@ Docker URLs:
 - API health: http://127.0.0.1:4000/health
 - Auth API: http://127.0.0.1:4000/api/auth/me
 - Public challenges API: http://127.0.0.1:4000/api/challenges
+- Protected attempt API: http://127.0.0.1:4000/api/challenges/{id}/attempts
 - PostgreSQL from host tools: 127.0.0.1:55432
 - PostgreSQL from Compose services: `db:5432`
 
@@ -141,17 +143,42 @@ Auth endpoints:
 
 The session token is returned only as the `rr_session` cookie. API responses must not include `passwordHash`, `sessionTokenHash`, token values, or cookie values.
 
+## Attempt API smoke
+
+The backend exposes protected attempt submission. The frontend attempt UI is still out of scope.
+
+Attempt submissions require:
+
+- a valid `rr_session` cookie;
+- `Content-Type: application/json`;
+- `X-RegexRiddle-CSRF: 1`.
+
+Use a cookie jar and submit an attempt:
+
+```powershell
+curl.exe -i -c .\.tmp-auth-cookies.txt -H "Content-Type: application/json" -d '{"usernameOrEmail":"demo_player","password":"Password123!"}' http://127.0.0.1:4000/api/auth/login
+curl.exe -i -b .\.tmp-auth-cookies.txt -H "Content-Type: application/json" -H "X-RegexRiddle-CSRF: 1" -d '{"pattern":".*","flags":""}' http://127.0.0.1:4000/api/challenges/aaaaaaaa-0006-4000-8000-000000000006/attempts
+```
+
+Attempt responses return aggregate counts only:
+
+- `positiveMatched`: positive secret controls matched by the submitted regex.
+- `negativeMatched`: negative secret controls matched by the submitted regex.
+- `isCorrect`: `positiveMatched === positiveTotal && negativeMatched === 0`.
+
+Attempt responses must not include `secretPattern`, `ChallengeControl.value`, control lists, `proposedPattern`, password hashes, session hashes, token values, or cookie values.
+
 This public review repository must never contain real secrets. `.env.example` values and demo credentials are development-only placeholders.
 
 ## Safe regex engine
 
-GOAL 04 adds an internal backend regex engine based on `re2-wasm`. It is not exposed through a public attempt endpoint yet.
+GOAL 04 added an internal backend regex engine based on `re2-wasm`; GOAL 05 uses it from the protected attempt endpoint.
 
 - Evaluation happens server-side only.
 - User candidate patterns are compiled with RE2-compatible semantics, not JavaScript `RegExp`.
 - Full match uses RE2 absolute text anchors: `\A(?:pattern)\z`.
 - Supported user flags are `i` and `m`; `u` is added internally because `re2-wasm` requires Unicode mode.
-- Attempt-style evaluation returns only aggregate counts, never control values, secret patterns, or candidate patterns.
+- Attempt submission returns only aggregate counts, never control values, secret patterns, or candidate patterns.
 
 ## Scope guard
 

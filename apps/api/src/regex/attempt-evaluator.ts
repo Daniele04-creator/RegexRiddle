@@ -48,7 +48,7 @@ export function evaluateCandidateAgainstControls(
     if (control.kind === "NEGATIVE") {
       negativeTotal += 1;
 
-      if (!matched) {
+      if (matched) {
         negativeMatched += 1;
       }
     }
@@ -59,8 +59,7 @@ export function evaluateCandidateAgainstControls(
     positiveTotal,
     negativeMatched,
     negativeTotal,
-    isCorrect:
-      positiveMatched === positiveTotal && negativeMatched === negativeTotal
+    isCorrect: positiveMatched === positiveTotal && negativeMatched === 0
   };
 }
 

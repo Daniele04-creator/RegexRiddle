@@ -51,12 +51,31 @@ interface ChallengeCreateResponseBody {
   };
 }
 
+interface LeaderboardResponseBody {
+  items: Array<{
+    rank: number;
+    user: {
+      username: string;
+      displayName: string;
+    };
+    solvedCount: number;
+    averageAttempts: number;
+    totalAttemptsUsed: number;
+  }>;
+  page: number;
+  limit: number;
+  total: number;
+}
+
 const demoPlayerId = "22222222-2222-4222-8222-222222222222";
 const attemptChallengeId = "aaaaaaaa-0006-4000-8000-000000000006";
 const correctAttemptChallengeId = "aaaaaaaa-0007-4000-8000-000000000007";
 const csrfHeaderName = "X-RegexRiddle-CSRF";
 const csrfHeaderValue = "1";
 const e2eChallengeTitlePrefix = "E2E Challenge Create";
+const e2eLeaderboardUserPrefix = "e2e_lb_";
+const e2eLeaderboardChallengeTitlePrefix = "E2E Leaderboard Challenge";
+const e2eLeaderboardPasswordHash = "e2e-leaderboard-password-hash";
 
 function apiBaseUrl(): string {
   const apiPort = Number(process.env.API_PORT ?? 4000);
@@ -92,6 +111,26 @@ function expectNoSensitiveKeys(value: unknown, forbiddenValue?: string): void {
 
   if (forbiddenValue !== undefined) {
     expect(JSON.stringify(value)).not.toContain(forbiddenValue);
+  }
+}
+
+function expectNoLeaderboardSensitiveKeys(value: unknown): void {
+  const keys = collectKeys(value);
+  const forbiddenLeaderboardKeys = [
+    "id",
+    "email",
+    "secretPattern",
+    "controls",
+    "value",
+    "proposedPattern",
+    "passwordHash",
+    "sessionTokenHash",
+    "token",
+    "sessionToken"
+  ];
+
+  for (const forbiddenKey of forbiddenLeaderboardKeys) {
+    expect(keys.has(forbiddenKey)).toBe(false);
   }
 }
 
@@ -149,6 +188,50 @@ async function cleanupE2EChallengeCreateData(): Promise<void> {
   });
 }
 
+async function cleanupE2ELeaderboardData(): Promise<void> {
+  const users = await prisma.user.findMany({
+    where: { username: { startsWith: e2eLeaderboardUserPrefix } },
+    select: { id: true }
+  });
+  const userIds = users.map((user) => user.id);
+  const challenges = await prisma.challenge.findMany({
+    where: {
+      OR: [
+        { authorId: { in: userIds } },
+        { title: { startsWith: e2eLeaderboardChallengeTitlePrefix } }
+      ]
+    },
+    select: { id: true }
+  });
+  const challengeIds = challenges.map((challenge) => challenge.id);
+
+  await prisma.solution.deleteMany({
+    where: {
+      OR: [
+        { userId: { in: userIds } },
+        { challengeId: { in: challengeIds } }
+      ]
+    }
+  });
+  await prisma.attempt.deleteMany({
+    where: {
+      OR: [
+        { userId: { in: userIds } },
+        { challengeId: { in: challengeIds } }
+      ]
+    }
+  });
+  await prisma.challenge.deleteMany({
+    where: { id: { in: challengeIds } }
+  });
+  await prisma.session.deleteMany({
+    where: { userId: { in: userIds } }
+  });
+  await prisma.user.deleteMany({
+    where: { id: { in: userIds } }
+  });
+}
+
 async function loginDemoPlayer(
   request: APIRequestContext
 ): Promise<{ cookie: string; sessionToken: string }> {
@@ -190,12 +273,68 @@ function makeValidChallengeCreatePayload(suffix: string) {
   };
 }
 
+async function createE2ELeaderboardUser(suffix: string): Promise<string> {
+  const user = await prisma.user.create({
+    data: {
+      username: `${e2eLeaderboardUserPrefix}${suffix}`,
+      email: `${e2eLeaderboardUserPrefix}${suffix}@example.test`,
+      passwordHash: e2eLeaderboardPasswordHash,
+      displayName: `E2E Leaderboard ${suffix}`
+    },
+    select: { id: true }
+  });
+
+  return user.id;
+}
+
+async function seedE2ELeaderboardData(): Promise<void> {
+  const authorId = await createE2ELeaderboardUser("author");
+  const alphaId = await createE2ELeaderboardUser("alpha");
+  const betaId = await createE2ELeaderboardUser("beta");
+
+  await createE2ELeaderboardUser("zero");
+
+  const challenges = await Promise.all(
+    [1, 2, 3, 4].map((index) =>
+      prisma.challenge.create({
+        data: {
+          authorId,
+          title: `${e2eLeaderboardChallengeTitlePrefix} ${index}`,
+          description: "Challenge used only for deterministic E2E leaderboard tests.",
+          difficulty: "EASY",
+          secretPattern: String.raw`\d+`,
+          flags: "",
+          publicPositiveExample: "123",
+          publicNegativeExample: "abc"
+        },
+        select: { id: true }
+      })
+    )
+  );
+
+  const [firstChallenge, secondChallenge, thirdChallenge, fourthChallenge] =
+    challenges;
+
+  await prisma.solution.createMany({
+    data: [
+      { userId: alphaId, challengeId: firstChallenge.id, attemptsUsed: 1 },
+      { userId: alphaId, challengeId: secondChallenge.id, attemptsUsed: 2 },
+      { userId: alphaId, challengeId: thirdChallenge.id, attemptsUsed: 2 },
+      { userId: alphaId, challengeId: fourthChallenge.id, attemptsUsed: 3 },
+      { userId: betaId, challengeId: firstChallenge.id, attemptsUsed: 1 },
+      { userId: betaId, challengeId: secondChallenge.id, attemptsUsed: 1 }
+    ]
+  });
+}
+
 test.beforeEach(async () => {
+  await cleanupE2ELeaderboardData();
   await cleanupE2EChallengeCreateData();
   await cleanupE2EAttemptData();
 });
 
 test.afterAll(async () => {
+  await cleanupE2ELeaderboardData();
   await cleanupE2EChallengeCreateData();
   await cleanupE2EAttemptData();
   await prisma.$disconnect();
@@ -473,6 +612,70 @@ test("challenge creation API rejects incoherent controls without leaking secrets
   expectNoSensitiveKeys(body, payload.secretPattern);
   expectNoSensitiveKeys(body, "ABCDE");
   expectNoSensitiveKeys(body, sessionToken);
+});
+
+test("public leaderboard API returns a safe leaderboard", async ({ request }) => {
+  await seedE2ELeaderboardData();
+
+  const response = await request.get(`${apiBaseUrl()}/api/leaderboard?limit=50&page=1`);
+  const body = (await response.json()) as LeaderboardResponseBody;
+  const alpha = body.items.find(
+    (item) => item.user.username === `${e2eLeaderboardUserPrefix}alpha`
+  );
+
+  expect(response.ok()).toBe(true);
+  expect(body.page).toBe(1);
+  expect(body.limit).toBe(50);
+  expect(body.total).toBeGreaterThanOrEqual(2);
+  expect(alpha).toMatchObject({
+    user: {
+      username: `${e2eLeaderboardUserPrefix}alpha`,
+      displayName: "E2E Leaderboard alpha"
+    },
+    solvedCount: 4,
+    averageAttempts: 2,
+    totalAttemptsUsed: 8
+  });
+  expectNoLeaderboardSensitiveKeys(body);
+});
+
+test("leaderboard API supports pagination and rejects invalid query", async ({
+  request
+}) => {
+  await seedE2ELeaderboardData();
+
+  const pageResponse = await request.get(`${apiBaseUrl()}/api/leaderboard?limit=1&page=1`);
+  const pageBody = (await pageResponse.json()) as LeaderboardResponseBody;
+  const unknownQueryResponse = await request.get(
+    `${apiBaseUrl()}/api/leaderboard?include=users`
+  );
+  const invalidPageResponse = await request.get(
+    `${apiBaseUrl()}/api/leaderboard?page=0`
+  );
+
+  expect(pageResponse.ok()).toBe(true);
+  expect(pageBody.page).toBe(1);
+  expect(pageBody.limit).toBe(1);
+  expect(pageBody.items).toHaveLength(1);
+  expect(pageBody.items[0]?.rank).toBe(1);
+  expect(unknownQueryResponse.status()).toBe(400);
+  expect(invalidPageResponse.status()).toBe(400);
+});
+
+test("leaderboard API response does not leak forbidden data", async ({
+  request
+}) => {
+  await seedE2ELeaderboardData();
+
+  const response = await request.get(`${apiBaseUrl()}/api/leaderboard?limit=50&page=1`);
+  const body = await response.json();
+  const bodyText = JSON.stringify(body);
+
+  expect(response.ok()).toBe(true);
+  expectNoLeaderboardSensitiveKeys(body);
+  expect(bodyText).not.toContain("@example.test");
+  expect(bodyText).not.toContain(e2eLeaderboardPasswordHash);
+  expect(bodyText).not.toContain(String.raw`\d+`);
 });
 
 test("api health endpoint responds", async ({ request }) => {

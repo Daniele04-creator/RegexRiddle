@@ -6,6 +6,8 @@ export const API_AUTH_PATH = "/api/auth";
 
 export const API_CHALLENGES_PATH = "/api/challenges";
 
+export const API_LEADERBOARD_PATH = "/api/leaderboard";
+
 export const API_SERVICE_NAME = "regexriddle-api";
 
 export const WEB_SMOKE_TEXT = "RegexRiddle scaffold is running";
@@ -70,6 +72,26 @@ export interface ChallengeListResponseDTO {
 
 export interface ChallengeDetailDTO extends ChallengeListItemDTO {
   updatedAt: string;
+}
+
+export interface LeaderboardUserDTO {
+  username: string;
+  displayName: string;
+}
+
+export interface LeaderboardItemDTO {
+  rank: number;
+  user: LeaderboardUserDTO;
+  solvedCount: number;
+  averageAttempts: number;
+  totalAttemptsUsed: number;
+}
+
+export interface LeaderboardResponseDTO {
+  items: LeaderboardItemDTO[];
+  page: number;
+  limit: number;
+  total: number;
 }
 
 export type ChallengeControlKindDTO = "POSITIVE" | "NEGATIVE";

@@ -107,6 +107,70 @@ Public challenge responses never include:
 - `Attempt.proposedPattern`
 - user password or session hashes
 
+## GET /api/leaderboard
+
+Returns the public solver leaderboard. This endpoint is read-only and does not require authentication or CSRF.
+
+Query parameters:
+
+- `page`: optional positive integer from `1` to `1000`. Default: `1`.
+- `limit`: optional positive integer from `1` to `50`. Default: `20`.
+
+Unknown query parameters are rejected. Prisma `include`, `select`, `where`, `orderBy`, or other arbitrary query controls are not accepted from clients.
+
+Leaderboard metrics:
+
+- `solvedCount`: number of `Solution` rows for the user.
+- `averageAttempts`: arithmetic average of `Solution.attemptsUsed`, rounded to 2 decimals.
+- `totalAttemptsUsed`: sum of `Solution.attemptsUsed`.
+- Users with zero solved challenges are excluded.
+- `rank` is the 1-based global position after sorting, not a dense rank.
+
+Ranking order:
+
+1. `solvedCount` descending.
+2. `averageAttempts` ascending.
+3. `user.username` ascending.
+
+Response `200 application/json`:
+
+```json
+{
+  "items": [
+    {
+      "rank": 1,
+      "user": {
+        "username": "demo_player",
+        "displayName": "Demo Player"
+      },
+      "solvedCount": 3,
+      "averageAttempts": 1.67,
+      "totalAttemptsUsed": 5
+    }
+  ],
+  "page": 1,
+  "limit": 20,
+  "total": 1
+}
+```
+
+Errors:
+
+- `400 Bad Request`: invalid `page`, invalid `limit`, or unsupported query parameter.
+
+Leaderboard responses never include:
+
+- user ids
+- user emails
+- avatar URLs
+- `Challenge.secretPattern`
+- `ChallengeControl.value`
+- control lists
+- `Attempt.proposedPattern`
+- `User.passwordHash`
+- `Session.sessionTokenHash`
+- raw session tokens or cookie values
+
 ## POST /api/challenges
 
 Creates a challenge for the authenticated user. This endpoint is protected and state-changing. No frontend authoring UI is implemented yet.
@@ -406,10 +470,10 @@ Auth responses never include:
 
 ## Future endpoints
 
-The following areas are intentionally TODO after GOAL 06:
+The following areas are intentionally TODO after GOAL 07:
 
-- Leaderboard.
 - Challenge edit/delete workflows.
 - Frontend authoring UI.
+- Frontend leaderboard UI.
 
 Future protected routes must include authorization checks and must not expose secret regexes or secret controls.

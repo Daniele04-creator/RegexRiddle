@@ -14,7 +14,7 @@
 browser -> frontend -> backend -> PostgreSQL
 ```
 
-GOAL 06 keeps the GOAL 05.5 delivery directory layout and adds protected challenge creation. PostgreSQL is present in Docker Compose and Prisma manages the versioned schema under `backend/prisma`. The regex evaluation engine remains backend-only and is reachable only through authorized service logic.
+GOAL 07 keeps the GOAL 05.5 delivery directory layout and adds the public solver leaderboard. PostgreSQL is present in Docker Compose and Prisma manages the versioned schema under `backend/prisma`. The regex evaluation engine remains backend-only and is reachable only through authorized service logic.
 
 ## Build shape
 
@@ -54,6 +54,8 @@ Regex helpers must return aggregate result DTOs only. They must not return secre
 Attempt submission uses a route/service/DTO split. The route handles auth, CSRF v1, route/body validation, and status mapping. The service loads secret controls with explicit Prisma `select`, evaluates the candidate through `re2-wasm`, stores `Attempt`, creates `Solution` only on success, and returns an aggregate DTO that excludes `Attempt.proposedPattern`.
 
 Challenge creation uses the same route/service/DTO split. `POST /api/challenges` requires a valid `rr_session`, `Content-Type: application/json`, and `X-RegexRiddle-CSRF: 1`. The route rejects unknown body keys and mass-assignment attempts before calling the service. The service derives `authorId` only from the authenticated session user, validates the secret regex, public examples, and secret controls with the server-side RE2 full-match engine, then creates `Challenge` and `ChallengeControl` rows transactionally. The response uses the existing public challenge detail DTO and never includes `Challenge.secretPattern` or control values.
+
+Leaderboard routes are public read-only. `GET /api/leaderboard` validates only `page` and `limit`, aggregates `Solution` rows by `userId`, fetches only `User.username` and `User.displayName`, sorts by solved count descending, average attempts ascending, and username ascending, then returns a paginated public DTO. The leaderboard service does not read challenge secrets, control values, submitted patterns, password hashes, session hashes, or user emails.
 
 ## Future architecture notes
 

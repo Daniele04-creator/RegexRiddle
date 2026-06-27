@@ -1,8 +1,8 @@
 # Difesa orale
 
-## Cosa contiene GOAL 06
+## Cosa contiene GOAL 07
 
-GOAL 06 aggiunge la creazione protetta delle sfide sopra il motore regex sicuro server-side.
+GOAL 07 aggiunge la leaderboard pubblica dei solutori sopra i dati di soluzione gia' presenti.
 
 Il repository contiene:
 
@@ -23,18 +23,21 @@ Il repository contiene:
 - semantica full match con ancore assolute RE2;
 - endpoint `POST /api/challenges` protetto da sessione e CSRF guard v1;
 - endpoint `POST /api/challenges/:id/attempts` protetto da sessione e CSRF guard v1;
+- endpoint pubblico `GET /api/leaderboard`;
 - DTO pubblici per risultato tentativo con soli conteggi aggregati;
 - documentazione iniziale per architettura, sicurezza, test e piano di sviluppo.
 
-La API espone `GET /health`, due endpoint pubblici read-only sulle sfide, quattro endpoint auth backend, un endpoint protetto per creare sfide e un endpoint protetto per inviare tentativi.
+La API espone `GET /health`, due endpoint pubblici read-only sulle sfide, un endpoint pubblico per la leaderboard, quattro endpoint auth backend, un endpoint protetto per creare sfide e un endpoint protetto per inviare tentativi.
 
 La creazione sfide e' protetta: solo utenti autenticati possono creare una sfida. Il client manda regex segreta, esempi pubblici e controlli segreti, ma il backend valida tutto con RE2 full match prima di salvare. L'autore non viene preso dal body: viene preso dalla sessione `rr_session`. La risposta torna come DTO pubblico e non contiene ne' la regex segreta ne' i valori dei controlli.
+
+La leaderboard non legge i tentativi grezzi e non mostra regex. Usa la tabella `Solution`, cioe' le sfide effettivamente risolte. Per ogni utente calcolo quante sfide ha risolto e la media dei tentativi usati. Ordino prima per numero di enigmi risolti in modo decrescente, poi per media tentativi crescente. La risposta e' pubblica ma contiene solo dati aggregati e identita' pubblica, non email, password hash, token, regex segrete, controlli o pattern proposti.
 
 ## Perche' serve
 
 Il backend carica i controlli segreti, valuta la regex dell'utente con RE2 full match, salva solo conteggi aggregati e non manda mai i controlli al frontend.
 
-In GOAL 06 questi controlli devono passare: seed, verify, lint, typecheck, unit test, build ed E2E. Docker Compose avvia PostgreSQL, API e web.
+In GOAL 07 questi controlli devono passare: seed, verify, lint, typecheck, unit test, build ed E2E. Docker Compose avvia PostgreSQL, API e web.
 
 Il progetto e' un monorepo pnpm, ma per chiarezza di consegna ho separato le directory principali in backend, frontend ed e2e. Il codice condiviso resta in packages/shared. Docker Compose orchestra backend, frontend e PostgreSQL.
 
@@ -44,9 +47,9 @@ Il seed crea utenti e sfide demo ripetibili. Serve per provare il progetto e per
 
 ## Cosa non contiene ancora
 
-Non ci sono ancora frontend auth UI, creazione sfide da UI, leaderboard o UI di gioco.
+Non ci sono ancora frontend auth UI, creazione sfide da UI, UI leaderboard o UI di gioco.
 
-Questa scelta e' intenzionale: GOAL 06 aggiunge solo il workflow backend per creare sfide, senza introdurre UI o feature di classifica.
+Questa scelta e' intenzionale: GOAL 07 aggiunge solo il workflow backend per leggere la leaderboard, senza introdurre UI.
 
 ## Punto di sicurezza principale
 

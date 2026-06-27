@@ -2,7 +2,7 @@
 
 ## Current milestone
 
-GOAL 06: protected challenge creation with ownership.
+GOAL 07: public solver leaderboard.
 
 ## Implemented
 
@@ -19,6 +19,7 @@ GOAL 06: protected challenge creation with ownership.
 - Database verification script.
 - Public read-only `GET /api/challenges`.
 - Public read-only `GET /api/challenges/:id`.
+- Public read-only `GET /api/leaderboard`.
 - Backend auth `POST /api/auth/register`.
 - Backend auth `POST /api/auth/login`.
 - Backend auth `POST /api/auth/logout`.
@@ -38,6 +39,9 @@ GOAL 06: protected challenge creation with ownership.
 - Challenge creation validation for unknown keys, mass assignment, public examples, secret controls, and RE2-compatible full-match regex semantics.
 - Transactional challenge and control persistence.
 - Public challenge detail DTO response for creation without secret regexes or control values.
+- Public solver leaderboard based on `Solution` aggregates.
+- Leaderboard ranking by solved count descending, average attempts ascending, and username ascending.
+- Leaderboard public DTO response with only username, display name, rank, and aggregate solve metrics.
 - Attempt persistence with aggregate public DTO response.
 - Solution creation for correct attempts.
 - Author self-attempt block.
@@ -50,8 +54,8 @@ GOAL 06: protected challenge creation with ownership.
 - Frontend authentication UI.
 - Frontend attempt UI.
 - Frontend challenge creation UI.
+- Frontend leaderboard UI.
 - Challenge update or deletion.
-- Leaderboard.
 
 ## Verification status
 
@@ -64,22 +68,23 @@ Verified on 2026-06-27:
 - `pnpm db:verify`: PASS, 3 users, 10 challenges, 60 controls, 4 attempts, 2 solutions; no secret values printed.
 - `pnpm lint`: PASS.
 - `pnpm typecheck`: PASS.
-- `pnpm test`: PASS, shared 1 test, frontend 1 test, backend 67 tests.
+- `pnpm test`: PASS, shared 1 test, frontend 1 test, backend 79 tests.
 - `pnpm build`: PASS.
 - `docker compose up --build -d`: PASS, images `regexriddle-api:dev` and `regexriddle-web:dev` built from `backend/Dockerfile` and `frontend/Dockerfile`; db, API, and web containers started.
-- `pnpm e2e`: PASS, 17 Playwright tests.
-- `pnpm check`: PASS, includes lint, typecheck, test, build, and 17 E2E tests.
+- `pnpm e2e`: PASS, 20 Playwright tests.
+- `pnpm check`: PASS, includes lint, typecheck, test, build, and 20 E2E tests.
 - `docker compose ps`: PASS, db healthy and API/web running on the existing ports.
 - `rg -n "new RegExp|RegExp\(" backend frontend packages e2e`: PASS, no matches.
 - Sensitive-field audit: PASS, `secretPattern`, `ChallengeControl`, `proposedPattern`, `sessionTokenHash`, and `passwordHash` appear only in docs, tests, shared request contracts, or internal backend auth/service code.
-- Ownership/raw-field audit: PASS, `authorId`, `createdAt`, `updatedAt`, and `_count` appear in explicit selects, validation/tests, or the protected create service; public responses still use DTO serializers.
-- Old path audit: PASS, no obsolete `apps/api`, `apps/web`, or `apps/e2e` references remain outside ignored/generated paths.
+- Leaderboard forbidden-field audit: PASS, `email`, password/session hashes, secret fields, control fields, and submitted pattern fields do not appear in leaderboard DTO construction.
+- Query abuse audit: PASS, public routes validate accepted query parameters before service calls; leaderboard accepts only `page` and `limit`.
+- Old path audit: PASS, no obsolete nested app-directory references remain outside ignored/generated paths.
 
-Smoke challenge creation response summary:
+Smoke leaderboard response summary:
 
-- `POST /api/challenges` returned `201 Created`.
-- Response included `Location: /api/challenges/:id`.
-- The persisted `Challenge.authorId` matched the authenticated `rr_session` user.
-- The response used the public challenge detail DTO with `stats.attemptsTotal=0` and `stats.solutionsTotal=0`.
+- `GET /api/leaderboard?limit=50&page=1` returned `200 OK`.
+- The response included `page`, `limit`, `total`, and ranked items.
+- Leaderboard items included `rank`, `user.username`, `user.displayName`, `solvedCount`, `averageAttempts`, and `totalAttemptsUsed`.
+- Deterministic test data confirmed ranking by solved count descending, average attempts ascending, then username ascending.
 
-The challenge creation response and public detail response did not include `secretPattern`, `ChallengeControl.value`, `controls`, `proposedPattern`, `passwordHash`, `sessionTokenHash`, token values, or cookie values.
+The leaderboard response did not include user ids, emails, avatar URLs, `secretPattern`, `ChallengeControl.value`, `controls`, `proposedPattern`, `passwordHash`, `sessionTokenHash`, token values, or cookie values.

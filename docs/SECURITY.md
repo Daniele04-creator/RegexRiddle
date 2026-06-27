@@ -13,9 +13,9 @@
 - Use opaque server-side sessions with `HttpOnly` and `SameSite` cookies when auth is implemented.
 - Use Argon2id when passwords are implemented.
 
-## GOAL 06 security posture
+## GOAL 07 security posture
 
-GOAL 06 adds protected challenge creation. The project still has no frontend auth UI, no frontend challenge authoring UI, no uploads, and no leaderboard.
+GOAL 07 adds a public solver leaderboard. The project still has no frontend auth UI, no frontend challenge authoring UI, no frontend leaderboard UI, no uploads, and no profile/statistics page.
 
 Regex engine decisions:
 
@@ -55,6 +55,16 @@ Challenge creation endpoint decisions:
 - Successful creation creates `Challenge` and `ChallengeControl` rows transactionally.
 - Successful creation returns only the public challenge detail DTO and never returns `Challenge.secretPattern`, control lists, or `ChallengeControl.value`.
 
+Leaderboard endpoint decisions:
+
+- `GET /api/leaderboard` is public and read-only.
+- It does not require a session cookie and does not require CSRF.
+- It accepts only `page` and `limit`; arbitrary Prisma query controls are rejected.
+- It uses `Solution` aggregates for solved count, total attempts used, and average attempts used.
+- It fetches only `User.username` and `User.displayName` for public identity.
+- It never returns user ids, emails, avatar URLs, secret regexes, control values, submitted patterns, password hashes, session hashes, token values, or cookie values.
+- It does not read challenge secret fields, challenge controls, attempt proposed patterns, password hashes, or session token hashes.
+
 Authentication decisions:
 
 - Passwords are hashed with Argon2id through `argon2`.
@@ -87,7 +97,7 @@ Sensitive database fields:
 
 These fields must not be exposed through public DTOs or logs. Seed and verify scripts print counts only.
 
-Public API tests and E2E tests include anti-leak assertions for forbidden response keys including `secretPattern`, `controls`, `value`, `proposedPattern`, `passwordHash`, `sessionTokenHash`, `token`, and `sessionToken`.
+Public API tests and E2E tests include anti-leak assertions for forbidden response keys including `id`, `email`, `secretPattern`, `controls`, `value`, `proposedPattern`, `passwordHash`, `sessionTokenHash`, `token`, and `sessionToken` where those fields are forbidden by the endpoint contract.
 
 CSRF guard v1 is implemented for protected cookie-authenticated product writes. Future protected mutations must reuse or strengthen this guard before release.
 

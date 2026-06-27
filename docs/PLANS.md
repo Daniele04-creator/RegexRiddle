@@ -66,7 +66,12 @@ DONE_TECH:
 
 ## GOAL 07
 
-- Add leaderboard behavior.
+DONE_TECH:
+
+- Add public solver leaderboard API.
+- Rank solvers by solved challenge count, average attempts, then username.
+- Keep leaderboard responses aggregate-only and public-identity-only.
+- Keep frontend leaderboard UI out of scope.
 
 ## GOAL 08
 

@@ -113,6 +113,20 @@
 - Do not return `Challenge.secretPattern`, control lists, `ChallengeControl.value`, `Attempt.proposedPattern`, password hashes, session hashes, token values, or cookie values.
 - Do not add a Prisma migration because the existing schema already supports challenge creation.
 
+## GOAL 07 decisions
+
+- Add `GET /api/leaderboard` as a public read-only endpoint.
+- Keep the frontend leaderboard UI out of scope.
+- Do not require auth or CSRF because the endpoint performs no mutation and returns public aggregates only.
+- Base leaderboard rows on `Solution` aggregates rather than raw attempts.
+- Exclude users with zero solved challenges.
+- Rank by solved challenge count descending, average attempts ascending, then username ascending.
+- Use 1-based global rank after sorting and apply pagination after ranking.
+- Round `averageAttempts` to 2 decimals in the API response while sorting by the raw aggregate average.
+- Return only `username`, `displayName`, `solvedCount`, `averageAttempts`, `totalAttemptsUsed`, and `rank`.
+- Do not return user ids, emails, avatar URLs, secret regexes, control values, submitted patterns, password hashes, session hashes, token values, or cookie values.
+- Do not add a Prisma migration because the existing `Solution` table already supports leaderboard aggregates.
+
 ## Rejected for GOAL 00
 
 - Prisma schema.

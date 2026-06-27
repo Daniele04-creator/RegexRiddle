@@ -74,10 +74,17 @@ pnpm check
 - Current backend test count after GOAL 06: 67 tests.
 - Current E2E count after GOAL 06: 17 tests.
 
+## GOAL 07 public solver leaderboard checks
+
+- Backend tests cover public `GET /api/leaderboard`, unauthenticated access, no CSRF requirement, default pagination, explicit pagination after global ranking, invalid `page`, invalid `limit`, unknown query parameter rejection, exclusion of zero-solution users, solved-count ranking, average-attempt tie-breaker, username tie-breaker, 2-decimal average rounding, and anti-leak assertions.
+- E2E API tests cover public leaderboard success, pagination, invalid query rejection, and leaderboard anti-leak behavior.
+- Leaderboard response tests assert public JSON does not contain user ids, emails, avatar URLs, `secretPattern`, `controls`, `value`, `proposedPattern`, `passwordHash`, `sessionTokenHash`, token values, or cookie values.
+- Current backend test count after GOAL 07: 79 tests.
+- Current E2E count after GOAL 07: 20 tests.
+
 ## Final delivery target
 
 The final project must include at least 10 meaningful E2E tests. Later milestones should add tests for:
 
-- Leaderboard visibility.
 - IDOR prevention.
 - Deterministic seed data.

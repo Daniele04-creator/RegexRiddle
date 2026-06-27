@@ -14,6 +14,7 @@ import { prisma } from "./db/prisma.js";
 import { registerAttemptRoutes } from "./routes/attempt-routes.js";
 import { registerAuthRoutes } from "./routes/auth-routes.js";
 import { registerChallengeRoutes } from "./routes/challenge-routes.js";
+import { registerLeaderboardRoutes } from "./routes/leaderboard-routes.js";
 
 function readErrorStatusCode(error: unknown): number | null {
   if (error === null || typeof error !== "object" || !("statusCode" in error)) {
@@ -84,6 +85,7 @@ export function buildApp(options: FastifyServerOptions = {}): FastifyInstance {
   registerAuthRoutes(app);
   registerChallengeRoutes(app);
   registerAttemptRoutes(app);
+  registerLeaderboardRoutes(app);
 
   return app;
 }

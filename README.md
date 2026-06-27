@@ -1,6 +1,6 @@
 # RegexRiddle
 
-RegexRiddle is a Web Technologies exam project scaffold. The repository currently includes the GOAL 06 protected challenge creation API: PostgreSQL, Prisma schema, deterministic demo seed data, public challenge DTOs, read-only challenge endpoints, backend auth, an internal server-side RE2-compatible evaluator, `POST /api/challenges`, and `POST /api/challenges/:id/attempts`. It still has no frontend auth UI, frontend challenge creation UI, leaderboard, or frontend attempt UI.
+RegexRiddle is a Web Technologies exam project scaffold. The repository currently includes the GOAL 07 public solver leaderboard API: PostgreSQL, Prisma schema, deterministic demo seed data, public challenge DTOs, read-only challenge endpoints, public leaderboard, backend auth, an internal server-side RE2-compatible evaluator, `POST /api/challenges`, and `POST /api/challenges/:id/attempts`. It still has no frontend auth UI, frontend challenge creation UI, frontend leaderboard UI, or frontend attempt UI.
 
 ## Stack
 
@@ -60,6 +60,7 @@ Useful local URLs:
 - API health: http://127.0.0.1:4000/health
 - Auth API: http://127.0.0.1:4000/api/auth/me
 - Public challenges API: http://127.0.0.1:4000/api/challenges
+- Public leaderboard API: http://127.0.0.1:4000/api/leaderboard
 - Protected challenge creation API: http://127.0.0.1:4000/api/challenges
 - Protected attempt API: http://127.0.0.1:4000/api/challenges/{id}/attempts
 - PostgreSQL from host tools: 127.0.0.1:55432
@@ -78,6 +79,7 @@ Docker URLs:
 - API health: http://127.0.0.1:4000/health
 - Auth API: http://127.0.0.1:4000/api/auth/me
 - Public challenges API: http://127.0.0.1:4000/api/challenges
+- Public leaderboard API: http://127.0.0.1:4000/api/leaderboard
 - Protected challenge creation API: http://127.0.0.1:4000/api/challenges
 - Protected attempt API: http://127.0.0.1:4000/api/challenges/{id}/attempts
 - PostgreSQL from host tools: 127.0.0.1:55432
@@ -129,6 +131,28 @@ curl http://127.0.0.1:4000/api/challenges/aaaaaaaa-0001-4000-8000-000000000001
 ```
 
 Public challenge responses must not include `secretPattern`, `ChallengeControl.value`, or `Attempt.proposedPattern`.
+
+## Public leaderboard API smoke
+
+The backend exposes the public solver leaderboard. No frontend leaderboard UI exists yet.
+
+```powershell
+curl "http://127.0.0.1:4000/api/leaderboard?limit=20&page=1"
+```
+
+Leaderboard entries are based on `Solution` rows:
+
+- `solvedCount`: number of solved challenges for the user.
+- `averageAttempts`: arithmetic average of `Solution.attemptsUsed`, rounded to 2 decimals.
+- `totalAttemptsUsed`: sum of `Solution.attemptsUsed`.
+
+Ranking order:
+
+1. Higher `solvedCount`.
+2. Lower `averageAttempts`.
+3. `username` ascending.
+
+The endpoint is public read-only and does not require auth or CSRF. Responses expose only `username`, `displayName`, and aggregate stats. They must not include user emails, user ids, secret regexes, control values, submitted patterns, password hashes, session hashes, token values, or cookie values.
 
 ## Auth API smoke
 
@@ -205,7 +229,7 @@ This public review repository must never contain real secrets. `.env.example` va
 
 ## Safe regex engine
 
-GOAL 04 added an internal backend regex engine based on `re2-wasm`; GOAL 05 uses it from the protected attempt endpoint and GOAL 06 uses it from protected challenge creation.
+GOAL 04 added an internal backend regex engine based on `re2-wasm`; GOAL 05 uses it from the protected attempt endpoint and GOAL 06 uses it from protected challenge creation. GOAL 07 does not change regex evaluation.
 
 - Evaluation happens server-side only.
 - User candidate patterns are compiled with RE2-compatible semantics, not JavaScript `RegExp`.

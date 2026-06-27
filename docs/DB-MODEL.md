@@ -24,6 +24,10 @@ Protected attempt submission uses the existing `Attempt` and `Solution` models w
 
 Protected challenge creation uses the existing `Challenge` and `ChallengeControl` models without a schema migration. The service creates both rows transactionally, sets `authorId` from the authenticated `rr_session` user, validates public examples and secret controls with the server-side RE2 full-match engine before writing, and returns only the public challenge detail DTO.
 
+## GOAL 07 status
+
+The public solver leaderboard uses the existing `Solution` and `User` models without a schema migration. It aggregates solution rows by user, computes solved counts, total attempts used, and average attempts used, then joins only public user identity fields for the response.
+
 ## Models
 
 ### User
@@ -86,6 +90,8 @@ Fields: `id`, `userId`, `challengeId`, `attemptsUsed`, `solvedAt`.
 Unique constraints: `userId + challengeId`.
 
 GOAL 05 enforces the rule that authors cannot solve their own challenges in attempt service logic. A solution is created only once for `userId + challengeId`; after that, additional attempts return `409 Conflict`.
+
+GOAL 07 reads this table for leaderboard aggregates. Users with no `Solution` rows are excluded from the public leaderboard.
 
 ## Enums
 

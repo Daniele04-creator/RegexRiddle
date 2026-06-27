@@ -13,9 +13,22 @@
 - Use opaque server-side sessions with `HttpOnly` and `SameSite` cookies when auth is implemented.
 - Use Argon2id when passwords are implemented.
 
-## GOAL 03 security posture
+## GOAL 04 security posture
 
-GOAL 03 adds backend authentication endpoints, but still has no frontend auth UI, no challenge mutation endpoints, no uploads, no attempt submission, and no regex evaluation.
+GOAL 04 adds an internal server-side regex engine, but still has no frontend auth UI, no challenge mutation endpoints, no uploads, no public attempt submission endpoint, and no leaderboard.
+
+Regex engine decisions:
+
+- `re2-wasm` `1.0.2` provides Google's RE2 engine through WASM.
+- User-provided patterns are not evaluated with JavaScript `RegExp`.
+- Evaluation uses full-string semantics by wrapping patterns with RE2 absolute text anchors: `\A(?:pattern)\z`.
+- `^...$` is intentionally avoided because multiline mode changes those anchors.
+- Supported user flags are only `i` and `m`.
+- The internal `u` flag is always added because `re2-wasm` requires Unicode mode.
+- Duplicate, unknown, and unsupported flags are rejected.
+- RE2-incompatible features such as backreferences and lookahead assertions are rejected with controlled errors.
+- Engine functions return aggregate counts only and never return `ChallengeControl.value`, `Challenge.secretPattern`, or candidate patterns.
+- Error messages and logs must not include secret regexes, control values, submitted candidate patterns, or input strings.
 
 Authentication decisions:
 
@@ -51,7 +64,7 @@ These fields must not be exposed through public DTOs or logs. Seed and verify sc
 
 Public API tests and E2E tests include anti-leak assertions for forbidden response keys including `secretPattern`, `controls`, `value`, `proposedPattern`, `passwordHash`, `sessionTokenHash`, `token`, and `sessionToken`.
 
-CSRF is not implemented in GOAL 03 because no protected state-changing product workflows exist yet beyond auth session lifecycle. Future cookie-authenticated mutations must be reviewed for CSRF protections before release.
+CSRF is not implemented in GOAL 04 because no protected state-changing product workflows exist yet beyond auth session lifecycle. Future cookie-authenticated mutations must be reviewed for CSRF protections before release.
 
 ## Future review checklist
 

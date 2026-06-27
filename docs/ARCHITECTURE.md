@@ -14,7 +14,7 @@
 browser -> apps/web -> apps/api -> PostgreSQL
 ```
 
-GOAL 03 exposes `GET /health`, public challenge read endpoints, and backend auth endpoints. PostgreSQL is present in Docker Compose and Prisma manages the versioned schema under `apps/api/prisma`.
+GOAL 04 exposes `GET /health`, public challenge read endpoints, and backend auth endpoints. PostgreSQL is present in Docker Compose and Prisma manages the versioned schema under `apps/api/prisma`. The regex evaluation engine is internal backend code and has no public API endpoint yet.
 
 ## Build shape
 
@@ -40,12 +40,15 @@ GOAL 03 exposes `GET /health`, public challenge read endpoints, and backend auth
 - Domain read logic lives under `apps/api/src/services`.
 - Public serializers live under `apps/api/src/dto`.
 - Session helpers live under `apps/api/src/auth`.
+- Regex engine helpers live under `apps/api/src/regex`.
 - Request parsing and validation live under `apps/api/src/validation`.
 - Shared response contracts live in `packages/shared`.
 
 Challenge routes must return public DTOs only. They must not return raw Prisma challenge records.
 
 Auth routes must return public user DTOs only. They use opaque session cookies and store only hashed session tokens in PostgreSQL.
+
+Regex helpers must return aggregate result DTOs only. They must not return secret patterns, candidate patterns, or per-control values.
 
 ## Future architecture notes
 

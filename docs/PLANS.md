@@ -29,8 +29,12 @@ DONE_TECH:
 
 ## GOAL 04
 
+DONE_TECH:
+
 - Add regex engine without unsafe JavaScript regex evaluation.
 - Use full-match semantics and a RE2-compatible engine.
+- Add aggregate attempt-style evaluator for future attempt submission.
+- Add challenge control verification for future challenge creation.
 
 ## GOAL 05
 

@@ -1,6 +1,6 @@
 # RegexRiddle
 
-RegexRiddle is a Web Technologies exam project scaffold. The repository currently includes the GOAL 03 backend auth API: PostgreSQL, Prisma schema, deterministic demo seed data, public challenge DTOs, read-only challenge endpoints, Argon2id password verification, and opaque server-side sessions with `HttpOnly`/`SameSite=Lax` cookies. It still has no frontend auth UI, challenge mutation API, leaderboard, attempt submission, or regex evaluation engine.
+RegexRiddle is a Web Technologies exam project scaffold. The repository currently includes the GOAL 04 safe regex engine: PostgreSQL, Prisma schema, deterministic demo seed data, public challenge DTOs, read-only challenge endpoints, backend auth, and an internal server-side RE2-compatible evaluator. It still has no frontend auth UI, challenge mutation API, leaderboard, or attempt submission endpoint.
 
 ## Stack
 
@@ -127,7 +127,7 @@ Demo credentials:
 Use a cookie jar for local smoke tests:
 
 ```powershell
-curl.exe -i -c .\.tmp-auth-cookies.txt -H "Content-Type: application/json" -d "{\"usernameOrEmail\":\"demo_player\",\"password\":\"Password123!\"}" http://127.0.0.1:4000/api/auth/login
+curl.exe -i -c .\.tmp-auth-cookies.txt -H "Content-Type: application/json" -d '{"usernameOrEmail":"demo_player","password":"Password123!"}' http://127.0.0.1:4000/api/auth/login
 curl.exe -i -b .\.tmp-auth-cookies.txt http://127.0.0.1:4000/api/auth/me
 curl.exe -i -b .\.tmp-auth-cookies.txt -c .\.tmp-auth-cookies.txt -X POST http://127.0.0.1:4000/api/auth/logout
 ```
@@ -143,6 +143,16 @@ The session token is returned only as the `rr_session` cookie. API responses mus
 
 This public review repository must never contain real secrets. `.env.example` values and demo credentials are development-only placeholders.
 
+## Safe regex engine
+
+GOAL 04 adds an internal backend regex engine based on `re2-wasm`. It is not exposed through a public attempt endpoint yet.
+
+- Evaluation happens server-side only.
+- User candidate patterns are compiled with RE2-compatible semantics, not JavaScript `RegExp`.
+- Full match uses RE2 absolute text anchors: `\A(?:pattern)\z`.
+- Supported user flags are `i` and `m`; `u` is added internally because `re2-wasm` requires Unicode mode.
+- Attempt-style evaluation returns only aggregate counts, never control values, secret patterns, or candidate patterns.
+
 ## Scope guard
 
-This repository must not evaluate user-provided regex with JavaScript `RegExp`. Future regex evaluation must happen server-side with full-match semantics and a RE2-compatible engine.
+This repository must not evaluate user-provided regex with JavaScript `RegExp`. Regex evaluation must stay server-side with full-match semantics and a RE2-compatible engine.

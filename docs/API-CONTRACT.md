@@ -235,7 +235,9 @@ Auth responses never include:
 
 ## Future endpoints
 
-The following areas are intentionally TODO after GOAL 03:
+GOAL 04 adds no new public API endpoints. The safe regex engine is internal backend code only.
+
+The following areas are intentionally TODO after GOAL 04:
 
 - Attempt submission.
 - Leaderboard.

@@ -12,6 +12,10 @@ Public challenge APIs read from this model through explicit Prisma selects and D
 
 Auth APIs use the existing `User` and `Session` models without a schema migration. User passwords are stored only as Argon2id hashes. Sessions store only `sessionTokenHash`; the raw session token exists only in the `rr_session` cookie.
 
+## GOAL 04 status
+
+The safe regex engine uses existing challenge, control, and attempt-shaped fields without a schema migration. It reads control values only internally and returns aggregate counts only.
+
 ## Models
 
 ### User

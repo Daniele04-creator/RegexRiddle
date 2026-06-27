@@ -47,6 +47,13 @@ pnpm check
 - Auth response tests assert public JSON does not contain `passwordHash`, `sessionTokenHash`, `token`, `sessionToken`, or cookie values.
 - Current E2E count: 8 tests.
 
+## GOAL 04 regex engine checks
+
+- Backend tests cover full-match behavior, no partial prefix/suffix matches, multiline full-string safety, supported flags, invalid flags, duplicate flags, invalid syntax, RE2-incompatible lookahead and backreference rejection, ReDoS-shaped pattern evaluation, aggregate candidate evaluation, and challenge control verification.
+- The regex engine has no public endpoint in GOAL 04, so no new E2E tests are added.
+- Current E2E count: 8 tests.
+- New E2E coverage for regex behavior should be added with the future attempt API or frontend workflow.
+
 ## Final delivery target
 
 The final project must include at least 10 meaningful E2E tests. Later milestones should add tests for:

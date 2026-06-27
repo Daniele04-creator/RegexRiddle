@@ -33,7 +33,6 @@
 
 ## Security decisions
 
-- No regex evaluation exists in GOAL 03.
 - Secret regex patterns and control values are stored only in the database layer and seed source, not exposed by API endpoints or logs.
 - `pnpm db:verify` and seed logs report counts only and do not print `secretPattern` or challenge control values.
 - `.env.example` contains development-only placeholder values.
@@ -61,6 +60,18 @@
 - Enable cookie `Secure` by default in production, with `AUTH_COOKIE_SECURE=false` documented for local HTTP Docker smoke tests.
 - Keep `GET /health`, `GET /api/challenges`, and `GET /api/challenges/:id` public.
 - Tag local Compose images as `regexriddle-api:dev` and `regexriddle-web:dev`.
+
+## GOAL 04 decisions
+
+- Use `re2-wasm` `1.0.2` as the server-side RE2-compatible regex engine.
+- Keep the regex engine internal; GOAL 04 adds no attempt endpoint and no frontend evaluation.
+- Implement full match with RE2 absolute text anchors: `\A(?:pattern)\z`.
+- Avoid `^...$` for full matching because multiline mode can match individual lines.
+- Support only user flags `i` and `m`; add `u` internally for `re2-wasm`.
+- Reject duplicate, unknown, and RE2-unsupported flags/patterns with controlled errors.
+- Return only aggregate attempt counts from engine evaluation.
+- Do not return or log `secretPattern`, `ChallengeControl.value`, candidate patterns, or per-control details.
+- Treat `git grep -n "new RegExp\|RegExp(" -- . ':!node_modules' ':!dist'` as the manual security check for accidental JavaScript regex construction.
 
 ## Rejected for GOAL 00
 

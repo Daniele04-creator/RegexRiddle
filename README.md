@@ -1,6 +1,6 @@
 # RegexRiddle
 
-RegexRiddle is a Web Technologies exam project scaffold. The repository currently includes the GOAL 08.1 public read frontend UI: PostgreSQL, Prisma schema, deterministic demo seed data, public challenge DTOs, read-only challenge endpoints, public leaderboard, backend auth, an internal server-side RE2-compatible evaluator, `POST /api/challenges`, `POST /api/challenges/:id/attempts`, and React/Vite pages connected to the public catalog, challenge detail, and leaderboard APIs. It still has no real frontend auth forms, real challenge creation UI, real attempt UI, profile/statistics, or edit/delete workflows.
+RegexRiddle is a Web Technologies exam project scaffold. The repository currently includes the GOAL 08.2 frontend authentication UI: PostgreSQL, Prisma schema, deterministic demo seed data, public challenge DTOs, read-only challenge endpoints, public leaderboard, backend auth, an internal server-side RE2-compatible evaluator, `POST /api/challenges`, `POST /api/challenges/:id/attempts`, React/Vite pages connected to the public catalog, challenge detail, leaderboard APIs, and real login/register/logout UI backed by the existing auth APIs. It still has no real challenge creation UI, real attempt UI, profile/statistics, or edit/delete workflows.
 
 ## Stack
 
@@ -65,6 +65,9 @@ Useful local URLs:
 - Same-origin frontend health proxy: http://127.0.0.1:5173/health
 - Frontend public catalog: http://127.0.0.1:5173/challenges
 - Frontend public leaderboard: http://127.0.0.1:5173/leaderboard
+- Frontend login: http://127.0.0.1:5173/login
+- Frontend register: http://127.0.0.1:5173/register
+- Frontend protected create placeholder: http://127.0.0.1:5173/create
 - Protected challenge creation API: http://127.0.0.1:4000/api/challenges
 - Protected attempt API: http://127.0.0.1:4000/api/challenges/{id}/attempts
 - PostgreSQL from host tools: 127.0.0.1:55432
@@ -87,6 +90,9 @@ Docker URLs:
 - Same-origin frontend health proxy: http://127.0.0.1:5173/health
 - Frontend public catalog: http://127.0.0.1:5173/challenges
 - Frontend public leaderboard: http://127.0.0.1:5173/leaderboard
+- Frontend login: http://127.0.0.1:5173/login
+- Frontend register: http://127.0.0.1:5173/register
+- Frontend protected create placeholder: http://127.0.0.1:5173/create
 - Protected challenge creation API: http://127.0.0.1:4000/api/challenges
 - Protected attempt API: http://127.0.0.1:4000/api/challenges/{id}/attempts
 - PostgreSQL from host tools: 127.0.0.1:55432
@@ -148,7 +154,7 @@ GOAL 08.0 replaces the smoke screen with the Regex Lab SPA foundation:
 - `DESIGN.md` is the visual source of truth.
 - React Router provides public routes for `/`, `/challenges`, `/challenges/:id`, `/leaderboard`, `/login`, `/register`, `/create`, and fallback `404`.
 - TanStack Query is configured for server state.
-- React Hook Form, Zod, and `@hookform/resolvers` are installed for later form goals.
+- React Hook Form, Zod, and `@hookform/resolvers` support the auth forms.
 - Motion for React uses the current `motion` package for subtle UI motion.
 - The frontend API client uses same-origin relative paths and always sends `credentials: "include"`.
 - Vite dev server proxies `/api/*` and `/health` to the backend.
@@ -164,7 +170,15 @@ TanStack Query owns this server state. Browser calls use same-origin relative AP
 
 The public UI shows only public examples, public author identity, public solver identity, and aggregate stats. It does not show secret regexes, hidden controls, submitted patterns, emails, user ids, password/session hashes, raw tokens, or cookie values.
 
-The frontend placeholders are intentionally non-functional for product writes. They do not implement real login, registration, attempt submission, or challenge creation.
+GOAL 08.2 connects the frontend authentication experience:
+
+- `/login` posts to `POST /api/auth/login`.
+- `/register` posts to `POST /api/auth/register`.
+- The header and mobile nav restore the current session through `GET /api/auth/me`.
+- Logout posts to `POST /api/auth/logout` and clears the TanStack Query current-user state.
+- `/create` is auth-aware: guests see a login-required card, authenticated users see the protected GOAL 08.4 placeholder.
+
+Auth uses the existing opaque server-side session model. The backend sets `rr_session` as an `HttpOnly`/`SameSite=Lax` cookie. The frontend never reads `document.cookie`, never stores auth tokens in `localStorage` or `sessionStorage`, and treats `/api/auth/me` as the source of truth for the current user. Attempt submission UI and challenge creation UI are still intentionally not implemented.
 
 ## Public leaderboard
 
@@ -188,9 +202,9 @@ Ranking order:
 
 The endpoint and frontend page are public read-only and do not require auth or CSRF. Responses and UI expose only `username`, `displayName`, and aggregate stats. They must not include user emails, user ids, secret regexes, control values, submitted patterns, password hashes, session hashes, token values, or cookie values.
 
-## Auth API smoke
+## Auth UI and API smoke
 
-The backend exposes auth endpoints only; no frontend auth UI exists yet.
+The backend exposes auth endpoints and the frontend now provides login, registration, logout, and session restoration UI.
 
 Demo credentials:
 
@@ -214,6 +228,8 @@ Auth endpoints:
 - `GET /api/auth/me`
 
 The session token is returned only as the `rr_session` cookie. API responses must not include `passwordHash`, `sessionTokenHash`, token values, or cookie values.
+
+Frontend auth requests use same-origin relative paths and `credentials: "include"` through the shared API client. The UI never logs passwords, never puts credentials in URLs, and never persists token material outside the browser-managed HttpOnly cookie.
 
 ## Challenge creation API smoke
 
@@ -265,7 +281,7 @@ The frontend must not store auth tokens in `localStorage` or `sessionStorage`, m
 
 ## Safe regex engine
 
-GOAL 04 added an internal backend regex engine based on `re2-wasm`; GOAL 05 uses it from the protected attempt endpoint and GOAL 06 uses it from protected challenge creation. GOAL 07, GOAL 08.0, and GOAL 08.1 do not change regex evaluation.
+GOAL 04 added an internal backend regex engine based on `re2-wasm`; GOAL 05 uses it from the protected attempt endpoint and GOAL 06 uses it from protected challenge creation. GOAL 07, GOAL 08.0, GOAL 08.1, and GOAL 08.2 do not change regex evaluation.
 
 - Evaluation happens server-side only.
 - User candidate patterns are compiled with RE2-compatible semantics, not JavaScript `RegExp`.

@@ -9,6 +9,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { renderRoute } from "@/test/render";
+import { mockAppFetch } from "@/test/mockFetch";
 
 const challengeApiMocks = vi.hoisted(() => ({
   getChallengeDetail: vi.fn(),
@@ -23,20 +24,7 @@ vi.mock("@/features/challenges/api", () => challengeApiMocks);
 vi.mock("@/features/leaderboard/api", () => leaderboardApiMocks);
 
 function mockHealthFetch() {
-  vi.stubGlobal(
-    "fetch",
-    vi.fn(async () =>
-      new Response(
-        JSON.stringify({
-          status: "ok",
-          service: "regexriddle-api",
-          appName: "RegexRiddle",
-          environment: "test"
-        }),
-        { headers: { "content-type": "application/json" }, status: 200 }
-      )
-    )
-  );
+  mockAppFetch();
 }
 
 function makeChallenge(

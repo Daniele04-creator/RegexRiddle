@@ -2,27 +2,11 @@ import { screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { renderRoute } from "@/test/render";
-
-function mockHealthFetch() {
-  vi.stubGlobal(
-    "fetch",
-    vi.fn(async () =>
-      new Response(
-        JSON.stringify({
-          status: "ok",
-          service: "regexriddle-api",
-          appName: "RegexRiddle",
-          environment: "test"
-        }),
-        { headers: { "content-type": "application/json" }, status: 200 }
-      )
-    )
-  );
-}
+import { mockAppFetch } from "@/test/mockFetch";
 
 describe("app routing foundation", () => {
   beforeEach(() => {
-    mockHealthFetch();
+    mockAppFetch();
   });
 
   afterEach(() => {
@@ -41,7 +25,7 @@ describe("app routing foundation", () => {
     );
   });
 
-  it("exposes public navigation links", () => {
+  it("exposes public navigation and logged-out auth links", async () => {
     renderRoute("/");
 
     expect(screen.getAllByRole("link", { name: "Sfide" })[0]).toHaveAttribute(
@@ -52,13 +36,13 @@ describe("app routing foundation", () => {
       "href",
       "/leaderboard"
     );
+    expect(await screen.findByRole("link", { name: "Registrati" })).toHaveAttribute(
+      "href",
+      "/register"
+    );
     expect(screen.getAllByRole("link", { name: "Accedi" })[0]).toHaveAttribute(
       "href",
       "/login"
-    );
-    expect(screen.getAllByRole("link", { name: "Registrati" })[0]).toHaveAttribute(
-      "href",
-      "/register"
     );
   });
 

@@ -1,4 +1,4 @@
-import { ArrowRightIcon, TrophyIcon } from "lucide-react";
+import { ArrowRightIcon, LogInIcon, TrophyIcon } from "lucide-react";
 import { motion } from "motion/react";
 import { Link } from "react-router";
 
@@ -19,16 +19,16 @@ export function HeroSection() {
           <div className="mb-5 flex flex-wrap items-center gap-2">
             <HealthBadge />
             <span className="rounded-lg border bg-card px-2.5 py-1 text-xs font-medium text-muted-foreground">
-              GOAL 08.1 public read UI
+              GOAL 08.2 auth UI
             </span>
           </div>
           <h1 className="max-w-4xl text-5xl font-semibold tracking-normal text-foreground sm:text-6xl lg:text-7xl">
             RegexRiddle
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-muted-foreground sm:text-xl">
-            Regex puzzle game for Web Technologies: explore public pattern
-            riddles, inspect safe examples, and follow solver rankings without
-            exposing hidden answers.
+            Regex puzzle game for Web Technologies: explore public riddles,
+            register or login with server-side sessions, and follow solver
+            rankings without exposing hidden answers.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button asChild size="lg">
@@ -44,7 +44,10 @@ export function HeroSection() {
               </Link>
             </Button>
             <Button asChild size="lg" variant="secondary">
-              <Link to="/create">Crea una sfida · in arrivo</Link>
+              <Link to="/login">
+                <LogInIcon aria-hidden="true" data-icon="inline-start" />
+                Accedi
+              </Link>
             </Button>
           </div>
         </motion.div>

@@ -1,45 +1,41 @@
 import { LockKeyholeIcon } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { PlaceholderLayout } from "@/routes/PlaceholderLayout";
+import { PageContainer } from "@/components/layout/PageContainer";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { AuthStatusCard } from "@/features/auth/components/AuthStatusCard";
+import { LoginForm } from "@/features/auth/components/LoginForm";
+import { useCurrentUserQuery } from "@/features/auth/queries";
 
 export function LoginPage() {
+  const currentUserQuery = useCurrentUserQuery();
+
   return (
-    <PlaceholderLayout
-      badge="Auth UI later"
-      description="The future login UI will use the HttpOnly rr_session cookie issued by the backend. It will not store browser-readable auth tokens."
-      title="Login"
-    >
-      <div className="grid max-w-md gap-4">
-        <div className="grid gap-2">
-          <Label htmlFor="future-login">Username or email</Label>
-          <Input
-            autoComplete="username"
-            disabled
-            id="future-login"
-            name="usernameOrEmail"
-            placeholder="demo_player…"
-            spellCheck={false}
-          />
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="future-password">Password</Label>
-          <Input
-            autoComplete="current-password"
-            disabled
-            id="future-password"
-            name="password"
-            placeholder="Password123!…"
-            type="password"
-          />
-        </div>
-        <Button disabled>
-          <LockKeyholeIcon aria-hidden="true" data-icon="inline-start" />
-          Login UI not active yet
-        </Button>
+    <PageContainer className="py-10 sm:py-14">
+      <div className="max-w-3xl">
+        <Badge variant="secondary">Auth UI live</Badge>
+        <h1 className="mt-4 flex items-center gap-3 text-4xl font-semibold tracking-normal">
+          <LockKeyholeIcon aria-hidden="true" />
+          Login
+        </h1>
+        <p className="mt-4 text-base leading-7 text-muted-foreground">
+          Accedi con le API backend esistenti. Il frontend aggiorna la sessione
+          tramite GET /api/auth/me e non conserva token nel browser.
+        </p>
       </div>
-    </PlaceholderLayout>
+      <div className="mt-8">
+        {currentUserQuery.isLoading ? (
+          <div className="max-w-xl rounded-lg border bg-card/88 p-6" aria-busy="true">
+            <Skeleton className="h-6 w-32" />
+            <Skeleton className="mt-4 h-12 w-full" />
+            <Skeleton className="mt-3 h-12 w-full" />
+          </div>
+        ) : currentUserQuery.data ? (
+          <AuthStatusCard mode="login" user={currentUserQuery.data} />
+        ) : (
+          <LoginForm />
+        )}
+      </div>
+    </PageContainer>
   );
 }

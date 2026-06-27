@@ -68,15 +68,18 @@ Leaderboard routes are public read-only. `GET /api/leaderboard` validates only `
 - `frontend/src/features/health`: optional health query using TanStack Query.
 - `frontend/src/features/challenges`: public challenge catalog/detail API functions, query hooks, cards, examples, stats, difficulty badges, and pagination controls.
 - `frontend/src/features/leaderboard`: public leaderboard API function, query hook, desktop table, and mobile stacked list.
+- `frontend/src/features/auth`: auth API functions, current-user query, login/register/logout mutations, Zod schemas, forms, session menu, and protected-placeholder UI.
 - `frontend/src/lib`: API client, CSRF helper, route metadata, and class merge utility.
-- `frontend/src/routes`: public SPA routes, public read-only data pages, and safe placeholders for future write/auth workflows.
+- `frontend/src/routes`: public SPA routes, public read-only data pages, real auth pages, and safe placeholders for future write workflows.
 - `frontend/src/styles/globals.css`: Tailwind v4 import, shadcn theme variables, Regex Lab tokens, focus, reduced-motion, and touch defaults.
 
 The frontend API client accepts same-origin paths only, sends `credentials: "include"`, supports JSON responses, and has a small CSRF header helper for future protected mutations. It does not read cookies and does not use browser storage for auth.
 
 GOAL 08.1 routes connect public read-only data only. `/challenges` fetches `GET /api/challenges`, `/challenges/:id` fetches `GET /api/challenges/:id`, and `/leaderboard` fetches `GET /api/leaderboard` through TanStack Query and the same-origin API client.
 
-The frontend still does not fetch or render attempt data, auth forms, challenge creation workflows, user emails, user ids, hidden challenge controls, secret regexes, or submitted candidate patterns.
+GOAL 08.2 routes connect auth UI only. `/login` calls `POST /api/auth/login`, `/register` calls `POST /api/auth/register`, logout calls `POST /api/auth/logout`, and the app shell restores session state through `GET /api/auth/me`. TanStack Query stores only the public user DTO in memory. The browser-managed `rr_session` cookie remains HttpOnly; the frontend does not read `document.cookie` and does not store token material in `localStorage` or `sessionStorage`.
+
+The frontend still does not fetch or render attempt data, challenge creation form workflows, user ids, hidden challenge controls, secret regexes, submitted candidate patterns, password hashes, session hashes, raw tokens, or cookie values. Header and mobile navigation display public `displayName` and `username` only, not email.
 
 ## Future architecture notes
 

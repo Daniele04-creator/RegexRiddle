@@ -158,6 +158,20 @@
 - Do not render emails, user ids, secret regexes, hidden controls, submitted patterns, password/session hashes, raw tokens, or cookie values.
 - Keep login/register forms, logout UI, attempt submission UI, challenge creation UI, profile/statistics, and edit/delete out of scope.
 
+## GOAL 08.2 decisions
+
+- Connect only frontend auth UI to existing backend auth APIs; do not change backend behavior, database schema, auth/session/cookie semantics, CSRF rules, challenge APIs, attempt APIs, regex semantics, or regex engine.
+- Use the existing same-origin API client for `POST /api/auth/register`, `POST /api/auth/login`, `POST /api/auth/logout`, and `GET /api/auth/me`.
+- Treat `GET /api/auth/me` as the current-user source of truth; `401 Unauthorized` maps to guest state in the frontend.
+- Use TanStack Query for the current public user DTO and auth mutations; keep auth state in memory only.
+- Do not introduce JWT, local token storage, session token storage, `document.cookie` auth reads, or custom browser token stores.
+- Use React Hook Form and Zod for login/register validation; client validation improves UX but the backend remains authoritative.
+- Keep `confirmPassword` frontend-only and never send it to `POST /api/auth/register`.
+- Show generic credential errors and duplicate-account errors without revealing which credential field failed.
+- Header and mobile navigation show login/register for guests and display name, username, create link, and logout for authenticated users.
+- `/create` is auth-aware but remains a protected placeholder; no challenge creation form, secret pattern field, or control fields are introduced.
+- Keep attempt submission UI, profile/statistics, challenge edit/delete, and frontend regex evaluation out of scope.
+
 ## Rejected for GOAL 00
 
 - Prisma schema.

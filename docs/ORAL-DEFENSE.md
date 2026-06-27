@@ -1,5 +1,21 @@
 # Difesa orale
 
+## Cosa contiene GOAL 08.2
+
+Nel GOAL 08.2 ho collegato il frontend alle API di autenticazione gia' presenti. Login e registrazione non ricevono token JSON: il backend imposta un cookie HttpOnly chiamato `rr_session`. Il frontend non legge il cookie e non salva token in localStorage o sessionStorage. Per sapere se l'utente e' autenticato chiama GET /api/auth/me con credentials include. TanStack Query mantiene lo stato utente in memoria e lo aggiorna dopo login, registrazione e logout.
+
+GOAL 08.2 aggiunge:
+
+- form reale `/login` collegato a `POST /api/auth/login`;
+- form reale `/register` collegato a `POST /api/auth/register`;
+- logout collegato a `POST /api/auth/logout`;
+- ripristino sessione tramite `GET /api/auth/me`;
+- header e menu mobile con stato guest/autenticato;
+- placeholder `/create` protetto: guest vede richiesta login, utente autenticato vede il placeholder GOAL 08.4;
+- test frontend e E2E per login, logout, registrazione, conflitto, anti-leak, storage e placeholder protetto.
+
+Non aggiunge invio tentativi, creazione sfide da UI, profilo, statistiche, edit/delete, JWT, storage token nel browser o valutazione regex nel frontend.
+
 ## Cosa contiene GOAL 08.1
 
 Nel GOAL 08.1 ho collegato le pagine pubbliche della SPA alle API gia' presenti. Il catalogo legge GET /api/challenges, il dettaglio legge GET /api/challenges/:id e la classifica legge GET /api/leaderboard. Uso TanStack Query perche' questi dati sono server state: vengono caricati, messi in cache e aggiornati senza gestire stato manuale complesso. La UI mostra solo dati pubblici: esempi pubblici, autore pubblico e statistiche aggregate. Regex segreta, controlli nascosti e pattern proposti non arrivano mai nel frontend e non vengono renderizzati.
@@ -85,9 +101,9 @@ Il seed crea utenti e sfide demo ripetibili. Serve per provare il progetto e per
 
 ## Cosa non contiene ancora
 
-Non ci sono ancora frontend auth UI, creazione sfide da UI, UI leaderboard o UI di gioco.
+Non ci sono ancora creazione sfide da UI, UI di gioco per inviare tentativi, profilo/statistiche o edit/delete.
 
-Questa scelta e' intenzionale: GOAL 07 aggiunge solo il workflow backend per leggere la leaderboard, senza introdurre UI.
+Questa scelta e' intenzionale: GOAL 08.2 chiude solo l'esperienza di autenticazione frontend e lascia gameplay e authoring ai goal successivi.
 
 ## Punto di sicurezza principale
 

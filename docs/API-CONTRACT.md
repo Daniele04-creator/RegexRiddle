@@ -17,21 +17,27 @@ Response `200 application/json`:
 
 ## Frontend same-origin boundary
 
-GOAL 08.0 adds a frontend API client foundation without changing backend endpoint behavior. GOAL 08.1 uses that client for public read-only catalog, challenge detail, and leaderboard UI.
+GOAL 08.0 adds a frontend API client foundation without changing backend endpoint behavior. GOAL 08.1 uses that client for public read-only catalog, challenge detail, and leaderboard UI. GOAL 08.2 uses the same boundary for frontend login, registration, logout, and current-session restoration.
 
 Frontend rules:
 
 - Browser calls use same-origin relative paths such as `/health` and `/api/challenges`.
 - Vite dev server proxies `/api/*` and `/health` to `http://127.0.0.1:4000`.
 - Docker web server proxies `/api/*` and `/health` to `API_ORIGIN`.
-- All frontend API calls send `credentials: "include"` for future cookie-authenticated flows.
+- All frontend API calls send `credentials: "include"` for cookie-authenticated flows.
 - A CSRF header helper exists for future protected mutations: `X-RegexRiddle-CSRF: 1`.
 - GOAL 08.0 does not implement real mutation UI and does not change any backend auth, challenge, attempt, or leaderboard contract.
 - GOAL 08.1 public pages do not require auth and do not implement mutations.
+- GOAL 08.2 auth UI does not change backend auth behavior, cookie name, cookie attributes, database schema, CSRF rules, challenge APIs, attempt APIs, or regex semantics.
 - `/challenges` calls `GET /api/challenges?page=1&limit=9`.
 - `/challenges/:id` calls `GET /api/challenges/:id`.
 - `/leaderboard` calls `GET /api/leaderboard?page=1&limit=10`.
+- `/login` calls `POST /api/auth/login`.
+- `/register` calls `POST /api/auth/register`.
+- Logout calls `POST /api/auth/logout`.
+- The current user source of truth is `GET /api/auth/me`; a `401` response means guest in the frontend state.
 - Public frontend rendering must stay limited to DTO fields documented below.
+- The frontend must not read `document.cookie`, must not store auth tokens in `localStorage` or `sessionStorage`, and must not create a custom token store.
 
 ## GOAL 01 note
 
@@ -364,6 +370,13 @@ Attempt responses never include:
 
 Creates a user, creates a server-side session, sets the `rr_session` cookie, and returns the public user. This endpoint does not return the session token in JSON.
 
+Frontend consumption:
+
+- `/register` validates fields client-side for UX, but server validation remains authoritative.
+- The frontend sends `username`, `email`, `password`, and `displayName` only.
+- `confirmPassword` is frontend-only and is never sent to this endpoint.
+- A `409 Conflict` is shown as the generic user-facing message `Username o email gia in uso.`
+
 Request `application/json`:
 
 ```json
@@ -411,6 +424,12 @@ Errors:
 
 Verifies credentials with Argon2id, creates a new server-side session, sets the `rr_session` cookie, and returns the public user.
 
+Frontend consumption:
+
+- `/login` sends `usernameOrEmail` and `password` in the JSON request body only.
+- Credentials are never placed in URLs, logs, browser storage, or custom token stores.
+- A `401 Unauthorized` is shown as the generic user-facing message `Credenziali non valide.`
+
 Request `application/json`:
 
 ```json
@@ -443,6 +462,12 @@ Errors:
 
 Reads the `rr_session` cookie, deletes the matching server-side session if present, clears the cookie, and returns success even when no valid session exists.
 
+Frontend consumption:
+
+- Logout is triggered from the header/mobile session area.
+- On success the current-user TanStack Query value is set to `null`.
+- The frontend does not read the cleared cookie value.
+
 Response `200 application/json`:
 
 ```json
@@ -460,6 +485,12 @@ Set-Cookie: rr_session=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0; Expires=Thu,
 ## GET /api/auth/me
 
 Reads the `rr_session` cookie, checks for a valid non-expired server-side session, and returns the public user.
+
+Frontend consumption:
+
+- The app shell and auth pages use this endpoint to restore the current session.
+- The frontend treats `401 Unauthorized` as guest state instead of a fatal app error.
+- The header displays `displayName` and `username`, never the user's email.
 
 Response `200 application/json`:
 
@@ -488,11 +519,10 @@ Auth responses never include:
 
 ## Future endpoints
 
-The following areas are intentionally TODO after GOAL 07:
+The following areas are intentionally TODO after GOAL 08.2:
 
 - Challenge edit/delete workflows.
 - Frontend authoring UI.
-- Frontend auth UI.
 - Frontend attempt UI.
 
 Future protected routes must include authorization checks and must not expose secret regexes or secret controls.

@@ -112,6 +112,19 @@ Current E2E count after GOAL 08.0: 24 tests.
 Current frontend test count after GOAL 08.1: 20 tests.
 Current E2E count after GOAL 08.1: 30 tests.
 
+## GOAL 08.2 frontend auth UI checks
+
+- Frontend tests cover auth API functions, `GET /api/auth/me` guest handling on `401`, login/register/logout payloads, and `credentials: "include"` through the API client.
+- Frontend tests cover login required-field validation, successful login payloads, generic invalid-credential errors, and no password storage/logging behavior at the component boundary.
+- Frontend tests cover register validation for username, email, display name, password rules, mismatched confirmation, duplicate-account errors, and omission of `confirmPassword` from backend payloads.
+- Frontend route tests cover guest/authenticated header states, logout updating current-user query state, auth pages for already-authenticated users, and `/create` guest/authenticated placeholder states.
+- Source security tests assert no `dangerouslySetInnerHTML`, no production frontend `document.cookie`, no browser auth-token storage APIs, no frontend `RegExp` construction, and no raw `fetch` outside the API client boundary.
+- E2E tests cover real login form rendering, seeded demo login, session restoration through UI state, logout UI clearing, register form rendering, mismatched password validation, deterministic successful registration, duplicate account conflict, invalid login, auth-aware `/create`, public catalog/leaderboard access while logged out, rendered anti-leak checks, and storage anti-token checks after login/logout.
+- GOAL 08.2 must keep backend API, database schema, auth/session/cookie behavior, CSRF behavior, and regex semantics unchanged.
+
+Current frontend test count after GOAL 08.2: 31 tests.
+Current E2E count after GOAL 08.2: 36 tests.
+
 ## Final delivery target
 
 The final project must include at least 10 meaningful E2E tests. Later milestones should add tests for:

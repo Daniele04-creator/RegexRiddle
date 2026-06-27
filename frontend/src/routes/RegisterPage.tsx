@@ -1,46 +1,42 @@
 import { UserPlusIcon } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { PlaceholderLayout } from "@/routes/PlaceholderLayout";
+import { PageContainer } from "@/components/layout/PageContainer";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { AuthStatusCard } from "@/features/auth/components/AuthStatusCard";
+import { RegisterForm } from "@/features/auth/components/RegisterForm";
+import { useCurrentUserQuery } from "@/features/auth/queries";
 
 export function RegisterPage() {
+  const currentUserQuery = useCurrentUserQuery();
+
   return (
-    <PlaceholderLayout
-      badge="Registration UI later"
-      description="Registration endpoints exist in the backend, but this frontend milestone only prepares the accessible route and form layout primitives."
-      title="Register"
-    >
-      <div className="grid max-w-md gap-4">
-        <div className="grid gap-2">
-          <Label htmlFor="future-register-username">Username</Label>
-          <Input
-            autoComplete="username"
-            disabled
-            id="future-register-username"
-            name="username"
-            placeholder="student_demo…"
-            spellCheck={false}
-          />
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="future-register-email">Email</Label>
-          <Input
-            autoComplete="email"
-            disabled
-            id="future-register-email"
-            name="email"
-            placeholder="student@example.test…"
-            spellCheck={false}
-            type="email"
-          />
-        </div>
-        <Button disabled>
-          <UserPlusIcon aria-hidden="true" data-icon="inline-start" />
-          Register UI not active yet
-        </Button>
+    <PageContainer className="py-10 sm:py-14">
+      <div className="max-w-3xl">
+        <Badge variant="secondary">Auth UI live</Badge>
+        <h1 className="mt-4 flex items-center gap-3 text-4xl font-semibold tracking-normal">
+          <UserPlusIcon aria-hidden="true" />
+          Register
+        </h1>
+        <p className="mt-4 text-base leading-7 text-muted-foreground">
+          Registra un account con sessione server-side. Il form normalizza
+          username/email e manda solo i campi previsti dal contratto auth.
+        </p>
       </div>
-    </PlaceholderLayout>
+      <div className="mt-8">
+        {currentUserQuery.isLoading ? (
+          <div className="max-w-2xl rounded-lg border bg-card/88 p-6" aria-busy="true">
+            <Skeleton className="h-6 w-36" />
+            <Skeleton className="mt-4 h-12 w-full" />
+            <Skeleton className="mt-3 h-12 w-full" />
+            <Skeleton className="mt-3 h-12 w-3/4" />
+          </div>
+        ) : currentUserQuery.data ? (
+          <AuthStatusCard mode="register" user={currentUserQuery.data} />
+        ) : (
+          <RegisterForm />
+        )}
+      </div>
+    </PageContainer>
   );
 }

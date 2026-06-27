@@ -1,4 +1,4 @@
-import { expect, test, type APIRequestContext } from "@playwright/test";
+import { expect, test, type APIRequestContext, type Page } from "@playwright/test";
 
 import { prisma } from "../../backend/src/db/prisma.js";
 
@@ -73,6 +73,9 @@ const correctAttemptChallengeId = "aaaaaaaa-0007-4000-8000-000000000007";
 const csrfHeaderName = "X-RegexRiddle-CSRF";
 const csrfHeaderValue = "1";
 const e2eChallengeTitlePrefix = "E2E Challenge Create";
+const e2eAuthUsername = "e2e_auth_ui";
+const e2eAuthEmail = "e2e_auth_ui@example.test";
+const e2eAuthDisplayName = "E2E Auth UI";
 const e2eLeaderboardUserPrefix = "e2e_lb_";
 const e2eLeaderboardChallengeTitlePrefix = "E2E Leaderboard Challenge";
 const e2eLeaderboardPasswordHash = "e2e-leaderboard-password-hash";
@@ -81,7 +84,8 @@ const forbiddenRenderedFrontendStrings = [
   "ChallengeControl.value",
   "proposedPattern",
   "passwordHash",
-  "sessionTokenHash"
+  "sessionTokenHash",
+  "rr_session="
 ];
 
 function apiBaseUrl(): string {
@@ -147,6 +151,27 @@ async function expectNoForbiddenRenderedFrontendStrings(pageContent: string): Pr
   }
 }
 
+async function expectNoAuthStorage(page: Page): Promise<void> {
+  const storage = await page.evaluate(() => [
+    ...Object.entries(window.localStorage),
+    ...Object.entries(window.sessionStorage)
+  ]);
+  const serializedStorage = JSON.stringify(storage);
+
+  expect(serializedStorage).not.toMatch(/auth|token|session|rr_session/i);
+}
+
+async function loginDemoPlayerThroughUi(page: Page): Promise<void> {
+  await page.goto("/login");
+  await page.getByLabel("Username o email").fill("demo_player");
+  await page.getByLabel("Password").fill("Password123!");
+  await page.getByRole("button", { name: "Accedi" }).click();
+
+  await expect(page).toHaveURL(/\/challenges$/);
+  await expect(page.getByText("Demo Player").first()).toBeVisible();
+  await expect(page.getByText("@demo_player").first()).toBeVisible();
+}
+
 function readSetCookieHeader(headers: Record<string, string>): string {
   const setCookie = headers["set-cookie"];
 
@@ -198,6 +223,29 @@ async function cleanupE2EChallengeCreateData(): Promise<void> {
   });
   await prisma.challenge.deleteMany({
     where: { id: { in: challengeIds } }
+  });
+}
+
+async function cleanupE2EAuthUiData(): Promise<void> {
+  const users = await prisma.user.findMany({
+    where: {
+      OR: [{ username: e2eAuthUsername }, { email: e2eAuthEmail }]
+    },
+    select: { id: true }
+  });
+  const userIds = users.map((user) => user.id);
+
+  await prisma.session.deleteMany({
+    where: { userId: { in: userIds } }
+  });
+  await prisma.solution.deleteMany({
+    where: { userId: { in: userIds } }
+  });
+  await prisma.attempt.deleteMany({
+    where: { userId: { in: userIds } }
+  });
+  await prisma.user.deleteMany({
+    where: { id: { in: userIds } }
   });
 }
 
@@ -341,12 +389,14 @@ async function seedE2ELeaderboardData(): Promise<void> {
 }
 
 test.beforeEach(async () => {
+  await cleanupE2EAuthUiData();
   await cleanupE2ELeaderboardData();
   await cleanupE2EChallengeCreateData();
   await cleanupE2EAttemptData();
 });
 
 test.afterAll(async () => {
+  await cleanupE2EAuthUiData();
   await cleanupE2ELeaderboardData();
   await cleanupE2EChallengeCreateData();
   await cleanupE2EAttemptData();
@@ -359,7 +409,7 @@ test("web app renders the Regex Lab landing foundation", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "RegexRiddle" })).toBeVisible();
   await expect(page.getByRole("link", { name: /Esplora sfide/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /Guarda classifica/ })).toBeVisible();
-  await expect(page.getByText("GOAL 08.1 public read UI")).toBeVisible();
+  await expect(page.getByText("GOAL 08.2 auth UI")).toBeVisible();
 });
 
 test("landing CTA navigates to the public challenge catalog", async ({ page }) => {
@@ -392,9 +442,10 @@ test("desktop SPA navigation reaches public read routes", async ({ page }) => {
   await expect(page).toHaveURL(/\/register$/);
   await expect(page.getByRole("heading", { name: "Register" })).toBeVisible();
 
-  await page.getByRole("link", { name: /Crea/ }).first().click();
+  await page.goto("/create");
   await expect(page).toHaveURL(/\/create$/);
   await expect(page.getByRole("heading", { name: "Create a challenge" })).toBeVisible();
+  await expect(page.getByText("Accedi per creare una sfida")).toBeVisible();
 });
 
 test("mobile navigation opens and routes to public pages", async ({ page }) => {
@@ -407,6 +458,123 @@ test("mobile navigation opens and routes to public pages", async ({ page }) => {
   await page.getByRole("link", { exact: true, name: "Classifica" }).click();
   await expect(page).toHaveURL(/\/leaderboard$/);
   await expect(page.getByRole("heading", { name: "Classifica solver" })).toBeVisible();
+});
+
+test("mobile navigation exposes guest and authenticated auth actions", async ({
+  page
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+
+  await page.getByRole("button", { name: "Open navigation menu" }).click();
+  await expect(page.getByRole("link", { exact: true, name: "Accedi" })).toBeVisible();
+  await expect(
+    page.getByRole("link", { exact: true, name: "Registrati" })
+  ).toBeVisible();
+  await page.getByRole("link", { exact: true, name: "Accedi" }).click();
+  await page.getByLabel("Username o email").fill("demo_player");
+  await page.getByLabel("Password").fill("Password123!");
+  await page.getByRole("button", { name: "Accedi" }).click();
+
+  await expect(page).toHaveURL(/\/challenges$/);
+  await page.getByRole("button", { name: "Open navigation menu" }).click();
+  await expect(
+    page.getByRole("navigation", { name: "Mobile navigation" })
+  ).toContainText("Demo Player");
+  await expect(page.getByRole("button", { name: "Logout" })).toBeVisible();
+});
+
+test("login form rejects invalid credentials generically", async ({ page }) => {
+  await page.goto("/login");
+
+  await expect(page.getByRole("heading", { name: "Login" })).toBeVisible();
+  await expect(page.getByLabel("Username o email")).toBeVisible();
+  await expect(page.getByLabel("Password")).toHaveAttribute("type", "password");
+
+  await page.getByLabel("Username o email").fill("demo_player");
+  await page.getByLabel("Password").fill("WrongPassword123!");
+  await page.getByRole("button", { name: "Accedi" }).click();
+
+  await expect(page.getByText("Credenziali non valide.")).toBeVisible();
+  await expect(page.getByText("Invalid credentials.")).toHaveCount(0);
+  await expectNoForbiddenRenderedFrontendStrings(await page.content());
+});
+
+test("login restores current session in UI and logout clears it", async ({
+  page
+}) => {
+  await loginDemoPlayerThroughUi(page);
+  await expectNoAuthStorage(page);
+  await expectNoForbiddenRenderedFrontendStrings(await page.content());
+
+  await page.getByRole("button", { name: "Logout" }).click();
+
+  await expect(page.getByRole("link", { exact: true, name: "Accedi" })).toBeVisible();
+  await expect(page.getByText("Demo Player")).toHaveCount(0);
+  await expectNoAuthStorage(page);
+});
+
+test("registration validates passwords and logs in a new deterministic user", async ({
+  page
+}) => {
+  await page.goto("/register");
+
+  await expect(page.getByRole("heading", { name: "Register" })).toBeVisible();
+  await page.getByLabel("Username").fill(e2eAuthUsername);
+  await page.getByLabel("Email").fill(e2eAuthEmail);
+  await page.getByLabel("Nome visibile").fill(e2eAuthDisplayName);
+  await page.getByLabel("Password", { exact: true }).fill("Password123!");
+  await page.getByLabel("Conferma password").fill("Password124!");
+  await page.getByRole("button", { name: "Registrati" }).click();
+
+  await expect(page.getByText("Le password non coincidono.")).toBeVisible();
+  await expect(page).toHaveURL(/\/register$/);
+
+  await page.getByLabel("Conferma password").fill("Password123!");
+  await page.getByRole("button", { name: "Registrati" }).click();
+
+  await expect(page).toHaveURL(/\/challenges$/);
+  await expect(page.getByText(e2eAuthDisplayName).first()).toBeVisible();
+  await expect(page.getByText(`@${e2eAuthUsername}`).first()).toBeVisible();
+  await expectNoAuthStorage(page);
+  await expectNoForbiddenRenderedFrontendStrings(await page.content());
+});
+
+test("registration conflict shows a friendly error", async ({ page }) => {
+  await page.goto("/register");
+  await page.getByLabel("Username").fill("demo_player");
+  await page.getByLabel("Email").fill("demo_player@example.test");
+  await page.getByLabel("Nome visibile").fill("Duplicate Demo Player");
+  await page.getByLabel("Password", { exact: true }).fill("Password123!");
+  await page.getByLabel("Conferma password").fill("Password123!");
+  await page.getByRole("button", { name: "Registrati" }).click();
+
+  await expect(page.getByText("Username o email gia in uso.")).toBeVisible();
+  await expect(page.getByText("Username or email already exists.")).toHaveCount(0);
+  await expectNoForbiddenRenderedFrontendStrings(await page.content());
+});
+
+test("create route is auth-aware without rendering a challenge creation form", async ({
+  page
+}) => {
+  await page.goto("/create");
+
+  await expect(page.getByText("Accedi per creare una sfida")).toBeVisible();
+  await expect(page.getByText("Creazione sfida in arrivo nel GOAL 08.4.")).toHaveCount(
+    0
+  );
+  await expectNoForbiddenRenderedFrontendStrings(await page.content());
+
+  await loginDemoPlayerThroughUi(page);
+  await page.goto("/create");
+
+  await expect(
+    page.getByText("Creazione sfida in arrivo nel GOAL 08.4.")
+  ).toBeVisible();
+  await expect(page.getByText("Demo Player").first()).toBeVisible();
+  await expect(page.getByLabel("Secret pattern")).toHaveCount(0);
+  await expect(page.getByRole("textbox", { name: /Pattern/ })).toHaveCount(0);
+  await expectNoForbiddenRenderedFrontendStrings(await page.content());
 });
 
 test("public challenge catalog renders API cards with public examples and stats", async ({
@@ -513,22 +681,20 @@ test("rendered frontend shell does not leak sensitive field names or auth tokens
     "/",
     "/challenges",
     "/challenges/aaaaaaaa-0010-4000-8000-000000000010",
-    "/leaderboard"
+    "/leaderboard",
+    "/login",
+    "/register",
+    "/create"
   ]) {
     await page.goto(path);
     await expectNoForbiddenRenderedFrontendStrings(await page.content());
   }
 
-  const storageKeys = await page.evaluate(() => ({
-    localStorageKeys: Object.keys(window.localStorage),
-    sessionStorageKeys: Object.keys(window.sessionStorage)
-  }));
-  const joinedKeys = [
-    ...storageKeys.localStorageKeys,
-    ...storageKeys.sessionStorageKeys
-  ].join(" ");
-
-  expect(joinedKeys).not.toMatch(/auth|token|session|rr_session/i);
+  await expectNoAuthStorage(page);
+  await loginDemoPlayerThroughUi(page);
+  await expectNoAuthStorage(page);
+  await page.getByRole("button", { name: "Logout" }).click();
+  await expectNoAuthStorage(page);
 });
 
 test("attempt API rejects unauthenticated submissions", async ({ request }) => {

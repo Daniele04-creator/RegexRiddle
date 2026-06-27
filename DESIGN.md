@@ -63,7 +63,7 @@ Headings use balanced wrapping. Body copy should stay short, active, and product
 
 - Semantic `header`, `nav`, `main`, and `footer`.
 - Skip link targets `#main-content`.
-- Public navigation includes home, challenges, leaderboard, login, register, and create.
+- Public navigation includes home, challenges, and leaderboard. Auth actions live in the session area as login/register links for guests and display name, username, create link, and logout for authenticated users.
 - Mobile navigation uses shadcn `Sheet` and must not trap keyboard users after close.
 
 ### Buttons
@@ -72,6 +72,7 @@ Headings use balanced wrapping. Body copy should stay short, active, and product
 - Navigation actions use `Link` inside `Button asChild`.
 - Icon-only buttons require an accessible name.
 - Icons paired with text are decorative and use `aria-hidden`.
+- Mobile buttons and inputs should use larger tap targets, then compact back to the dense desktop rhythm at tablet/desktop breakpoints.
 
 ### Cards
 
@@ -94,9 +95,10 @@ Headings use balanced wrapping. Body copy should stay short, active, and product
 
 ### Forms
 
-- GOAL 08.0 forms are disabled placeholders only.
-- Inputs still need labels, names, autocomplete, and realistic examples.
-- Future real forms should use React Hook Form, Zod, and inline errors.
+- Auth forms use React Hook Form, Zod, shadcn field composition, explicit labels, autocomplete, field-level errors, and form-level alerts.
+- Password fields use `type="password"` and must not render password values outside the input.
+- Submit buttons show pending states and remain keyboard-submittable.
+- Server errors are generic and user-facing; they must not expose backend internals or credential details.
 
 ### Pattern Chips
 
@@ -148,3 +150,9 @@ It does not ship real login/register forms, attempt UI, challenge creation UI, c
 GOAL 08.1 connects public read-only data views for `/challenges`, `/challenges/:id`, and `/leaderboard`.
 
 It still does not ship real login/register forms, logout UI, attempt submission UI, challenge creation UI, profile/statistics, edit/delete, or frontend regex evaluation.
+
+## GOAL 08.2 Scope
+
+GOAL 08.2 connects login, registration, logout, current-session restoration, authenticated header/mobile nav states, and the auth-aware `/create` placeholder.
+
+It still does not ship attempt submission UI, challenge creation form UI, profile/statistics, edit/delete, or frontend regex evaluation.

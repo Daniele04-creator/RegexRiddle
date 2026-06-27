@@ -13,9 +13,9 @@
 - Use opaque server-side sessions with `HttpOnly` and `SameSite` cookies when auth is implemented.
 - Use Argon2id when passwords are implemented.
 
-## GOAL 08.1 security posture
+## GOAL 08.2 security posture
 
-GOAL 08.1 connects public read-only frontend pages to existing public APIs. The project still has no real frontend auth forms, no frontend challenge authoring workflow, no frontend attempt UI, no uploads, no profile/statistics page, and no challenge edit/delete UI.
+GOAL 08.2 connects frontend login, registration, logout, and current-session restoration to existing backend auth APIs. The project still has no frontend challenge authoring workflow, no frontend attempt UI, no uploads, no profile/statistics page, and no challenge edit/delete UI.
 
 Regex engine decisions:
 
@@ -68,7 +68,7 @@ Leaderboard endpoint decisions:
 Frontend foundation decisions:
 
 - The frontend uses same-origin relative API paths.
-- The frontend API client always sends `credentials: "include"` so cookie auth can work without browser-readable tokens.
+- The frontend API client always sends `credentials: "include"` so cookie auth works without browser-readable tokens.
 - Vite dev server proxies `/api/*` and `/health` to the backend.
 - Docker web server proxies `/api/*` and `/health` to `API_ORIGIN`.
 - The frontend does not store auth tokens in `localStorage` or `sessionStorage`.
@@ -76,8 +76,8 @@ Frontend foundation decisions:
 - The frontend does not introduce JWT.
 - The frontend does not evaluate user regex with JavaScript `RegExp`.
 - The frontend does not use `dangerouslySetInnerHTML`.
-- Placeholder pages avoid rendering sensitive field names in the DOM.
-- Disabled placeholder forms are clearly marked as not active and do not submit data.
+- Auth pages avoid rendering sensitive field names or token/cookie values in the DOM.
+- The `/create` placeholder is auth-aware but still does not submit challenge creation data.
 
 Frontend public-read decisions:
 
@@ -89,6 +89,20 @@ Frontend public-read decisions:
 - Leaderboard UI renders only public display name, username, rank, solved count, average attempts, and total attempts used.
 - Leaderboard UI does not render user ids, emails, avatar URLs, password hashes, session hashes, raw tokens, or cookie values.
 - Public UI does not render secret regexes, hidden controls, or submitted candidate patterns.
+
+Frontend auth UI decisions:
+
+- `/login` sends only `usernameOrEmail` and `password` to `POST /api/auth/login`.
+- `/register` sends only `username`, `email`, `password`, and `displayName` to `POST /api/auth/register`.
+- `confirmPassword` exists only for frontend validation and is not sent to the backend.
+- Logout calls `POST /api/auth/logout` and clears the in-memory current-user query state.
+- Session restoration calls `GET /api/auth/me`; `401 Unauthorized` is treated as guest state.
+- Header and mobile navigation display `displayName` and `username` only. Email is not shown in the shell.
+- Login failures show a generic message and do not reveal whether username/email or password failed.
+- Duplicate registration failures show a generic username/email conflict message.
+- Passwords are never logged, never placed in URLs, and never persisted outside the password input and request body.
+- The frontend does not read raw cookies, does not expose raw cookie values, and does not expose session tokens.
+- The auth UI does not render `User.passwordHash`, `Session.sessionTokenHash`, raw tokens, or cookie values.
 
 Authentication decisions:
 
@@ -123,6 +137,8 @@ Sensitive database fields:
 These fields must not be exposed through public DTOs or logs. Seed and verify scripts print counts only.
 
 Public API tests and E2E tests include anti-leak assertions for forbidden response keys including `id`, `email`, `secretPattern`, `controls`, `value`, `proposedPattern`, `passwordHash`, `sessionTokenHash`, `token`, and `sessionToken` where those fields are forbidden by the endpoint contract.
+
+Frontend auth tests and E2E tests include anti-leak assertions for rendered sensitive strings, no browser auth-token storage, no `document.cookie` auth access in production frontend source, and no frontend JavaScript `RegExp` evaluation for user regex.
 
 CSRF guard v1 is implemented for protected cookie-authenticated product writes. Future protected mutations must reuse or strengthen this guard before release.
 

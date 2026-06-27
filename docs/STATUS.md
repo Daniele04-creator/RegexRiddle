@@ -2,7 +2,7 @@
 
 ## Current milestone
 
-GOAL 08.1: public challenge catalog, challenge detail, and leaderboard UI.
+GOAL 08.2: frontend authentication UI with HttpOnly session.
 
 ## Implemented
 
@@ -60,7 +60,11 @@ GOAL 08.1: public challenge catalog, challenge detail, and leaderboard UI.
 - Vite dev proxy for `/api/*` and `/health`.
 - Docker frontend server proxy for `/api/*` and `/health` through `API_ORIGIN`.
 - Compose web service sets `API_ORIGIN=http://api:4000`.
-- Disabled, clearly marked placeholder pages for future auth, registration, and challenge creation UI.
+- Real frontend login and registration pages using existing auth APIs.
+- Header and mobile nav guest/authenticated states.
+- Frontend logout action.
+- Current-session restoration through `GET /api/auth/me`.
+- Auth-aware `/create` placeholder for guest and authenticated users.
 - Frontend tests for routing, API client credentials, CSRF helper, source security baseline, and reduced-motion CSS.
 - Public `/challenges` frontend page connected to `GET /api/challenges?page=1&limit=9`.
 - Public `/challenges/:id` frontend page connected to `GET /api/challenges/:id`.
@@ -71,10 +75,10 @@ GOAL 08.1: public challenge catalog, challenge detail, and leaderboard UI.
 - Public leaderboard UI showing rank, display name, username, solved count, average attempts, and total attempts used.
 - Leaderboard desktop/tablet table and mobile stacked layout.
 - Catalog and leaderboard URL pagination.
+- Auth feature folder with typed API functions, TanStack Query hooks, Zod schemas, form components, session menu, and protected-placeholder component.
 
 ## Not implemented
 
-- Real frontend authentication forms.
 - Frontend attempt UI.
 - Real frontend challenge creation UI.
 - Challenge update or deletion.
@@ -142,3 +146,22 @@ Verified on 2026-06-27 after GOAL 08.1 implementation:
 - `docker compose ps`: PASS, db healthy and API/web running on the existing ports.
 - Visual viewport verification: PASS for desktop `1440x900`, tablet `768x1024`, mobile `390x844`, and mobile nav; no horizontal overflow detected.
 - Source security audit: PASS, no production frontend `dangerouslySetInnerHTML`, browser-readable auth-token storage APIs, JavaScript `RegExp` construction, or raw `fetch` outside the API client boundary.
+
+Verified on 2026-06-27 after GOAL 08.2 implementation:
+
+- `docker compose up -d db`: PASS.
+- `pnpm db:seed`: PASS, 3 users, 10 challenges, 60 controls, 4 attempts, 2 solutions.
+- `pnpm db:verify`: PASS, 3 users, 10 challenges, 60 controls, 4 attempts, 2 solutions; no secret values printed.
+- `pnpm lint`: PASS with two non-blocking Fast Refresh warnings in generated shadcn `button` and `badge` files.
+- `pnpm typecheck`: PASS.
+- `pnpm test`: PASS, shared 1 test, backend 79 tests, frontend 31 tests.
+- `pnpm build`: PASS, with the existing non-blocking Vite chunk-size warning.
+- `docker compose up --build -d`: PASS, images `regexriddle-api:dev` and `regexriddle-web:dev` rebuilt; db, API, and web containers started.
+- `pnpm e2e`: PASS, 36 Playwright tests.
+- `pnpm check`: PASS, includes lint, typecheck, test, build, and 36 E2E tests.
+- `pnpm audit --audit-level=high`: PASS at the high threshold; one moderate advisory remains in tooling dependencies.
+- `git diff --check`: PASS.
+- `docker compose ps`: PASS, db healthy and API/web running on the expected ports.
+- Visual viewport verification: PASS for desktop `1440x900`, tablet `768x1024`, mobile `390x844`, logged-out nav, logged-in nav, login, register, and create placeholder; no horizontal overflow or sensitive text detected.
+- Web Interface Guidelines audit: PASS after adjusting auth form placeholders/loading ellipses and mobile tap target sizing.
+- Source security audit: PASS, no production frontend `dangerouslySetInnerHTML`, `document.cookie`, browser auth-token storage APIs, JavaScript `RegExp` construction, sensitive auth/challenge fields, `console.*`, or obsolete `apps/*` path references.

@@ -1,8 +1,9 @@
-import { MenuIcon, PlusIcon } from "lucide-react";
+import { MenuIcon } from "lucide-react";
 import { useState } from "react";
-import { Link, NavLink } from "react-router";
+import { NavLink } from "react-router";
 
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import {
   Sheet,
   SheetClose,
@@ -12,6 +13,7 @@ import {
   SheetTitle,
   SheetTrigger
 } from "@/components/ui/sheet";
+import { UserMenu } from "@/features/auth/components/UserMenu";
 import { publicNavItems } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
@@ -49,14 +51,8 @@ export function MobileNav() {
               </NavLink>
             </SheetClose>
           ))}
-          <SheetClose asChild>
-            <Button asChild className="mt-2 justify-start">
-              <Link to="/create">
-                <PlusIcon aria-hidden="true" data-icon="inline-start" />
-                Crea · in arrivo
-              </Link>
-            </Button>
-          </SheetClose>
+          <Separator className="my-2" />
+          <UserMenu onNavigate={() => setOpen(false)} orientation="mobile" />
         </nav>
       </SheetContent>
     </Sheet>

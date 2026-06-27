@@ -91,9 +91,29 @@ DONE_TECH:
 - Connect public challenge detail UI to `GET /api/challenges/:id`.
 - Keep auth UI, attempt UI, and challenge creation UI out of scope.
 
+## GOAL 08.2
+
+DONE_TECH:
+
+- Connect frontend login/register/logout UI to existing auth APIs.
+- Restore current session through `GET /api/auth/me`.
+- Keep auth state in TanStack Query memory only.
+- Keep `rr_session` as an HttpOnly/SameSite backend cookie; do not read it in the frontend.
+- Keep attempt UI and challenge creation UI out of scope.
+
+## GOAL 08.3
+
+- Add frontend attempt/gameplay UI for solving existing public challenges.
+- Keep authoring UI, profile/statistics, and edit/delete out of scope unless explicitly requested.
+
+## GOAL 08.4
+
+- Add frontend challenge creation UI using the existing protected creation API.
+- Preserve server-side secret handling and CSRF/mutation guards.
+
 ## GOAL 09
 
-- Expand gameplay-oriented E2E coverage beyond the frontend foundation.
+- Expand gameplay-oriented E2E coverage.
 
 ## GOAL 10
 

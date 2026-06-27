@@ -15,21 +15,21 @@ import { Badge } from "@/components/ui/badge";
 
 const howItWorks = [
   {
-    title: "Creators publish riddles",
+    title: "Register or login",
     description:
-      "The public catalog is live with safe examples and aggregate stats. Hidden checks stay server-only.",
+      "Auth UI is live and uses the existing backend session cookie flow.",
     icon: FlaskConicalIcon
   },
   {
     title: "Solvers submit candidates",
     description:
-      "Future attempt UI will send candidate patterns to the API. Public pages remain read-only in this milestone.",
+      "Future attempt UI will send candidate patterns to the API. Public pages remain readable while logged out.",
     icon: ListChecksIcon
   },
   {
     title: "Leaderboard rewards precision",
     description:
-      "The leaderboard now renders public aggregate rankings without emails, ids, or private attempt data.",
+      "The leaderboard renders public aggregate rankings without emails, ids, or private attempt data.",
     icon: TrophyIcon
   }
 ];
@@ -42,12 +42,12 @@ const securityItems = [
   },
   {
     title: "Secrets stay hidden",
-    description: "Secret patterns, controls, and submitted candidates are not rendered.",
+    description: "Hidden checks and submitted candidates are not rendered.",
     icon: ShieldCheckIcon
   },
   {
     title: "Cookie-first auth",
-    description: "Auth remains based on the HttpOnly rr_session cookie, not browser token storage.",
+    description: "Auth uses an HttpOnly session cookie, not browser token storage.",
     icon: LockKeyholeIcon
   }
 ];
@@ -66,8 +66,9 @@ export function HomePage() {
               </h2>
             </div>
             <p className="max-w-xl text-sm leading-6 text-muted-foreground">
-              The public catalog, challenge detail, and leaderboard are wired to
-              existing read APIs. Gameplay and authoring stay upcoming.
+              The public catalog, challenge detail, leaderboard, login,
+              registration, logout, and session restoration are wired to
+              existing APIs. Gameplay and authoring stay upcoming.
             </p>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
@@ -90,11 +91,12 @@ export function HomePage() {
             <div>
               <Badge variant="secondary">Security by design</Badge>
               <h2 id="security-title" className="mt-3 text-3xl font-semibold">
-                Safe foundation before feature UI
+                Safe foundation before gameplay UI
               </h2>
               <p className="mt-4 text-sm leading-6 text-muted-foreground">
-                The browser gets public examples and public aggregates. The
-                sensitive regex workflow stays inside backend services.
+                The browser gets public examples, public aggregates, and a
+                current-user DTO. Sensitive regex workflows stay inside backend
+                services.
               </p>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
@@ -108,13 +110,13 @@ export function HomePage() {
         <section aria-labelledby="milestone-title" className="mt-14 rounded-lg border bg-card/82 p-6">
           <Badge variant="outline">Current milestone</Badge>
           <h2 id="milestone-title" className="mt-3 text-2xl font-semibold">
-            Public read UI is now connected
+            Frontend auth UI is now connected
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
-            GOAL 08.1 connects the catalog, challenge detail, and leaderboard
-            pages to the existing public APIs through TanStack Query and the
-            same-origin API client. Auth forms, attempt submission, and challenge
-            creation UI remain later work.
+            GOAL 08.2 connects login, registration, logout, and session
+            restoration to the existing auth APIs through TanStack Query and the
+            same-origin API client. Attempt submission and challenge creation UI
+            remain later work.
           </p>
         </section>
       </PageContainer>

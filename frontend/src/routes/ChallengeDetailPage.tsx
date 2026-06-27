@@ -1,7 +1,6 @@
 import { ArrowLeftIcon } from "lucide-react";
 import { Link, useParams } from "react-router";
 
-import { ApiClientError } from "@/lib/api-client";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,11 +12,13 @@ import {
   CardTitle
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AttemptPanel } from "@/features/attempts/components/AttemptPanel";
 import { ChallengeExamples } from "@/features/challenges/components/ChallengeExamples";
 import { ChallengeStats } from "@/features/challenges/components/ChallengeStats";
 import { DifficultyBadge } from "@/features/challenges/components/DifficultyBadge";
 import { formatDate } from "@/features/challenges/format";
 import { useChallengeDetailQuery } from "@/features/challenges/queries";
+import { ApiClientError } from "@/lib/api-client";
 
 export function ChallengeDetailPage() {
   const { challengeId } = useParams();
@@ -106,14 +107,27 @@ export function ChallengeDetailPage() {
             </CardContent>
             <CardFooter className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-sm text-muted-foreground">
-                Creata il {formatDate(challenge.createdAt)} · aggiornata il{" "}
+                Creata il {formatDate(challenge.createdAt)} - aggiornata il{" "}
                 {formatDate(challenge.updatedAt)}
               </p>
-              <Button disabled type="button" variant="secondary">
-                Prova a risolvere · in arrivo
-              </Button>
             </CardFooter>
           </Card>
+
+          <section
+            aria-labelledby="attempt-panel-title"
+            className="lg:col-span-2"
+          >
+            <div className="mb-3">
+              <h2 id="attempt-panel-title" className="text-2xl font-semibold">
+                Prova a risolvere
+              </h2>
+              <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
+                Invia una regex candidata e confrontala con i controlli segreti
+                tramite il backend.
+              </p>
+            </div>
+            <AttemptPanel challenge={challenge} />
+          </section>
         </article>
       ) : null}
     </PageContainer>
@@ -122,7 +136,11 @@ export function ChallengeDetailPage() {
 
 function ChallengeDetailSkeleton() {
   return (
-    <div aria-label="Caricamento dettaglio sfida" aria-busy="true" className="mt-8 grid gap-6 lg:grid-cols-[1fr_22rem]">
+    <div
+      aria-busy="true"
+      aria-label="Caricamento dettaglio sfida"
+      className="mt-8 grid gap-6 lg:grid-cols-[1fr_22rem]"
+    >
       <div className="flex flex-col gap-4">
         <Skeleton className="h-5 w-24" />
         <Skeleton className="h-10 w-3/4" />

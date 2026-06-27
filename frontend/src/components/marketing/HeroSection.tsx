@@ -19,7 +19,7 @@ export function HeroSection() {
           <div className="mb-5 flex flex-wrap items-center gap-2">
             <HealthBadge />
             <span className="rounded-lg border bg-card px-2.5 py-1 text-xs font-medium text-muted-foreground">
-              GOAL 08.2 auth UI
+              GOAL 08.3 gameplay UI
             </span>
           </div>
           <h1 className="max-w-4xl text-5xl font-semibold tracking-normal text-foreground sm:text-6xl lg:text-7xl">

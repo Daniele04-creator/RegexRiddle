@@ -13,9 +13,9 @@
 - Use opaque server-side sessions with `HttpOnly` and `SameSite` cookies when auth is implemented.
 - Use Argon2id when passwords are implemented.
 
-## GOAL 08.2 security posture
+## GOAL 08.3 security posture
 
-GOAL 08.2 connects frontend login, registration, logout, and current-session restoration to existing backend auth APIs. The project still has no frontend challenge authoring workflow, no frontend attempt UI, no uploads, no profile/statistics page, and no challenge edit/delete UI.
+GOAL 08.3 connects frontend attempt gameplay to the existing protected attempt API. The project still has no frontend challenge authoring workflow, no uploads, no profile/statistics page, and no challenge edit/delete UI.
 
 Regex engine decisions:
 
@@ -89,6 +89,19 @@ Frontend public-read decisions:
 - Leaderboard UI renders only public display name, username, rank, solved count, average attempts, and total attempts used.
 - Leaderboard UI does not render user ids, emails, avatar URLs, password hashes, session hashes, raw tokens, or cookie values.
 - Public UI does not render secret regexes, hidden controls, or submitted candidate patterns.
+
+Frontend attempt UI decisions:
+
+- `/challenges/:id` shows login/register CTAs to guests and does not render the attempt form.
+- `/challenges/:id` blocks authors in the UI, while the backend `403` remains authoritative.
+- Authenticated non-authors submit only `pattern` and `flags`.
+- Attempt submission uses the existing same-origin API client with `credentials: "include"`.
+- Attempt submission sets `X-RegexRiddle-CSRF: 1` through `protectedMutation: true`.
+- Candidate regexes stay in React form state only; they are not put in URLs, localStorage, sessionStorage, custom token stores, or logs.
+- The frontend does not run JavaScript `RegExp` against candidate patterns and does not provide a client-side match preview.
+- Attempt feedback renders only aggregate counts: positive matched/total, negative matched/total, attempt number, solved status, and date.
+- The frontend does not render secret regexes, hidden controls, `Attempt.proposedPattern`, password hashes, session hashes, raw tokens, or cookie values.
+- `401`, `403`, `404`, `409`, and `422` attempt errors map to safe user-facing messages without stack traces or raw response bodies.
 
 Frontend auth UI decisions:
 

@@ -1,5 +1,24 @@
 # Difesa orale
 
+## Cosa contiene GOAL 08.3
+
+Nel GOAL 08.3 ho aggiunto la UI di gioco nel dettaglio sfida. Un utente non autenticato vede l'invito ad accedere; un autore vede che non puo' risolvere la propria sfida; un utente autenticato non autore puo' inviare una regex candidata. Il frontend manda solo pattern candidato e flag supportati all'endpoint protetto POST /api/challenges/:id/attempts, con credentials include e header CSRF. La regex non viene valutata nel browser: viene valutata dal backend con RE2 full match. La risposta contiene solo conteggi aggregati, quindi la regex segreta, i controlli nascosti e il pattern proposto non vengono esposti nelle response pubbliche.
+
+GOAL 08.3 aggiunge:
+
+- pannello tentativi reale in `/challenges/:id`;
+- gate login/register per utenti guest;
+- stato autore bloccato;
+- form candidato con React Hook Form e Zod;
+- selettore flag `i` e `m`;
+- mutation TanStack Query verso `POST /api/challenges/:id/attempts`;
+- feedback aggregato per soluzione corretta e tentativo errato;
+- mapping sicuro per errori `401`, `403`, `404`, `409` e `422`;
+- invalidazione di dettaglio sfida, catalogo e leaderboard quando serve;
+- test frontend e E2E per stati UI, feedback, errori, responsive e anti-leak.
+
+Non aggiunge creazione sfide da UI, profilo, statistiche, edit/delete, modifiche backend, modifiche database, JWT, storage token nel browser o valutazione regex nel frontend.
+
 ## Cosa contiene GOAL 08.2
 
 Nel GOAL 08.2 ho collegato il frontend alle API di autenticazione gia' presenti. Login e registrazione non ricevono token JSON: il backend imposta un cookie HttpOnly chiamato `rr_session`. Il frontend non legge il cookie e non salva token in localStorage o sessionStorage. Per sapere se l'utente e' autenticato chiama GET /api/auth/me con credentials include. TanStack Query mantiene lo stato utente in memoria e lo aggiorna dopo login, registrazione e logout.
@@ -101,9 +120,9 @@ Il seed crea utenti e sfide demo ripetibili. Serve per provare il progetto e per
 
 ## Cosa non contiene ancora
 
-Non ci sono ancora creazione sfide da UI, UI di gioco per inviare tentativi, profilo/statistiche o edit/delete.
+Non ci sono ancora creazione sfide da UI, profilo/statistiche o edit/delete.
 
-Questa scelta e' intenzionale: GOAL 08.2 chiude solo l'esperienza di autenticazione frontend e lascia gameplay e authoring ai goal successivi.
+Questa scelta e' intenzionale: GOAL 08.3 chiude l'esperienza di gameplay per tentativi e lascia authoring, profilo e gestione sfide ai goal successivi.
 
 ## Punto di sicurezza principale
 

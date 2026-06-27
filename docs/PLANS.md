@@ -104,6 +104,8 @@ DONE_TECH:
 ## GOAL 08.3
 
 - Add frontend attempt/gameplay UI for solving existing public challenges.
+- Guest, author, authenticated solver, aggregate feedback, invalid regex, and already-solved states are implemented on `/challenges/:id`.
+- Candidate regex evaluation remains server-side only through the existing protected attempt API.
 - Keep authoring UI, profile/statistics, and edit/delete out of scope unless explicitly requested.
 
 ## GOAL 08.4

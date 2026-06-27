@@ -172,6 +172,20 @@
 - `/create` is auth-aware but remains a protected placeholder; no challenge creation form, secret pattern field, or control fields are introduced.
 - Keep attempt submission UI, profile/statistics, challenge edit/delete, and frontend regex evaluation out of scope.
 
+## GOAL 08.3 decisions
+
+- Connect only frontend attempt/gameplay UI to the existing protected attempt API; do not change backend behavior, database schema, auth/session/cookie semantics, CSRF rules, challenge APIs, regex semantics, or regex engine.
+- Keep gameplay on `/challenges/:id` instead of adding a separate route.
+- Use the existing `GET /api/auth/me` current-user query to choose guest, author-blocked, and solver form states.
+- Use React Hook Form and Zod for attempt form shape validation only; do not validate regex syntax in the browser.
+- Preserve the candidate pattern text exactly in the submitted body except for rejecting empty or whitespace-only input client-side.
+- Support only `i` and `m` flag controls in the UI and map them to the backend flag string.
+- Use the same-origin API client for `POST /api/challenges/:id/attempts` with `protectedMutation: true`, so credentials and CSRF stay centralized.
+- Send only `pattern` and `flags`; do not send user ids, challenge ids, counts, `isCorrect`, or attempt metadata from the client.
+- Show aggregate feedback only and never render secret regexes, hidden controls, or `Attempt.proposedPattern`.
+- Invalidate challenge detail/list queries after successful attempts and leaderboard queries when `solved` is true.
+- Keep challenge creation UI, profile/statistics, challenge edit/delete, backend API changes, database changes, and frontend regex evaluation out of scope.
+
 ## Rejected for GOAL 00
 
 - Prisma schema.

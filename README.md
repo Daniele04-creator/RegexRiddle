@@ -1,6 +1,6 @@
 # RegexRiddle
 
-RegexRiddle is a Web Technologies exam project scaffold. The repository currently includes the GOAL 08.2 frontend authentication UI: PostgreSQL, Prisma schema, deterministic demo seed data, public challenge DTOs, read-only challenge endpoints, public leaderboard, backend auth, an internal server-side RE2-compatible evaluator, `POST /api/challenges`, `POST /api/challenges/:id/attempts`, React/Vite pages connected to the public catalog, challenge detail, leaderboard APIs, and real login/register/logout UI backed by the existing auth APIs. It still has no real challenge creation UI, real attempt UI, profile/statistics, or edit/delete workflows.
+RegexRiddle is a Web Technologies exam project scaffold. The repository currently includes the GOAL 08.3 frontend attempt/gameplay UI: PostgreSQL, Prisma schema, deterministic demo seed data, public challenge DTOs, read-only challenge endpoints, public leaderboard, backend auth, an internal server-side RE2-compatible evaluator, `POST /api/challenges`, `POST /api/challenges/:id/attempts`, React/Vite pages connected to the public catalog, challenge detail, leaderboard APIs, real login/register/logout UI, and a protected attempt panel on `/challenges/:id`. It still has no real challenge creation UI, profile/statistics, or edit/delete workflows.
 
 ## Stack
 
@@ -154,7 +154,7 @@ GOAL 08.0 replaces the smoke screen with the Regex Lab SPA foundation:
 - `DESIGN.md` is the visual source of truth.
 - React Router provides public routes for `/`, `/challenges`, `/challenges/:id`, `/leaderboard`, `/login`, `/register`, `/create`, and fallback `404`.
 - TanStack Query is configured for server state.
-- React Hook Form, Zod, and `@hookform/resolvers` support the auth forms.
+- React Hook Form, Zod, and `@hookform/resolvers` support the auth and attempt forms.
 - Motion for React uses the current `motion` package for subtle UI motion.
 - The frontend API client uses same-origin relative paths and always sends `credentials: "include"`.
 - Vite dev server proxies `/api/*` and `/health` to the backend.
@@ -178,7 +178,20 @@ GOAL 08.2 connects the frontend authentication experience:
 - Logout posts to `POST /api/auth/logout` and clears the TanStack Query current-user state.
 - `/create` is auth-aware: guests see a login-required card, authenticated users see the protected GOAL 08.4 placeholder.
 
-Auth uses the existing opaque server-side session model. The backend sets `rr_session` as an `HttpOnly`/`SameSite=Lax` cookie. The frontend never reads `document.cookie`, never stores auth tokens in `localStorage` or `sessionStorage`, and treats `/api/auth/me` as the source of truth for the current user. Attempt submission UI and challenge creation UI are still intentionally not implemented.
+Auth uses the existing opaque server-side session model. The backend sets `rr_session` as an `HttpOnly`/`SameSite=Lax` cookie. The frontend never reads `document.cookie`, never stores auth tokens in `localStorage` or `sessionStorage`, and treats `/api/auth/me` as the source of truth for the current user.
+
+GOAL 08.3 connects the frontend attempt/gameplay experience on `/challenges/:id`:
+
+- guests see login/register CTAs instead of the form;
+- challenge authors see a blocked-author message;
+- authenticated non-author users can submit a candidate regex and optional `i`/`m` flags;
+- the attempt mutation calls `POST /api/challenges/:id/attempts` through the same-origin API client with `credentials: "include"` and `X-RegexRiddle-CSRF: 1`;
+- the frontend sends only `pattern` and `flags`;
+- feedback shows only aggregate counts for positive and negative controls;
+- challenge detail, catalog, and leaderboard queries are invalidated after successful attempts where relevant;
+- the frontend still does not evaluate user regex with JavaScript `RegExp`.
+
+Challenge creation UI is still intentionally not implemented.
 
 ## Public leaderboard
 
@@ -250,9 +263,9 @@ curl.exe -i -b .\.tmp-auth-cookies.txt -H "Content-Type: application/json" -H "X
 
 The authenticated user from `rr_session` becomes the author. The backend validates the secret regex, public examples, and secret controls server-side with RE2 full-match semantics before saving. Successful responses use the public challenge detail DTO and must not include `secretPattern`, control lists, `ChallengeControl.value`, password hashes, session hashes, token values, or cookie values.
 
-## Attempt API smoke
+## Attempt API and UI smoke
 
-The backend exposes protected attempt submission. The frontend attempt UI is still out of scope.
+The backend exposes protected attempt submission and the frontend consumes it from the attempt panel on `/challenges/:id`.
 
 Attempt submissions require:
 
@@ -275,13 +288,15 @@ Attempt responses return aggregate counts only:
 
 Attempt responses must not include `secretPattern`, `ChallengeControl.value`, control lists, `proposedPattern`, password hashes, session hashes, token values, or cookie values.
 
+In the UI, `demo_player` can solve seeded non-author challenges after login. Authors such as `daniele_demo` are blocked from solving their own challenges in the UI, and the backend remains authoritative with a `403` response.
+
 This public review repository must never contain real secrets. `.env.example` values and demo credentials are development-only placeholders.
 
 The frontend must not store auth tokens in `localStorage` or `sessionStorage`, must not read `document.cookie` for auth, must not use JWT, must not use `dangerouslySetInnerHTML`, and must not evaluate user regex with JavaScript `RegExp`.
 
 ## Safe regex engine
 
-GOAL 04 added an internal backend regex engine based on `re2-wasm`; GOAL 05 uses it from the protected attempt endpoint and GOAL 06 uses it from protected challenge creation. GOAL 07, GOAL 08.0, GOAL 08.1, and GOAL 08.2 do not change regex evaluation.
+GOAL 04 added an internal backend regex engine based on `re2-wasm`; GOAL 05 uses it from the protected attempt endpoint and GOAL 06 uses it from protected challenge creation. GOAL 07, GOAL 08.0, GOAL 08.1, GOAL 08.2, and GOAL 08.3 do not change regex evaluation.
 
 - Evaluation happens server-side only.
 - User candidate patterns are compiled with RE2-compatible semantics, not JavaScript `RegExp`.

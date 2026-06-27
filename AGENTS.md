@@ -10,7 +10,8 @@
 - GOAL 08.0 may add frontend foundation dependencies, design system, routing, app shell, same-origin proxy, Query provider, and placeholder pages because it explicitly requests the frontend foundation.
 - GOAL 08.1 may connect public read-only frontend pages for catalog, challenge detail, and leaderboard because it explicitly requests those existing public APIs.
 - GOAL 08.2 may add real frontend auth forms, logout UI, session restoration, and auth-aware shell/create placeholder because it explicitly requests frontend authentication.
-- Do not implement additional authentication endpoints, challenge edit/delete APIs, profile/statistics pages, real attempt UI, or real challenge authoring UI until a later goal explicitly requests them.
+- GOAL 08.3 may add the frontend attempt/gameplay UI for existing public challenges because it explicitly requests that existing protected attempt API.
+- Do not implement additional authentication endpoints, challenge edit/delete APIs, profile/statistics pages, or real challenge authoring UI until a later goal explicitly requests them.
 - Do not introduce large dependencies without a clear goal requirement and human confirmation.
 - Do not commit, push, branch, checkout, stash, or reset unless the user explicitly asks.
 - Do not edit real `.env` files or store secrets in code, logs, tests, documentation, or generated files.

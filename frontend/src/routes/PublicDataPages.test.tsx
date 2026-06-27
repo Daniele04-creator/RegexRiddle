@@ -175,7 +175,11 @@ describe("public data pages", () => {
     expect(screen.getByText("abc123")).toBeInTheDocument();
     expect(screen.getByText("2 tentativi")).toBeInTheDocument();
     expect(screen.getByText("1 soluzione")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /Prova a risolvere/ })).toBeDisabled();
+    expect(await screen.findByText("Accedi per risolvere")).toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: "Accedi" })[0]).toHaveAttribute(
+      "href",
+      "/login"
+    );
   });
 
   it("renders leaderboard ranking metrics without private identity fields", async () => {

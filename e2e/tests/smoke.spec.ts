@@ -87,6 +87,21 @@ const forbiddenRenderedFrontendStrings = [
   "sessionTokenHash",
   "rr_session="
 ];
+const forbiddenAttemptChallengeControlValues = [
+  "AA-0000",
+  "ZX-9876",
+  "RR-2026",
+  "aa-0000",
+  "AAA-0000"
+];
+const forbiddenCorrectChallengeControlValues = [
+  "AA000AA",
+  "ZZ999ZZ",
+  "RG123EX",
+  "AA00AA",
+  "aa000aa",
+  "AAA000A"
+];
 
 function apiBaseUrl(): string {
   const apiPort = Number(process.env.API_PORT ?? 4000);
@@ -151,6 +166,15 @@ async function expectNoForbiddenRenderedFrontendStrings(pageContent: string): Pr
   }
 }
 
+async function expectNoRenderedSeedControlValues(
+  pageContent: string,
+  values: string[]
+): Promise<void> {
+  for (const value of values) {
+    expect(pageContent).not.toContain(value);
+  }
+}
+
 async function expectNoAuthStorage(page: Page): Promise<void> {
   const storage = await page.evaluate(() => [
     ...Object.entries(window.localStorage),
@@ -170,6 +194,17 @@ async function loginDemoPlayerThroughUi(page: Page): Promise<void> {
   await expect(page).toHaveURL(/\/challenges$/);
   await expect(page.getByText("Demo Player").first()).toBeVisible();
   await expect(page.getByText("@demo_player").first()).toBeVisible();
+}
+
+async function loginDanieleThroughUi(page: Page): Promise<void> {
+  await page.goto("/login");
+  await page.getByLabel("Username o email").fill("daniele_demo");
+  await page.getByLabel("Password").fill("Password123!");
+  await page.getByRole("button", { name: "Accedi" }).click();
+
+  await expect(page).toHaveURL(/\/challenges$/);
+  await expect(page.getByText("Daniele Demo").first()).toBeVisible();
+  await expect(page.getByText("@daniele_demo").first()).toBeVisible();
 }
 
 function readSetCookieHeader(headers: Record<string, string>): string {
@@ -409,7 +444,7 @@ test("web app renders the Regex Lab landing foundation", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "RegexRiddle" })).toBeVisible();
   await expect(page.getByRole("link", { name: /Esplora sfide/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /Guarda classifica/ })).toBeVisible();
-  await expect(page.getByText("GOAL 08.2 auth UI")).toBeVisible();
+  await expect(page.getByText("GOAL 08.3 adds")).toBeVisible();
 });
 
 test("landing CTA navigates to the public challenge catalog", async ({ page }) => {
@@ -602,8 +637,166 @@ test("challenge card opens public detail without leaking secret fields", async (
   await expect(page.getByRole("heading", { name: "Slug URL" })).toBeVisible();
   await expect(page.getByText("regex-riddle-2026")).toBeVisible();
   await expect(page.getByText("-regex-riddle")).toBeVisible();
-  await expect(page.getByRole("button", { name: /Prova a risolvere/ })).toBeDisabled();
+  await expect(page.getByText("Accedi per risolvere")).toBeVisible();
+  await expect(page.getByRole("link", { exact: true, name: "Accedi" }).first()).toBeVisible();
   await expectNoForbiddenRenderedFrontendStrings(await page.content());
+});
+
+test("logged-out challenge detail shows the attempt login gate", async ({ page }) => {
+  await page.goto(`/challenges/${attemptChallengeId}`);
+
+  await expect(page.getByRole("heading", { name: "Codice prodotto" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Prova a risolvere" })).toBeVisible();
+  await expect(page.getByText("Accedi per risolvere")).toBeVisible();
+  await expect(
+    page.getByRole("link", { exact: true, name: "Registrati" }).first()
+  ).toBeVisible();
+  await expect(page.getByLabel("Regex candidata")).toHaveCount(0);
+  await expectNoForbiddenRenderedFrontendStrings(await page.content());
+});
+
+test("authenticated non-author sees the attempt form", async ({ page }) => {
+  await loginDemoPlayerThroughUi(page);
+  await page.goto(`/challenges/${attemptChallengeId}`);
+
+  await expect(page.getByRole("heading", { name: "Codice prodotto" })).toBeVisible();
+  await expect(page.getByLabel("Regex candidata")).toBeVisible();
+  await expect(page.getByRole("checkbox", { exact: true, name: "i" })).toBeVisible();
+  await expect(page.getByRole("checkbox", { exact: true, name: "m" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Invia tentativo" })).toBeEnabled();
+  await expectNoAuthStorage(page);
+  await expectNoForbiddenRenderedFrontendStrings(await page.content());
+});
+
+test("attempt UI shows safe invalid-regex feedback", async ({ page }) => {
+  await loginDemoPlayerThroughUi(page);
+  await page.goto(`/challenges/${attemptChallengeId}`);
+
+  await page.getByLabel("Regex candidata").fill("(?=a)");
+  await page.getByRole("button", { name: "Invia tentativo" }).click();
+
+  await expect(
+    page.getByText("Regex non valida o non compatibile con il dialetto RE2.")
+  ).toBeVisible();
+  await expect(page.getByText("Submitted regex is invalid or unsupported.")).toHaveCount(
+    0
+  );
+  await expectNoForbiddenRenderedFrontendStrings(await page.content());
+});
+
+test("attempt UI renders incorrect aggregate feedback only", async ({ page }) => {
+  await loginDemoPlayerThroughUi(page);
+  await page.goto(`/challenges/${attemptChallengeId}`);
+
+  await page.getByLabel("Regex candidata").fill(".*");
+  await page.getByRole("button", { name: "Invia tentativo" }).click();
+
+  await expect(page.getByText("Non ancora")).toBeVisible();
+  await expect(
+    page.getByText(
+      "Hai soddisfatto 3 controlli positivi su 3 e hai accettato 3 controlli negativi su 3."
+    )
+  ).toBeVisible();
+  const content = await page.content();
+  await expectNoForbiddenRenderedFrontendStrings(content);
+  await expectNoRenderedSeedControlValues(content, forbiddenAttemptChallengeControlValues);
+  await expectNoAuthStorage(page);
+});
+
+test("attempt UI renders solved state and disables repeated submissions", async ({
+  page
+}) => {
+  await loginDemoPlayerThroughUi(page);
+  await page.goto(`/challenges/${correctAttemptChallengeId}`);
+
+  await page.getByLabel("Regex candidata").fill(String.raw`[A-Z]{2}\d{3}[A-Z]{2}`);
+  await page.getByRole("button", { name: "Invia tentativo" }).click();
+
+  await expect(page.getByText("Soluzione corretta")).toBeVisible();
+  await expect(page.getByText("Hai risolto la sfida.")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Sfida risolta" })).toBeDisabled();
+  await expect(page.getByText("1 tentativo")).toBeVisible();
+  await expect(page.getByText("1 soluzione")).toBeVisible();
+  const content = await page.content();
+  await expectNoForbiddenRenderedFrontendStrings(content);
+  await expectNoRenderedSeedControlValues(content, forbiddenCorrectChallengeControlValues);
+  await expectNoAuthStorage(page);
+});
+
+test("challenge author sees the author-blocked attempt state", async ({ page }) => {
+  await loginDanieleThroughUi(page);
+  await page.goto(`/challenges/${attemptChallengeId}`);
+
+  await expect(page.getByText("Sei l'autore di questa sfida")).toBeVisible();
+  await expect(
+    page.getByText("Gli autori non possono risolvere le proprie sfide.")
+  ).toBeVisible();
+  await expect(page.getByLabel("Regex candidata")).toHaveCount(0);
+  await expectNoForbiddenRenderedFrontendStrings(await page.content());
+});
+
+test("mobile attempt panel and feedback avoid horizontal overflow", async ({ page }) => {
+  await loginDemoPlayerThroughUi(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto(`/challenges/${attemptChallengeId}`);
+
+  await expect(page.getByRole("heading", { name: "Codice prodotto" })).toBeVisible();
+  await expect(page.getByLabel("Regex candidata")).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth
+    )
+  ).toBe(false);
+
+  await page.getByLabel("Regex candidata").fill(".*");
+  await page.getByRole("button", { name: "Invia tentativo" }).click();
+
+  await expect(page.getByText("Non ancora")).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth
+    )
+  ).toBe(false);
+  await expectNoAuthStorage(page);
+});
+
+test("desktop and tablet attempt states avoid horizontal overflow", async ({
+  page
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto(`/challenges/${attemptChallengeId}`);
+
+  await expect(page.getByText("Accedi per risolvere")).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth
+    )
+  ).toBe(false);
+
+  await loginDemoPlayerThroughUi(page);
+  await page.goto(`/challenges/${attemptChallengeId}`);
+
+  await expect(page.getByLabel("Regex candidata")).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth
+    )
+  ).toBe(false);
+
+  await page.setViewportSize({ width: 768, height: 1024 });
+  await page.goto(`/challenges/${attemptChallengeId}`);
+  await page.getByLabel("Regex candidata").fill("(?=a)");
+  await page.getByRole("button", { name: "Invia tentativo" }).click();
+
+  await expect(
+    page.getByText("Regex non valida o non compatibile con il dialetto RE2.")
+  ).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth
+    )
+  ).toBe(false);
+  await expectNoAuthStorage(page);
 });
 
 test("public leaderboard renders aggregate solver metrics only", async ({ page }) => {

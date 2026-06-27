@@ -96,6 +96,7 @@ Headings use balanced wrapping. Body copy should stay short, active, and product
 ### Forms
 
 - Auth forms use React Hook Form, Zod, shadcn field composition, explicit labels, autocomplete, field-level errors, and form-level alerts.
+- Attempt forms use React Hook Form, Zod, shadcn field composition, explicit labels, native keyboard-operable flag checkboxes, field-level errors, and form-level alerts.
 - Password fields use `type="password"` and must not render password values outside the input.
 - Submit buttons show pending states and remain keyboard-submittable.
 - Server errors are generic and user-facing; they must not expose backend internals or credential details.
@@ -110,6 +111,18 @@ Headings use balanced wrapping. Body copy should stay short, active, and product
 
 - Health status is non-blocking and uses `aria-live="polite"`.
 - Offline status should not crash the shell.
+- Attempt feedback panels use `aria-live="polite"`, aggregate counters, text labels, and meter visuals. Correct, incorrect, invalid, and already-solved states must be understandable without color.
+
+### Attempt Gameplay
+
+- `/challenges/:id` contains the gameplay panel below public examples.
+- Guests see login/register CTAs.
+- Authors see a blocked-author message.
+- Authenticated non-authors see the candidate pattern form.
+- The form explains server-side RE2 full-match verification without adding a client-side preview.
+- The candidate pattern stays in form state only.
+- Feedback shows attempt number, positive aggregate progress, negative aggregate result, solved/incorrect state, and created date.
+- Long regex text must wrap or scroll inside the input without causing page overflow.
 
 ## Motion Rules
 
@@ -131,7 +144,7 @@ Headings use balanced wrapping. Body copy should stay short, active, and product
 ## Security-Aware UI Rules
 
 - Never render secret regexes or hidden control values.
-- Never expose submitted candidate patterns in public UI.
+- Never expose submitted candidate patterns outside normal form input state.
 - Never store auth tokens in `localStorage` or `sessionStorage`.
 - Never read `document.cookie` for auth.
 - Never introduce JWT in the frontend.
@@ -156,3 +169,9 @@ It still does not ship real login/register forms, logout UI, attempt submission 
 GOAL 08.2 connects login, registration, logout, current-session restoration, authenticated header/mobile nav states, and the auth-aware `/create` placeholder.
 
 It still does not ship attempt submission UI, challenge creation form UI, profile/statistics, edit/delete, or frontend regex evaluation.
+
+## GOAL 08.3 Scope
+
+GOAL 08.3 connects the attempt/gameplay panel on `/challenges/:id` to the existing protected attempt endpoint.
+
+It still does not ship challenge creation form UI, profile/statistics, edit/delete, backend API changes, database changes, auth/session changes, regex semantic changes, or frontend regex evaluation.

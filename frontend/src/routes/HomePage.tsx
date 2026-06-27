@@ -23,7 +23,7 @@ const howItWorks = [
   {
     title: "Solvers submit candidates",
     description:
-      "Future attempt UI will send candidate patterns to the API. Public pages remain readable while logged out.",
+      "Attempt UI is live on challenge detail pages and sends candidates to the protected API.",
     icon: ListChecksIcon
   },
   {
@@ -68,7 +68,7 @@ export function HomePage() {
             <p className="max-w-xl text-sm leading-6 text-muted-foreground">
               The public catalog, challenge detail, leaderboard, login,
               registration, logout, and session restoration are wired to
-              existing APIs. Gameplay and authoring stay upcoming.
+              existing APIs. Gameplay is live; authoring stays upcoming.
             </p>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
@@ -91,7 +91,7 @@ export function HomePage() {
             <div>
               <Badge variant="secondary">Security by design</Badge>
               <h2 id="security-title" className="mt-3 text-3xl font-semibold">
-                Safe foundation before gameplay UI
+                Safe gameplay without browser regex evaluation
               </h2>
               <p className="mt-4 text-sm leading-6 text-muted-foreground">
                 The browser gets public examples, public aggregates, and a
@@ -110,13 +110,12 @@ export function HomePage() {
         <section aria-labelledby="milestone-title" className="mt-14 rounded-lg border bg-card/82 p-6">
           <Badge variant="outline">Current milestone</Badge>
           <h2 id="milestone-title" className="mt-3 text-2xl font-semibold">
-            Frontend auth UI is now connected
+            Frontend attempt gameplay is now connected
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
-            GOAL 08.2 connects login, registration, logout, and session
-            restoration to the existing auth APIs through TanStack Query and the
-            same-origin API client. Attempt submission and challenge creation UI
-            remain later work.
+            GOAL 08.3 adds the protected attempt panel to challenge detail pages.
+            Authenticated non-author users can submit candidate regexes and get
+            aggregate feedback. Challenge creation UI remains later work.
           </p>
         </section>
       </PageContainer>

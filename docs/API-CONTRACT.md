@@ -17,7 +17,7 @@ Response `200 application/json`:
 
 ## Frontend same-origin boundary
 
-GOAL 08.0 adds a frontend API client foundation without changing backend endpoint behavior. GOAL 08.1 uses that client for public read-only catalog, challenge detail, and leaderboard UI. GOAL 08.2 uses the same boundary for frontend login, registration, logout, and current-session restoration.
+GOAL 08.0 adds a frontend API client foundation without changing backend endpoint behavior. GOAL 08.1 uses that client for public read-only catalog, challenge detail, and leaderboard UI. GOAL 08.2 uses the same boundary for frontend login, registration, logout, and current-session restoration. GOAL 08.3 uses it for protected attempt submission from `/challenges/:id`.
 
 Frontend rules:
 
@@ -25,10 +25,11 @@ Frontend rules:
 - Vite dev server proxies `/api/*` and `/health` to `http://127.0.0.1:4000`.
 - Docker web server proxies `/api/*` and `/health` to `API_ORIGIN`.
 - All frontend API calls send `credentials: "include"` for cookie-authenticated flows.
-- A CSRF header helper exists for future protected mutations: `X-RegexRiddle-CSRF: 1`.
+- The CSRF header helper sends `X-RegexRiddle-CSRF: 1` for protected mutations.
 - GOAL 08.0 does not implement real mutation UI and does not change any backend auth, challenge, attempt, or leaderboard contract.
 - GOAL 08.1 public pages do not require auth and do not implement mutations.
 - GOAL 08.2 auth UI does not change backend auth behavior, cookie name, cookie attributes, database schema, CSRF rules, challenge APIs, attempt APIs, or regex semantics.
+- GOAL 08.3 attempt UI does not change backend attempt behavior, cookie name, cookie attributes, database schema, auth/session behavior, CSRF rules, or regex semantics.
 - `/challenges` calls `GET /api/challenges?page=1&limit=9`.
 - `/challenges/:id` calls `GET /api/challenges/:id`.
 - `/leaderboard` calls `GET /api/leaderboard?page=1&limit=10`.
@@ -36,6 +37,8 @@ Frontend rules:
 - `/register` calls `POST /api/auth/register`.
 - Logout calls `POST /api/auth/logout`.
 - The current user source of truth is `GET /api/auth/me`; a `401` response means guest in the frontend state.
+- `/challenges/:id` calls `POST /api/challenges/:id/attempts` only for authenticated non-author users submitting the attempt form.
+- Attempt UI requests send only `pattern` and `flags`.
 - Public frontend rendering must stay limited to DTO fields documented below.
 - The frontend must not read `document.cookie`, must not store auth tokens in `localStorage` or `sessionStorage`, and must not create a custom token store.
 
@@ -291,6 +294,16 @@ Challenge creation responses never include:
 
 Submits a candidate regex for a challenge. This endpoint is protected and state-changing.
 
+Frontend consumption:
+
+- `/challenges/:id` shows login/register CTAs to guests.
+- `/challenges/:id` shows an author-blocked message when the current user is the challenge author.
+- Authenticated non-author users can submit the attempt form.
+- The frontend sends only `pattern` and supported `flags`.
+- The frontend uses the same-origin API client with `credentials: "include"` and the CSRF helper.
+- The frontend shows aggregate feedback only and never receives secret regexes, hidden controls, or `Attempt.proposedPattern`.
+- The frontend does not evaluate candidate regexes with JavaScript `RegExp`.
+
 Route parameters:
 
 - `id`: required UUID.
@@ -519,10 +532,10 @@ Auth responses never include:
 
 ## Future endpoints
 
-The following areas are intentionally TODO after GOAL 08.2:
+The following areas are intentionally TODO after GOAL 08.3:
 
 - Challenge edit/delete workflows.
 - Frontend authoring UI.
-- Frontend attempt UI.
+- Profile/statistics UI.
 
 Future protected routes must include authorization checks and must not expose secret regexes or secret controls.

@@ -2,7 +2,7 @@
 
 ## Current milestone
 
-GOAL 08.2: frontend authentication UI with HttpOnly session.
+GOAL 08.3: frontend attempt/gameplay UI on challenge detail.
 
 ## Implemented
 
@@ -76,10 +76,13 @@ GOAL 08.2: frontend authentication UI with HttpOnly session.
 - Leaderboard desktop/tablet table and mobile stacked layout.
 - Catalog and leaderboard URL pagination.
 - Auth feature folder with typed API functions, TanStack Query hooks, Zod schemas, form components, session menu, and protected-placeholder component.
+- Attempt feature folder with typed protected API function, TanStack Query mutation, Zod schema, candidate form, flag selector, aggregate feedback, and guest/author gates.
+- Challenge detail attempt panel for guests, authenticated non-authors, and authors.
+- Attempt mutation using `POST /api/challenges/:id/attempts` through the same-origin API client with `credentials: "include"` and `X-RegexRiddle-CSRF: 1`.
+- Attempt feedback for correct, incorrect, invalid regex, already solved, and forbidden author states without rendering secret controls or proposed patterns.
 
 ## Not implemented
 
-- Frontend attempt UI.
 - Real frontend challenge creation UI.
 - Challenge update or deletion.
 
@@ -165,3 +168,23 @@ Verified on 2026-06-27 after GOAL 08.2 implementation:
 - Visual viewport verification: PASS for desktop `1440x900`, tablet `768x1024`, mobile `390x844`, logged-out nav, logged-in nav, login, register, and create placeholder; no horizontal overflow or sensitive text detected.
 - Web Interface Guidelines audit: PASS after adjusting auth form placeholders/loading ellipses and mobile tap target sizing.
 - Source security audit: PASS, no production frontend `dangerouslySetInnerHTML`, `document.cookie`, browser auth-token storage APIs, JavaScript `RegExp` construction, sensitive auth/challenge fields, `console.*`, or obsolete `apps/*` path references.
+
+Verified on 2026-06-27 after GOAL 08.3 implementation:
+
+- `docker compose up -d db`: PASS.
+- `pnpm db:seed`: PASS, 3 users, 10 challenges, 60 controls, 4 attempts, 2 solutions.
+- `pnpm db:verify`: PASS, 3 users, 10 challenges, 60 controls, 4 attempts, 2 solutions; no secret values printed.
+- `pnpm lint`: PASS with two pre-existing non-blocking Fast Refresh warnings in generated shadcn `button` and `badge` files.
+- `pnpm typecheck`: PASS.
+- `pnpm test`: PASS, shared 1 test, backend 79 tests, frontend 42 tests.
+- `pnpm build`: PASS, with the existing non-blocking Vite chunk-size warning.
+- `docker compose up --build -d`: PASS, images `regexriddle-api:dev` and `regexriddle-web:dev` rebuilt; db, API, and web containers started.
+- `pnpm e2e`: PASS, 44 Playwright tests.
+- `pnpm check`: PASS, includes lint, typecheck, test, build, and 44 E2E tests.
+- `pnpm audit --audit-level=high`: PASS at the high threshold; one moderate advisory remains in tooling dependencies.
+- `git diff --check`: PASS.
+- `docker compose ps`: PASS, db healthy and API/web running on the expected ports.
+- Visual viewport verification: PASS for desktop `1440x900`, tablet `768x1024`, and mobile `390x844` attempt states; no horizontal overflow detected.
+- Web Interface Guidelines audit: PASS for the attempt UI after checking labels, focus states, ellipses, `aria-live`, long-content handling, and responsive overflow.
+- Source security audit: PASS, no production frontend `dangerouslySetInnerHTML`, `document.cookie`, browser auth-token storage APIs, JavaScript `RegExp` construction, `console.*`, or obsolete `apps/*` path references.
+- Sensitive-field audit: PASS, sensitive names appear only in docs, tests, shared challenge-creation contracts, or backend internals; production attempt UI does not render secret regexes, hidden controls, `Attempt.proposedPattern`, password hashes, session hashes, raw tokens, or cookie values.

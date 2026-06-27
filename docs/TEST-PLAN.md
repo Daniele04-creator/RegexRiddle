@@ -125,6 +125,18 @@ Current E2E count after GOAL 08.1: 30 tests.
 Current frontend test count after GOAL 08.2: 31 tests.
 Current E2E count after GOAL 08.2: 36 tests.
 
+## GOAL 08.3 frontend attempt/gameplay UI checks
+
+- Frontend tests cover the attempt API function sending `POST /api/challenges/:id/attempts` with `credentials: "include"`, JSON body, `X-RegexRiddle-CSRF: 1`, and only `pattern` plus `flags`.
+- Frontend tests cover attempt schema validation for empty patterns, 256-character max length, preserving pattern text, supported `i`/`m` flags, and unsupported/duplicated flag rejection.
+- Frontend route tests cover guest login/register gate, authenticated non-author form, author-blocked state, correct feedback, incorrect aggregate feedback, `409` already solved, `422` invalid regex, and malicious extra response fields not rendering.
+- Source security tests assert no `dangerouslySetInnerHTML`, no production frontend `document.cookie`, no browser auth-token storage APIs, no frontend `RegExp` construction, and no raw `fetch` outside the API client boundary.
+- E2E tests cover logged-out attempt gate, seeded demo login, authenticated attempt form, invalid regex feedback, incorrect aggregate feedback, correct solved feedback, disabled repeated submission after solve, author block, mobile attempt layout overflow, rendered anti-leak checks, seed hidden-control anti-leak checks, and storage anti-token checks after attempt flows.
+- GOAL 08.3 must keep backend API, database schema, auth/session/cookie behavior, CSRF behavior, and regex semantics unchanged.
+
+Current frontend test count after GOAL 08.3: 42 tests.
+Current E2E count after GOAL 08.3: 44 tests.
+
 ## Final delivery target
 
 The final project must include at least 10 meaningful E2E tests. Later milestones should add tests for:

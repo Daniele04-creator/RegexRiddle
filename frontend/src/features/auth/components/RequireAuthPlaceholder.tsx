@@ -117,8 +117,8 @@ export function RequireAuthPlaceholder() {
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <p className="text-sm leading-6 text-muted-foreground">
-            Nessun pattern o controllo segreto viene inviato dal frontend in
-            GOAL 08.2. La UI resta un placeholder protetto.
+            Nessun pattern segreto o controllo segreto viene inviato dal
+            frontend autore. La UI resta un placeholder protetto per GOAL 08.4.
           </p>
           <Alert>
             <LockKeyholeIcon aria-hidden="true" />

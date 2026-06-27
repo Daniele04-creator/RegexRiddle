@@ -27,7 +27,7 @@ importers:
         specifier: 8.62.0
         version: 8.62.0(eslint@10.6.0(jiti@2.7.0))(typescript@6.0.3)
 
-  apps/api:
+  backend:
     dependencies:
       '@prisma/adapter-pg':
         specifier: 7.8.0
@@ -37,7 +37,7 @@ importers:
         version: 7.8.0(prisma@7.8.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@6.0.3))(typescript@6.0.3)
       '@regexriddle/shared':
         specifier: workspace:*
-        version: link:../../packages/shared
+        version: link:../packages/shared
       argon2:
         specifier: 0.44.0
         version: 0.44.0
@@ -73,7 +73,7 @@ importers:
         specifier: 4.1.9
         version: 4.1.9(@types/node@26.0.1)(vite@8.1.0(@types/node@26.0.1)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.4))
 
-  apps/e2e:
+  e2e:
     devDependencies:
       '@playwright/test':
         specifier: 1.61.1
@@ -85,11 +85,11 @@ importers:
         specifier: 6.0.3
         version: 6.0.3
 
-  apps/web:
+  frontend:
     dependencies:
       '@regexriddle/shared':
         specifier: workspace:*
-        version: link:../../packages/shared
+        version: link:../packages/shared
       '@vitejs/plugin-react':
         specifier: 6.0.3
         version: 6.0.3(vite@8.1.0(@types/node@26.0.1)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.22.4))

@@ -1,5 +1,7 @@
 packages:
-  - "apps/*"
+  - "backend"
+  - "frontend"
+  - "e2e"
   - "packages/*"
 allowBuilds:
   '@prisma/engines': true

@@ -59,6 +59,13 @@ pnpm check
 - E2E API tests cover unauthenticated attempt rejection, demo user wrong attempt with aggregate counts only, demo user correct attempt with `solved: true`, and author self-attempt rejection.
 - Current E2E count: 12 tests.
 
+## GOAL 05.5 directory restructure checks
+
+- The delivery directories are `backend`, `frontend`, and `e2e`.
+- `packages/shared` remains unchanged in location.
+- The restructure must not change API contracts, auth/session behavior, database schema, regex semantics, or test coverage.
+- Full gates after the move must pass: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm e2e`, `pnpm check`, `pnpm db:verify`, and `docker compose up --build -d`.
+
 ## Final delivery target
 
 The final project must include at least 10 meaningful E2E tests. Later milestones should add tests for:

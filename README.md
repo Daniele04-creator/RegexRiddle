@@ -5,12 +5,24 @@ RegexRiddle is a Web Technologies exam project scaffold. The repository currentl
 ## Stack
 
 - Monorepo: pnpm workspace
-- Web app: React, Vite, TypeScript
-- API: Fastify, TypeScript
+- Frontend app: React, Vite, TypeScript in `frontend/`
+- Backend API: Fastify, TypeScript in `backend/`
 - ORM: Prisma with PostgreSQL
 - Shared package: minimal shared constants and types
-- E2E: Playwright
+- E2E: Playwright in `e2e/`
 - Local infrastructure: Docker Compose with PostgreSQL, API, and web services
+
+## Repository layout
+
+```text
+backend/          Fastify API, Prisma, auth, regex engine, seed, db verification
+frontend/         React/Vite SPA
+e2e/              Playwright E2E tests
+packages/shared/  shared DTOs and TypeScript contracts
+docs/             project documentation and oral-defense notes
+```
+
+The repository remains one pnpm workspace monorepo. The top-level `backend/` and `frontend/` directories make the delivery structure explicit for review while `packages/shared/` keeps shared contracts in one place.
 
 ## Windows quickstart
 
@@ -35,11 +47,11 @@ pnpm check
 Run the local development servers in two terminals:
 
 ```powershell
-pnpm dev:api
+pnpm dev:backend
 ```
 
 ```powershell
-pnpm dev:web
+pnpm dev:frontend
 ```
 
 Useful local URLs:

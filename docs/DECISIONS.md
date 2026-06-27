@@ -4,14 +4,14 @@
 
 - Use `pnpm@11.7.0` for workspace management because it is the stable pnpm shim available in the Windows/Codex PATH for this repository.
 - Use Node.js `>=24.14.0` locally and Docker image `node:24.17.0-bookworm-slim` for container builds.
-- Use React `19.2.7`, React DOM `19.2.7`, Vite `8.1.0`, and TypeScript `6.0.3` for `apps/web`.
-- Use Fastify `5.8.5` and TypeScript `6.0.3` for `apps/api`.
+- Use React `19.2.7`, React DOM `19.2.7`, Vite `8.1.0`, and TypeScript `6.0.3` for the frontend app.
+- Use Fastify `5.8.5` and TypeScript `6.0.3` for the backend API.
 - Use Playwright `1.61.1` and Vitest `4.1.9` for tests.
 - Use ESLint `10.6.0` with `typescript-eslint` `8.62.0`.
 - Use PostgreSQL Docker image `postgres:18.1-bookworm`.
 - Mount the PostgreSQL Docker volume at `/var/lib/postgresql`, which is the required layout for PostgreSQL 18+ Docker images.
 - Tag local Compose build images explicitly instead of relying on Compose's default `latest` tag.
-- Serve the production web container with a minimal Node static server in `apps/web/server.mjs`; Vite remains a build-time and dev-time tool only.
+- Serve the production web container with a minimal Node static server in `frontend/server.mjs`; Vite remains a build-time and dev-time tool only.
 - Allow only the `esbuild` dependency build script in `pnpm-workspace.yaml`, because Vite requires it and pnpm blocks dependency build scripts by default.
 - Keep `packages/shared` minimal: only scaffold constants and the `HealthResponse` type.
 - Keep database migration and seed commands as explicit placeholders until GOAL 01.
@@ -20,10 +20,10 @@
 
 - Use Prisma `7.8.0` and `@prisma/client` `7.8.0`.
 - Use `@prisma/adapter-pg` with `pg` because Prisma 7 uses driver adapters for PostgreSQL runtime access.
-- Keep Prisma files under `apps/api/prisma`.
-- Generate Prisma Client into `apps/api/src/generated/prisma` and keep generated output out of Git.
+- Keep Prisma files under `backend/prisma`.
+- Generate Prisma Client into `backend/src/generated/prisma` and keep generated output out of Git.
 - Use UUID primary keys for non-enumerable identifiers.
-- Use a versioned migration at `apps/api/prisma/migrations/20260626222148_init/migration.sql`.
+- Use a versioned migration at `backend/prisma/migrations/20260626222148_init/migration.sql`.
 - Use Argon2id for demo password hashes through `argon2` `0.44.0`.
 - Use deterministic demo salts only for local seed repeatability; production password hashing must use normal per-password random salts.
 - Keep `/health` independent from database tables.
@@ -89,6 +89,15 @@
 - Block authors from attempting their own challenges.
 - Return `409 Conflict` when the authenticated user already solved the challenge.
 - Use the current authenticated user id only; reject unknown body keys to prevent mass assignment.
+
+## GOAL 05.5 decisions
+
+- Move delivery-facing directories from the previous nested app layout to `backend`, `frontend`, and `e2e`.
+- Keep one pnpm workspace monorepo and keep `packages/shared` in place.
+- Keep npm package names stable: `@regexriddle/api`, `@regexriddle/web`, and `@regexriddle/e2e`.
+- Keep Docker service names and ports stable.
+- Do not change API routes, DTOs, database schema, auth/session behavior, or regex semantics.
+- Use `git mv` for the tracked directory moves to preserve Git history.
 
 ## Rejected for GOAL 00
 

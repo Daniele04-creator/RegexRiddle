@@ -1,6 +1,6 @@
 import { expect, test, type APIRequestContext } from "@playwright/test";
 
-import { prisma } from "../../api/src/db/prisma.js";
+import { prisma } from "../../backend/src/db/prisma.js";
 
 const forbiddenResponseKeys = [
   "secretPattern",

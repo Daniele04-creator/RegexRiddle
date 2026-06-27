@@ -9,18 +9,20 @@
     "pnpm": ">=11.7.0"
   },
   "scripts": {
-    "dev:web": "pnpm --filter @regexriddle/web dev",
-    "dev:api": "pnpm --filter @regexriddle/api dev",
+    "dev:frontend": "pnpm --dir frontend dev",
+    "dev:backend": "pnpm --dir backend dev",
+    "dev:web": "pnpm dev:frontend",
+    "dev:api": "pnpm dev:backend",
     "lint": "eslint .",
     "typecheck": "pnpm -r --if-present typecheck",
     "test": "pnpm -r --filter @regexriddle/shared --filter @regexriddle/api --filter @regexriddle/web --if-present test",
     "build": "pnpm -r --if-present build",
-    "e2e": "pnpm --filter @regexriddle/e2e test",
+    "e2e": "pnpm --dir e2e test",
     "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm e2e",
-    "db:generate": "pnpm --filter @regexriddle/api db:generate",
-    "db:migrate": "pnpm --filter @regexriddle/api db:migrate",
-    "db:seed": "pnpm --filter @regexriddle/api db:seed",
-    "db:verify": "pnpm --filter @regexriddle/api db:verify"
+    "db:generate": "pnpm --dir backend db:generate",
+    "db:migrate": "pnpm --dir backend db:migrate",
+    "db:seed": "pnpm --dir backend db:seed",
+    "db:verify": "pnpm --dir backend db:verify"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

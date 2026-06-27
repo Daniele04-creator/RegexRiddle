@@ -7,9 +7,9 @@ GOAL 05 aggiunge l'endpoint protetto di invio tentativi sopra il motore regex si
 Il repository contiene:
 
 - un monorepo `pnpm`;
-- una SPA React in `apps/web`;
-- una API Fastify in `apps/api`;
-- test E2E Playwright in `apps/e2e`;
+- una SPA React in `frontend`;
+- una API Fastify in `backend`;
+- test E2E Playwright in `e2e`;
 - un package condiviso in `packages/shared`;
 - Docker Compose con web, API e PostgreSQL;
 - Prisma come ORM nel backend;
@@ -32,6 +32,8 @@ La API espone `GET /health`, due endpoint pubblici read-only sulle sfide, quattr
 Il backend carica i controlli segreti, valuta la regex dell'utente con RE2 full match, salva solo conteggi aggregati e non manda mai i controlli al frontend.
 
 In GOAL 05 questi controlli devono passare: migration, seed, verify, lint, typecheck, unit test, build ed E2E. Docker Compose avvia PostgreSQL, API e web.
+
+Il progetto e' un monorepo pnpm, ma per chiarezza di consegna ho separato le directory principali in backend, frontend ed e2e. Il codice condiviso resta in packages/shared. Docker Compose orchestra backend, frontend e PostgreSQL.
 
 Prisma e' l'ORM: descriviamo le tabelle in TypeScript/Prisma schema, generiamo un client tipizzato e applichiamo le modifiche al database con migration versionate.
 

@@ -17,13 +17,13 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: "pnpm --filter @regexriddle/api dev",
+      command: "pnpm --dir ../backend dev",
       url: `${apiBaseURL}/health`,
       reuseExistingServer: !process.env.CI,
       timeout: 120_000
     },
     {
-      command: "pnpm --filter @regexriddle/web dev",
+      command: "pnpm --dir ../frontend dev",
       url: webBaseURL,
       reuseExistingServer: !process.env.CI,
       timeout: 120_000

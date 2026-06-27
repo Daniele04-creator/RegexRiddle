@@ -13,11 +13,18 @@
 ## Stack
 
 - Package manager: pnpm workspace
-- Web: React, Vite, TypeScript
-- API: Fastify, TypeScript
+- Frontend: React, Vite, TypeScript in `frontend/`
+- Backend API: Fastify, TypeScript in `backend/`
 - Shared code: `packages/shared`
-- E2E: Playwright
+- E2E: Playwright in `e2e/`
 - Database service: PostgreSQL in Docker Compose
+
+## Layout
+
+- `backend/`: Fastify API, Prisma, auth, regex engine, seed, and database verification.
+- `frontend/`: React/Vite SPA.
+- `e2e/`: Playwright E2E tests.
+- `packages/shared/`: shared DTOs and TypeScript contracts.
 
 ## Security invariants
 

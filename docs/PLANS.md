@@ -45,6 +45,15 @@ DONE_TECH:
 - Require auth and CSRF guard v1 for attempt mutations.
 - Store attempts and create solutions without exposing secret controls or submitted patterns.
 
+## GOAL 05.5
+
+DONE_TECH:
+
+- Restructure delivery directories to `backend`, `frontend`, and `e2e`.
+- Keep one pnpm workspace monorepo.
+- Keep `packages/shared` in place for shared contracts.
+- Preserve existing API, auth, database, regex, Docker, and test behavior.
+
 ## GOAL 06
 
 - Add challenge creation with author ownership checks.

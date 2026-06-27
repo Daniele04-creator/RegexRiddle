@@ -99,9 +99,6 @@ async function cleanupAttemptTestData(): Promise<void> {
       challengeId: { in: [ATTEMPT_CHALLENGE_ID, INCREMENT_CHALLENGE_ID] }
     }
   });
-  await prisma.session.deleteMany({
-    where: { userId: { in: [DEMO_CREATOR_ID, DEMO_PLAYER_ID] } }
-  });
 }
 
 async function countAttempts(

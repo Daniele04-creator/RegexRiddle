@@ -21,10 +21,10 @@ FROM node:24.17.0-bookworm-slim AS runtime
 WORKDIR /app
 ENV NODE_ENV=production
 
-COPY --from=build /app/apps/web/package.json ./apps/web/package.json
-COPY --from=build /app/apps/web/dist ./apps/web/dist
-COPY --from=build /app/apps/web/server.mjs ./apps/web/server.mjs
+COPY --from=build /app/frontend/package.json ./frontend/package.json
+COPY --from=build /app/frontend/dist ./frontend/dist
+COPY --from=build /app/frontend/server.mjs ./frontend/server.mjs
 
 EXPOSE 4173
 
-CMD ["node", "apps/web/server.mjs"]
+CMD ["node", "frontend/server.mjs"]

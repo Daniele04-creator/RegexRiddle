@@ -19,7 +19,7 @@ services:
     image: regexriddle-api:dev
     build:
       context: .
-      dockerfile: apps/api/Dockerfile
+      dockerfile: backend/Dockerfile
     environment:
       NODE_ENV: production
       API_HOST: 0.0.0.0
@@ -36,7 +36,7 @@ services:
     image: regexriddle-web:dev
     build:
       context: .
-      dockerfile: apps/web/Dockerfile
+      dockerfile: frontend/Dockerfile
     environment:
       NODE_ENV: production
     ports:

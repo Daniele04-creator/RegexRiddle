@@ -2,7 +2,7 @@
 
 ## GOAL 01 status
 
-The initial Prisma/PostgreSQL model exists in `apps/api/prisma/schema.prisma` and is applied through a versioned migration.
+The initial Prisma/PostgreSQL model exists in `backend/prisma/schema.prisma` and is applied through a versioned migration.
 
 ## GOAL 02 status
 

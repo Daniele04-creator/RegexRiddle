@@ -10,14 +10,14 @@ export default tseslint.config(
       "**/dist/**",
       "**/coverage/**",
       "**/node_modules/**",
-      "apps/e2e/test-results/**",
-      "apps/e2e/playwright-report/**"
+      "e2e/test-results/**",
+      "e2e/playwright-report/**"
     ]
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    files: ["apps/web/**/*.{ts,tsx}"],
+    files: ["frontend/**/*.{ts,tsx}"],
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",
@@ -38,7 +38,7 @@ export default tseslint.config(
     }
   },
   {
-    files: ["apps/api/**/*.ts", "apps/e2e/**/*.ts", "packages/shared/**/*.ts"],
+    files: ["backend/**/*.ts", "e2e/**/*.ts", "packages/shared/**/*.ts"],
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",

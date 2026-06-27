@@ -2,47 +2,47 @@
 
 ## Repository layout
 
-- `apps/web`: React, Vite, and TypeScript SPA.
-- `apps/api`: Fastify, TypeScript API, and Prisma data layer.
-- `apps/e2e`: Playwright smoke tests.
+- `frontend`: React, Vite, and TypeScript SPA.
+- `backend`: Fastify, TypeScript API, Prisma data layer, auth, and regex engine.
+- `e2e`: Playwright smoke and API workflow tests.
 - `packages/shared`: minimal shared constants and TypeScript contracts.
 - `docs`: project documentation and exam support notes.
 
 ## Runtime shape
 
 ```text
-browser -> apps/web -> apps/api -> PostgreSQL
+browser -> frontend -> backend -> PostgreSQL
 ```
 
-GOAL 05 exposes `GET /health`, public challenge read endpoints, backend auth endpoints, and protected attempt submission. PostgreSQL is present in Docker Compose and Prisma manages the versioned schema under `apps/api/prisma`. The regex evaluation engine remains backend-only and is reachable only through authorized service logic.
+GOAL 05.5 keeps the GOAL 05 API behavior and reorganizes delivery directories. PostgreSQL is present in Docker Compose and Prisma manages the versioned schema under `backend/prisma`. The regex evaluation engine remains backend-only and is reachable only through authorized service logic.
 
 ## Build shape
 
 - The shared package builds first.
-- The API compiles TypeScript to `apps/api/dist`.
-- Prisma Client is generated into `apps/api/src/generated/prisma` and is ignored by Git.
-- The web app builds static assets to `apps/web/dist`.
+- The API compiles TypeScript to `backend/dist`.
+- Prisma Client is generated into `backend/src/generated/prisma` and is ignored by Git.
+- The web app builds static assets to `frontend/dist`.
 - E2E starts the API and web development servers through Playwright `webServer`.
-- The Docker web container serves `apps/web/dist` with a small Node static server, avoiding runtime dependency on Vite or pnpm.
+- The Docker web container serves `frontend/dist` with a small Node static server, avoiding runtime dependency on Vite or pnpm.
 
 ## Data layer
 
-- Prisma schema: `apps/api/prisma/schema.prisma`.
-- Migration directory: `apps/api/prisma/migrations`.
-- Seed script: `apps/api/prisma/seed.ts`.
-- Verification script: `apps/api/prisma/verify.ts`.
+- Prisma schema: `backend/prisma/schema.prisma`.
+- Migration directory: `backend/prisma/migrations`.
+- Seed script: `backend/prisma/seed.ts`.
+- Verification script: `backend/prisma/verify.ts`.
 - Host database URL uses port `55432`.
 - Compose services use internal host `db` and port `5432`.
 
 ## API layering
 
-- Route handlers live under `apps/api/src/routes`.
-- Domain read logic lives under `apps/api/src/services`.
-- Public serializers live under `apps/api/src/dto`.
-- Session helpers live under `apps/api/src/auth`.
-- Regex engine helpers live under `apps/api/src/regex`.
-- Mutation guards live under `apps/api/src/security`.
-- Request parsing and validation live under `apps/api/src/validation`.
+- Route handlers live under `backend/src/routes`.
+- Domain read logic lives under `backend/src/services`.
+- Public serializers live under `backend/src/dto`.
+- Session helpers live under `backend/src/auth`.
+- Regex engine helpers live under `backend/src/regex`.
+- Mutation guards live under `backend/src/security`.
+- Request parsing and validation live under `backend/src/validation`.
 - Shared response contracts live in `packages/shared`.
 
 Challenge routes must return public DTOs only. They must not return raw Prisma challenge records.

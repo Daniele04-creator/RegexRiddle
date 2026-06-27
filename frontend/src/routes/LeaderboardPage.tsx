@@ -1,4 +1,6 @@
 import { useSearchParams } from "react-router";
+import { TrophyIcon } from "lucide-react";
+import type { LeaderboardItemDTO } from "@regexriddle/shared";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -52,8 +54,7 @@ export function LeaderboardPage() {
           Classifica solver
         </h1>
         <p className="mt-4 text-base leading-7 text-muted-foreground">
-          Dati letti da <span className="font-mono text-foreground">GET /api/leaderboard</span>.
-          Sono visibili solo identita' pubblica e metriche aggregate.
+          I migliori solver salgono risolvendo piu sfide con meno tentativi.
         </p>
       </div>
 
@@ -61,7 +62,8 @@ export function LeaderboardPage() {
         <CardHeader>
           <CardTitle>Formula di ranking</CardTitle>
           <CardDescription>
-            Ordine: piu' sfide risolte, meno tentativi medi, username alfabetico.
+            Conta prima chi risolve piu sfide. A parita, vince chi usa meno
+            tentativi.
           </CardDescription>
         </CardHeader>
       </Card>
@@ -90,7 +92,7 @@ export function LeaderboardPage() {
             <CardHeader>
               <CardTitle>Nessun solver in classifica</CardTitle>
               <CardDescription>
-                La classifica comparira' quando esisteranno soluzioni pubbliche.
+                La classifica aspetta il primo solver.
               </CardDescription>
             </CardHeader>
           </Card>
@@ -98,6 +100,7 @@ export function LeaderboardPage() {
 
         {data !== undefined && data.items.length > 0 ? (
           <>
+            <LeaderboardPodium items={data.items.slice(0, 3)} />
             <div className="hidden md:block">
               <LeaderboardTable items={data.items} />
             </div>
@@ -117,6 +120,36 @@ export function LeaderboardPage() {
         ) : null}
       </div>
     </PageContainer>
+  );
+}
+
+function LeaderboardPodium({ items }: { items: LeaderboardItemDTO[] }) {
+  const title = items.length >= 3 ? "Podio top 3" : "Podio in formazione";
+
+  return (
+    <section aria-labelledby="podium-title">
+      <h2 id="podium-title" className="sr-only">
+        {title}
+      </h2>
+      <div className="grid gap-3 md:grid-cols-3">
+        {items.map((item) => (
+          <Card className="bg-card/90" key={item.user.username}>
+            <CardHeader>
+              <div className="mb-2 flex items-center justify-between gap-3">
+                <Badge variant={item.rank === 1 ? "default" : "secondary"}>
+                  #{item.rank}
+                </Badge>
+                <TrophyIcon aria-hidden="true" className="text-primary" />
+              </div>
+              <CardTitle>{item.user.displayName}</CardTitle>
+              <CardDescription>
+                @{item.user.username} - {item.solvedCount} sfide risolte
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        ))}
+      </div>
+    </section>
   );
 }
 

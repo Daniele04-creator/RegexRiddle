@@ -20,14 +20,13 @@ export function ChallengeCreateGate() {
           Accedi per creare una sfida
         </CardTitle>
         <CardDescription>
-          La creazione e' protetta: l'autore viene preso dalla sessione server e
-          la richiesta usa il controllo CSRF gia previsto dall'API.
+          Pubblica un enigma con esempi visibili e prove nascoste.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <p className="text-sm leading-6 text-muted-foreground">
           Puoi esplorare il catalogo senza login. Per pubblicare una nuova sfida
-          serve una sessione valida.
+          serve un profilo solver.
         </p>
       </CardContent>
       <CardFooter className="flex flex-col items-stretch gap-3 sm:flex-row">

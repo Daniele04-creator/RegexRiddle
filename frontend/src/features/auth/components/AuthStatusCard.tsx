@@ -20,7 +20,7 @@ interface AuthStatusCardProps {
 
 export function AuthStatusCard({ mode, user }: AuthStatusCardProps) {
   const title =
-    mode === "login" ? "Sessione gia attiva" : "Account gia autenticato";
+    mode === "login" ? "Profilo gia attivo" : "Profilo gia pronto";
 
   return (
     <Card className="max-w-xl bg-card/88">
@@ -35,8 +35,8 @@ export function AuthStatusCard({ mode, user }: AuthStatusCardProps) {
       </CardHeader>
       <CardContent>
         <p className="text-sm leading-6 text-muted-foreground">
-          Puoi continuare a esplorare il catalogo pubblico oppure passare alla
-          sezione protetta di creazione.
+          Puoi continuare a esplorare il catalogo oppure creare un nuovo
+          enigma per gli altri solver.
         </p>
       </CardContent>
       <CardFooter className="flex flex-wrap gap-3">

@@ -19,13 +19,13 @@ interface RegexFlagSelectorProps {
 
 const flagOptions = [
   {
-    description: "Case-insensitive matching lato server.",
+    description: "Ignora la differenza tra maiuscole e minuscole.",
     field: "flags.i",
     id: "attempt-flag-i",
     label: "i"
   },
   {
-    description: "Multiline matching lato server.",
+    description: "Tratta ogni riga come parte del puzzle.",
     field: "flags.m",
     id: "attempt-flag-m",
     label: "m"
@@ -40,7 +40,7 @@ export function RegexFlagSelector({
     <FieldSet>
       <FieldLegend variant="label">Flag supportati</FieldLegend>
       <FieldDescription>
-        Opzionali. Il backend accetta solo i flag i e m.
+        Opzionali. Usali solo quando l'enigma lo richiede.
       </FieldDescription>
       <FieldGroup className="grid gap-3 sm:grid-cols-2" data-slot="checkbox-group">
         {flagOptions.map((option) => (

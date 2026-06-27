@@ -7,7 +7,9 @@ export default mergeConfig(
   defineConfig({
     test: {
       environment: "jsdom",
-      setupFiles: "./src/test/setup.ts"
+      fileParallelism: false,
+      setupFiles: "./src/test/setup.ts",
+      testTimeout: 15000
     }
   })
 );

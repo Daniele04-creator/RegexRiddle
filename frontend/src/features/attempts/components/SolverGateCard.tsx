@@ -23,12 +23,12 @@ export function SolverGateCard({ mode }: SolverGateCardProps) {
     ? "Sei l'autore di questa sfida"
     : isSessionError
       ? "Sessione non verificata"
-      : "Accedi per risolvere";
+      : "Accedi per salvare il tentativo";
   const description = isAuthor
     ? "Gli autori non possono risolvere le proprie sfide."
     : isSessionError
-      ? "Non riesco a verificare la sessione in modo affidabile. Accedi di nuovo e riprova."
-      : "I tentativi sono protetti da sessione HttpOnly.";
+      ? "Non riesco a verificare il profilo in modo affidabile. Accedi di nuovo e riprova."
+      : "Potrai inviare la regex, tenere traccia dei progressi e comparire in classifica.";
 
   return (
     <Card className="bg-card/88">
@@ -37,7 +37,7 @@ export function SolverGateCard({ mode }: SolverGateCardProps) {
           {isAuthor ? (
             <ShieldAlertIcon
               aria-hidden="true"
-              className="mt-1 size-5 shrink-0 text-amber-600"
+              className="mt-1 size-5 shrink-0 text-lab-warning"
             />
           ) : (
             <LockKeyholeIcon
@@ -53,7 +53,8 @@ export function SolverGateCard({ mode }: SolverGateCardProps) {
       </CardHeader>
       <CardContent>
         <p className="text-sm leading-6 text-muted-foreground">
-          La verifica resta server-side con RE2 full match e feedback aggregato.
+          Gli esempi sono indizi pubblici. Le prove nascoste decidono se hai
+          risolto l'enigma.
         </p>
       </CardContent>
       <CardFooter className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">

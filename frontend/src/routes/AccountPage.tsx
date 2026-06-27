@@ -39,8 +39,8 @@ export function AccountPage() {
           Impostazioni account
         </h1>
         <p className="mt-4 text-base leading-7 text-muted-foreground">
-          Gestisci il profilo visibile del tuo account corrente. La sessione
-          resta server-side e il frontend non legge cookie né salva token.
+          Gestisci il nome visibile, la bio e l'avatar che accompagnano il tuo
+          profilo solver.
         </p>
       </div>
 
@@ -51,8 +51,8 @@ export function AccountPage() {
           <AlertCircleIcon aria-hidden="true" />
           <AlertTitle>Account non disponibile</AlertTitle>
           <AlertDescription>
-            Non posso verificare la sessione. Ricarica la pagina o riprova tra
-            poco.
+            Non riesco a verificare il profilo. Ricarica la pagina o riprova
+            tra poco.
           </AlertDescription>
         </Alert>
       ) : currentUser ? (

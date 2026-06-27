@@ -1,5 +1,25 @@
 # Difesa orale
 
+## Cosa contiene GOAL 08.6
+
+Nel GOAL 08.6 ho trasformato la parte pubblica da demo tecnica a esperienza di gioco. La nuova direzione si chiama "Regex Lab Arcade": l'utente capisce subito che sceglie una sfida, studia esempi accettati e rifiutati, prova una regex, riceve indizi numerici e sale in classifica.
+
+Ho rimosso dalle schermate pubbliche il gergo tecnico inutile: niente riferimenti a API, endpoint, backend, CSRF, cookie, DTO, framework, database, Docker o GOAL. Questi dettagli restano nella documentazione tecnica e nei test, ma non devono distrarre un visitatore o un docente durante la demo prodotto.
+
+GOAL 08.6 aggiunge:
+
+- hero ridisegnata con puzzle preview, esempi accettati/rifiutati, regex visuale e prove nascoste;
+- copy da giocatore su home, come funziona, catalogo, dettaglio sfida, classifica, login, registrazione e creazione;
+- card sfida piu' giocose con CTA "Gioca";
+- feedback tentativo piu' chiaro: prove utili superate, falsi positivi rimasti e stato risolto;
+- podio top 3 in leaderboard e spiegazione semplice del ranking;
+- test anti-copy tecnico sulle pagine pubbliche principali;
+- documentazione aggiornata per il tema Regex Lab Arcade.
+
+Non cambia backend, contratti API, database, autenticazione, sessioni o semantica regex. La sicurezza resta la stessa: la regex dell'utente non viene valutata nel frontend, i controlli nascosti e la regex segreta non vengono mostrati, non uso localStorage/sessionStorage per token, non leggo document.cookie e non uso dangerouslySetInnerHTML.
+
+La scelta importante da spiegare e': l'interfaccia pubblica parla come un gioco, mentre la documentazione e il codice mantengono in modo esplicito le garanzie tecniche. Questo rende il prodotto piu' vendibile e comprensibile senza indebolire la sicurezza.
+
 ## Cosa contiene GOAL 08.5
 
 Nel GOAL 08.5 ho aggiunto la pagina pubblica "Come funziona", utile per la demo e per spiegare al docente full match, dialetto RE2, esempi pubblici, controlli segreti, feedback aggregato e classifica. Ho aggiunto anche una pagina account protetta: l'utente autenticato puo' aggiornare display name, bio e avatar URL, mentre username, email e password non vengono modificati in questo goal. L'aggiornamento usa la sessione rr_session, credentials include e header CSRF. Non uso JWT, non leggo document.cookie e non salvo token in localStorage o sessionStorage. Ho poi fatto un pass finale su responsive e accessibilita' delle pagine principali.

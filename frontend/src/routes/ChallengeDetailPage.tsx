@@ -82,7 +82,7 @@ export function ChallengeDetailPage() {
           <Card>
             <CardHeader>
               <CardTitle>Statistiche pubbliche</CardTitle>
-              <CardDescription>Solo aggregati, nessun controllo nascosto.</CardDescription>
+              <CardDescription>Tentativi e soluzioni della community.</CardDescription>
             </CardHeader>
             <CardContent>
               <ChallengeStats
@@ -96,7 +96,8 @@ export function ChallengeDetailPage() {
             <CardHeader>
               <CardTitle>Esempi pubblici</CardTitle>
               <CardDescription>
-                Questi esempi orientano il solver; la verifica completa resta nel backend.
+                Gli esempi sono indizi pubblici. Le prove nascoste decidono se
+                hai risolto l'enigma.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -122,8 +123,8 @@ export function ChallengeDetailPage() {
                 Prova a risolvere
               </h2>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
-                Invia una regex candidata e confrontala con i controlli segreti
-                tramite il backend.
+                Scrivi una regex, invia il tentativo e ricevi un indizio
+                numerico sulle prove superate.
               </p>
             </div>
             <AttemptPanel challenge={challenge} />

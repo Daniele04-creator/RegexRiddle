@@ -17,7 +17,7 @@ export function AttemptProgressMeter({
   const percentage = Math.min(100, Math.max(0, (matched / safeTotal) * 100));
 
   return (
-    <div className="space-y-2">
+    <div className="flex flex-col gap-2">
       <div className="flex items-center justify-between gap-3 text-sm">
         <span className="font-medium">{label}</span>
         <span className="font-mono tabular-nums text-muted-foreground">
@@ -36,7 +36,7 @@ export function AttemptProgressMeter({
         <div
           className={cn(
             "h-2 rounded-full transition-[width]",
-            tone === "positive" ? "bg-emerald-500" : "bg-amber-500"
+            tone === "positive" ? "bg-lab-success" : "bg-lab-warning"
           )}
           style={{ width: `${percentage}%` }}
         />

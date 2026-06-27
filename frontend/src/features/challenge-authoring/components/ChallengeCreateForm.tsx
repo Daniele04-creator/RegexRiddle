@@ -86,9 +86,9 @@ function createChallengeErrorMessage(error: unknown): string {
       case 401:
         return "Sessione richiesta. Accedi e riprova.";
       case 403:
-        return "Operazione non autorizzata o controllo CSRF non valido.";
+        return "Azione non disponibile. Ricarica la pagina e riprova.";
       case 422:
-        return "La regex segreta, gli esempi pubblici o i controlli non sono coerenti con il motore RE2.";
+        return "La soluzione, gli indizi o le prove nascoste non sono coerenti.";
       default:
         return "Creazione non disponibile. Riprova tra poco.";
     }
@@ -132,13 +132,13 @@ function ControlList({
 }: ControlListProps) {
   const arrayError = readArrayError(errors);
   const isPositive = name === "positiveControls";
-  const addLabel = isPositive ? "Aggiungi positivo" : "Aggiungi negativo";
+  const addLabel = isPositive ? "Aggiungi prova accettata" : "Aggiungi prova rifiutata";
 
   return (
     <FieldSet>
       <FieldLegend>{title}</FieldLegend>
       <FieldDescription>
-        Minimo 3, massimo {MAX_CONTROLS_PER_KIND}. I valori non vengono mostrati
+        Minimo 3, massimo {MAX_CONTROLS_PER_KIND}. Queste prove non vengono mostrate
         ai solver.
       </FieldDescription>
       <div className="grid gap-3">
@@ -151,7 +151,7 @@ function ControlList({
               <div className="flex items-start gap-2">
                 <div className="min-w-0 flex-1">
                   <FieldLabel htmlFor={fieldId}>
-                    {isPositive ? "Controllo positivo" : "Controllo negativo"}{" "}
+                    {isPositive ? "Prova da accettare" : "Prova da rifiutare"}{" "}
                     {index + 1}
                   </FieldLabel>
                   <Input
@@ -167,7 +167,7 @@ function ControlList({
                   />
                 </div>
                 <Button
-                  aria-label={`Rimuovi ${isPositive ? "controllo positivo" : "controllo negativo"} ${index + 1}`}
+                  aria-label={`Rimuovi ${isPositive ? "prova da accettare" : "prova da rifiutare"} ${index + 1}`}
                   className="mt-7"
                   disabled={disabled || fields.length <= 3}
                   onClick={() => remove(index)}
@@ -249,10 +249,9 @@ export function ChallengeCreateForm({ currentUser }: ChallengeCreateFormProps) {
 
         <Card className="bg-card/88">
           <CardHeader>
-            <CardTitle>Editor sfida</CardTitle>
+            <CardTitle>Editor enigma</CardTitle>
             <CardDescription>
-              Compila la sfida pubblica e i controlli segreti. La coerenza regex
-              viene verificata dal backend.
+              Guida i solver con pochi indizi e tieni nascoste le prove decisive.
             </CardDescription>
           </CardHeader>
           <form noValidate onSubmit={handleSubmit(onSubmit)}>
@@ -266,6 +265,13 @@ export function ChallengeCreateForm({ currentUser }: ChallengeCreateFormProps) {
               ) : null}
 
               <FieldGroup>
+                <div>
+                  <h2 className="text-lg font-semibold">Identita della sfida</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Dai un nome chiaro all'enigma e scegli quanto deve essere
+                    impegnativo.
+                  </p>
+                </div>
                 <Field data-invalid={errors.title ? "true" : undefined}>
                   <FieldLabel htmlFor="challenge-title">Titolo</FieldLabel>
                   <Input
@@ -291,7 +297,7 @@ export function ChallengeCreateForm({ currentUser }: ChallengeCreateFormProps) {
                     aria-invalid={Boolean(errors.description)}
                   />
                   <FieldDescription>
-                    Scrivi il requisito pubblico senza svelare regex o controlli.
+                    Scrivi il requisito pubblico senza svelare la soluzione.
                   </FieldDescription>
                   <FieldError>{errors.description?.message}</FieldError>
                 </Field>
@@ -318,6 +324,13 @@ export function ChallengeCreateForm({ currentUser }: ChallengeCreateFormProps) {
               </FieldGroup>
 
               <FieldGroup>
+                <div>
+                  <h2 className="text-lg font-semibold">Soluzione nascosta</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Questa regex e' la risposta dell'enigma. Deve descrivere
+                    tutta la stringa corretta.
+                  </p>
+                </div>
                 <Field data-invalid={errors.pattern ? "true" : undefined}>
                   <FieldLabel htmlFor="challenge-secret-pattern">
                     Regex segreta
@@ -336,16 +349,15 @@ export function ChallengeCreateForm({ currentUser }: ChallengeCreateFormProps) {
                     aria-invalid={Boolean(errors.pattern)}
                   />
                   <FieldDescription>
-                    Il browser non valuta questa regex. L'API la verifica con
-                    RE2 e full-match semantics.
+                    Non inserirla nella descrizione: i solver devono scoprirla.
                   </FieldDescription>
                   <FieldError>{errors.pattern?.message}</FieldError>
                 </Field>
 
                 <FieldSet>
-                  <FieldLegend>Flag supportati</FieldLegend>
+                  <FieldLegend>Opzioni regex</FieldLegend>
                   <FieldDescription>
-                    Sono ammessi solo i e m, inviati sempre in ordine stabile.
+                    Usali solo se servono all'enigma.
                   </FieldDescription>
                   <div className="grid gap-3 sm:grid-cols-2">
                     <Field
@@ -361,9 +373,9 @@ export function ChallengeCreateForm({ currentUser }: ChallengeCreateFormProps) {
                       />
                       <FieldContent>
                         <FieldLabel htmlFor="challenge-flag-i">
-                          <FieldTitle>Ignore case</FieldTitle>
+                          <FieldTitle>Ignora maiuscole</FieldTitle>
                         </FieldLabel>
-                        <FieldDescription>Flag `i`.</FieldDescription>
+                        <FieldDescription>Utile se A e a devono valere uguale.</FieldDescription>
                       </FieldContent>
                     </Field>
                     <Field
@@ -379,9 +391,9 @@ export function ChallengeCreateForm({ currentUser }: ChallengeCreateFormProps) {
                       />
                       <FieldContent>
                         <FieldLabel htmlFor="challenge-flag-m">
-                          <FieldTitle>Multiline</FieldTitle>
+                          <FieldTitle>Piu righe</FieldTitle>
                         </FieldLabel>
-                        <FieldDescription>Flag `m`.</FieldDescription>
+                        <FieldDescription>Utile per enigmi con testo su piu righe.</FieldDescription>
                       </FieldContent>
                     </Field>
                   </div>
@@ -390,6 +402,13 @@ export function ChallengeCreateForm({ currentUser }: ChallengeCreateFormProps) {
               </FieldGroup>
 
               <FieldGroup>
+                <div>
+                  <h2 className="text-lg font-semibold">Indizi pubblici</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Mostra un esempio che deve passare e uno che deve essere
+                    rifiutato.
+                  </p>
+                </div>
                 <Field data-invalid={errors.publicPositiveExample ? "true" : undefined}>
                   <FieldLabel htmlFor="challenge-public-positive">
                     Esempio pubblico positivo
@@ -429,7 +448,15 @@ export function ChallengeCreateForm({ currentUser }: ChallengeCreateFormProps) {
                 </Field>
               </FieldGroup>
 
-              <div className="grid gap-6 xl:grid-cols-2">
+              <div className="flex flex-col gap-4">
+                <div>
+                  <h2 className="text-lg font-semibold">Prove nascoste</h2>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Aggiungi casi che la soluzione deve accettare o rifiutare.
+                    Il solver vedra solo indizi numerici dopo il tentativo.
+                  </p>
+                </div>
+                <div className="grid gap-6 xl:grid-cols-2">
                 <ControlList
                   append={positiveControls.append}
                   disabled={isPending}
@@ -438,7 +465,7 @@ export function ChallengeCreateForm({ currentUser }: ChallengeCreateFormProps) {
                   name="positiveControls"
                   register={register}
                   remove={positiveControls.remove}
-                  title="Controlli segreti positivi"
+                  title="Prove nascoste da accettare"
                 />
                 <ControlList
                   append={negativeControls.append}
@@ -448,14 +475,15 @@ export function ChallengeCreateForm({ currentUser }: ChallengeCreateFormProps) {
                   name="negativeControls"
                   register={register}
                   remove={negativeControls.remove}
-                  title="Controlli segreti negativi"
+                  title="Prove nascoste da rifiutare"
                 />
+                </div>
               </div>
             </CardContent>
             <CardFooter className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between">
               <Button disabled={isPending} type="submit">
                 <SaveIcon aria-hidden="true" data-icon="inline-start" />
-                {isPending ? "Creazione in corso…" : "Crea sfida"}
+                {isPending ? "Pubblicazione in corso..." : "Pubblica sfida"}
               </Button>
               <p className="text-sm text-muted-foreground" aria-live="polite">
                 Autore: {currentUser.displayName} (@{currentUser.username})
@@ -470,17 +498,15 @@ export function ChallengeCreateForm({ currentUser }: ChallengeCreateFormProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ShieldCheckIcon aria-hidden="true" />
-              Sicurezza
+              Consiglio creator
             </CardTitle>
             <CardDescription>
-              Nessuna preview client-side, nessun browser storage, nessun segreto
-              nella risposta pubblica.
+              Gli indizi pubblici devono aiutare senza regalare la soluzione.
             </CardDescription>
           </CardHeader>
           <CardContent className="text-sm leading-6 text-muted-foreground">
-            La form invia solo il payload necessario all'endpoint protetto. Il
-            backend decide se regex, esempi e controlli sono validi prima di
-            salvare la sfida.
+            Usa esempi semplici per orientare chi gioca e prove nascoste piu
+            varie per bloccare le regex troppo larghe.
           </CardContent>
         </Card>
       </aside>

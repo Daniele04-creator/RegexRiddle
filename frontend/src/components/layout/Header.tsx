@@ -1,8 +1,8 @@
 import { FlaskConicalIcon } from "lucide-react";
 import { Link, NavLink } from "react-router";
 
-import { HealthBadge } from "@/components/layout/HealthBadge";
 import { MobileNav } from "@/components/layout/MobileNav";
+import { Button } from "@/components/ui/button";
 import { UserMenu } from "@/features/auth/components/UserMenu";
 import { publicNavItems } from "@/lib/routes";
 import { cn } from "@/lib/utils";
@@ -40,7 +40,9 @@ export function Header() {
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
-          <HealthBadge />
+          <Button asChild size="sm">
+            <Link to="/challenges">Gioca ora</Link>
+          </Button>
           <UserMenu />
         </div>
 

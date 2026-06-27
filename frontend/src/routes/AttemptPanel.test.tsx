@@ -89,7 +89,7 @@ describe("attempt panel route states", () => {
   it("shows login and register CTAs to guests", async () => {
     await renderChallengeDetail();
 
-    expect(await screen.findByText("Accedi per risolvere")).toBeInTheDocument();
+    expect(await screen.findByText("Accedi per salvare il tentativo")).toBeInTheDocument();
     expect(screen.getAllByRole("link", { name: "Accedi" })[0]).toHaveAttribute(
       "href",
       "/login"
@@ -149,7 +149,7 @@ describe("attempt panel route states", () => {
       );
     });
     expect(await screen.findByText("Soluzione corretta")).toBeInTheDocument();
-    expect(screen.getByText("Hai risolto la sfida.")).toBeInTheDocument();
+    expect(screen.getByText("Hai risolto la sfida. La classifica ti aspetta.")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Sfida risolta" })).toBeDisabled();
   });
 
@@ -175,7 +175,7 @@ describe("attempt panel route states", () => {
     expect(await screen.findByText("Non ancora")).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Hai soddisfatto 3 controlli positivi su 3 e hai accettato 3 controlli negativi su 3."
+        "Hai superato 3 prove utili su 3; restano 3 falsi positivi da eliminare su 3."
       )
     ).toBeInTheDocument();
   });
@@ -212,7 +212,7 @@ describe("attempt panel route states", () => {
     await user.click(screen.getByRole("button", { name: "Invia tentativo" }));
 
     expect(
-      await screen.findByText("Regex non valida o non compatibile con il dialetto RE2.")
+      await screen.findByText("Regex non valida per questo enigma.")
     ).toBeInTheDocument();
   });
 

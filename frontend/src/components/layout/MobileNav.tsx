@@ -33,7 +33,7 @@ export function MobileNav() {
       >
         <SheetHeader>
           <SheetTitle>RegexRiddle</SheetTitle>
-          <SheetDescription>Regex Lab navigation</SheetDescription>
+          <SheetDescription>Menu di gioco</SheetDescription>
         </SheetHeader>
         <nav aria-label="Mobile navigation" className="flex flex-col gap-2 px-4">
           {publicNavItems.map((item) => (

@@ -18,14 +18,13 @@ export function AccountGate() {
       <CardHeader>
         <CardTitle>Accedi per gestire l'account</CardTitle>
         <CardDescription>
-          Le impostazioni sono collegate alla sessione server-side corrente.
-          Non servono token nel browser.
+          Aggiorna nome visibile, bio e avatar del tuo profilo solver.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <p className="text-sm leading-6 text-muted-foreground">
-          Puoi esplorare sfide e classifica anche da guest. Per aggiornare nome
-          visibile, bio e avatar URL devi prima autenticarti.
+          Puoi esplorare sfide e classifica anche da guest. Per personalizzare
+          il profilo devi prima accedere.
         </p>
       </CardContent>
       <CardFooter className="flex flex-col items-stretch gap-3 sm:flex-row">

@@ -1,15 +1,14 @@
 import {
   ArrowRightIcon,
-  EyeOffIcon,
-  FlaskConicalIcon,
-  GaugeIcon,
-  ListChecksIcon,
+  BrainCircuitIcon,
+  CheckCircle2Icon,
+  EyeIcon,
+  LightbulbIcon,
   LockKeyholeIcon,
-  ServerIcon,
-  ShieldCheckIcon,
-  TrophyIcon,
-  UsersIcon
+  PencilLineIcon,
+  TrophyIcon
 } from "lucide-react";
+import { motion } from "motion/react";
 import { Link } from "react-router";
 
 import { routePaths } from "@/app/router";
@@ -18,235 +17,139 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 
-const actorCards = [
+const playSteps = [
   {
-    title: "Per chi crea una sfida",
+    title: "Scegli una sfida",
     description:
-      "L'autore scrive una regex segreta, due esempi pubblici e controlli positivi/negativi che restano sul backend.",
-    icon: FlaskConicalIcon
+      "Ogni enigma ha un titolo, una difficolta e una piccola traccia iniziale.",
+    icon: BrainCircuitIcon
   },
   {
-    title: "Per chi risolve",
+    title: "Studia gli esempi",
     description:
-      "Il solver vede solo titolo, descrizione, difficoltà ed esempi pubblici, poi invia una regex candidata.",
-    icon: UsersIcon
+      "Gli esempi accettati e rifiutati sono i tuoi primi indizi: usali per capire il pattern.",
+    icon: EyeIcon
   },
   {
-    title: "Per la demo",
+    title: "Scrivi la tua regex",
     description:
-      "Il percorso consigliato è catalogo, dettaglio sfida, tentativo, feedback, classifica e pagina account.",
-    icon: ListChecksIcon
+      "La soluzione deve coprire tutta la stringa, non solo un pezzo comodo.",
+    icon: PencilLineIcon
+  },
+  {
+    title: "Ricevi indizi",
+    description:
+      "Dopo ogni tentativo vedi quante prove hai superato e dove stai ancora lasciando buchi.",
+    icon: LightbulbIcon
+  },
+  {
+    title: "Risolvi e sali",
+    description:
+      "Chi completa piu enigmi con meno tentativi conquista la classifica.",
+    icon: TrophyIcon
   }
-];
-
-const ruleCards = [
-  {
-    title: "Full match",
-    description:
-      "Ogni controllo viene valutato come stringa intera: la regex deve coprire tutto l'input, non una sottostringa.",
-    icon: GaugeIcon
-  },
-  {
-    title: "RE2-compatible",
-    description:
-      "Il dialetto evita backreference e look-around non supportati, riducendo il rischio di catastrophic backtracking e ReDoS.",
-    icon: ServerIcon
-  },
-  {
-    title: "Flags i e m",
-    description:
-      "i rende il match case-insensitive; m abilita il comportamento multilinea dove supportato dal motore server-side.",
-    icon: ShieldCheckIcon
-  }
-];
-
-const securityCards = [
-  {
-    title: "Esempi pubblici",
-    description:
-      "Gli esempi positivi e negativi pubblici servono come indizi leggibili e sono visibili a tutti i solver.",
-    icon: EyeOffIcon
-  },
-  {
-    title: "Controlli segreti",
-    description:
-      "I controlli positivi e negativi nascosti restano server-only: il frontend non riceve regex segrete o valori nascosti.",
-    icon: LockKeyholeIcon
-  },
-  {
-    title: "Feedback aggregato",
-    description:
-      "Dopo un tentativo il solver vede quanti positivi sono stati riconosciuti e quanti negativi sono stati accettati per errore.",
-    icon: ListChecksIcon
-  }
-];
-
-const demoSteps = [
-  "Apri il catalogo e scegli una sfida pubblica.",
-  "Leggi esempi pubblici e descrizione senza vedere controlli nascosti.",
-  "Accedi come demo_player e invia una regex candidata.",
-  "Spiega il feedback aggregato positivi/negativi.",
-  "Mostra la classifica: più sfide risolte, media tentativi più bassa, username alfabetico."
 ];
 
 export function HowItWorksPage() {
   return (
     <PageContainer className="py-10 sm:py-14">
-      <section aria-labelledby="how-title" className="max-w-4xl">
-        <Badge variant="secondary">Come funziona</Badge>
-        <h1 id="how-title" className="mt-4 text-4xl font-semibold tracking-normal">
-          RegexRiddle spiegato per la demo
-        </h1>
-        <p className="mt-4 text-base leading-7 text-muted-foreground">
-          RegexRiddle è un laboratorio di puzzle regex: chi crea nasconde la
-          soluzione sul backend, chi risolve osserva esempi pubblici e riceve
-          solo feedback aggregato sui tentativi.
-        </p>
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Button asChild>
-            <Link to={routePaths.challenges}>
-              Esplora sfide
-              <ArrowRightIcon aria-hidden="true" data-icon="inline-end" />
-            </Link>
-          </Button>
-          <Button asChild variant="outline">
-            <Link to={routePaths.leaderboard}>
-              <TrophyIcon aria-hidden="true" data-icon="inline-start" />
-              Guarda classifica
-            </Link>
-          </Button>
-          <Button asChild variant="secondary">
-            <Link to={routePaths.create}>Crea una sfida</Link>
-          </Button>
+      <section aria-labelledby="how-title" className="relative overflow-hidden rounded-lg border bg-card/82 p-6 sm:p-8">
+        <div className="arcade-grid pointer-events-none absolute inset-0 opacity-45" />
+        <div className="relative max-w-4xl">
+          <Badge variant="secondary">Come funziona</Badge>
+          <h1 id="how-title" className="mt-4 text-4xl font-semibold tracking-normal sm:text-5xl">
+            Cinque mosse per risolvere un enigma regex
+          </h1>
+          <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground">
+            RegexRiddle e' un gioco di deduzione: osservi pochi esempi,
+            provi una regex e scopri se supera anche le prove nascoste.
+          </p>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <Button asChild>
+              <Link to={routePaths.challenges}>
+                Esplora sfide
+                <ArrowRightIcon aria-hidden="true" data-icon="inline-end" />
+              </Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link to={routePaths.create}>Crea una sfida</Link>
+            </Button>
+            <Button asChild variant="secondary">
+              <Link to={routePaths.leaderboard}>Classifica solver</Link>
+            </Button>
+          </div>
         </div>
       </section>
 
-      <section aria-labelledby="actors-title" className="mt-12">
+      <section aria-labelledby="steps-title" className="mt-12">
         <div className="mb-5 max-w-3xl">
-          <h2 id="actors-title" className="text-2xl font-semibold">
-            Creatori, solver e flusso demo
+          <Badge variant="outline">Flusso di gioco</Badge>
+          <h2 id="steps-title" className="mt-3 text-3xl font-semibold">
+            Dal catalogo alla classifica
           </h2>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            La divisione dei ruoli tiene separata la spiegazione pubblica dalla
-            verità server-side usata per validare i tentativi.
-          </p>
         </div>
-        <div className="grid gap-4 md:grid-cols-3">
-          {actorCards.map((item) => (
-            <Card className="bg-card/88" key={item.title}>
-              <CardHeader>
-                <div className="mb-2 flex size-10 items-center justify-center rounded-lg border bg-muted text-primary">
-                  <item.icon aria-hidden="true" />
-                </div>
-                <CardTitle>{item.title}</CardTitle>
-                <CardDescription>{item.description}</CardDescription>
-              </CardHeader>
-            </Card>
+        <ol className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+          {playSteps.map((step, index) => (
+            <motion.li
+              initial={{ opacity: 0, y: 16 }}
+              key={step.title}
+              transition={{ delay: index * 0.05, duration: 0.3 }}
+              viewport={{ once: true, margin: "-80px" }}
+              whileInView={{ opacity: 1, y: 0 }}
+            >
+              <Card className="h-full bg-card/90">
+                <CardHeader>
+                  <div className="mb-2 flex items-center gap-2">
+                    <Badge variant="secondary">{index + 1}</Badge>
+                    <div className="flex size-10 items-center justify-center rounded-lg border bg-muted text-primary">
+                      <step.icon aria-hidden="true" />
+                    </div>
+                  </div>
+                  <CardTitle>{step.title}</CardTitle>
+                  <CardDescription>{step.description}</CardDescription>
+                </CardHeader>
+              </Card>
+            </motion.li>
           ))}
-        </div>
-      </section>
-
-      <section aria-labelledby="rules-title" className="mt-12">
-        <div className="mb-5 max-w-3xl">
-          <h2 id="rules-title" className="text-2xl font-semibold">
-            Full match e dialetto regex
-          </h2>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            I tentativi vengono valutati sul backend con semantica full-string e
-            motore RE2-compatible. Il browser non costruisce né esegue regex
-            utente.
-          </p>
-        </div>
-        <div className="grid gap-4 md:grid-cols-3">
-          {ruleCards.map((item) => (
-            <Card className="bg-card/88" key={item.title}>
-              <CardHeader>
-                <div className="mb-2 flex size-10 items-center justify-center rounded-lg border bg-muted text-primary">
-                  <item.icon aria-hidden="true" />
-                </div>
-                <CardTitle>{item.title}</CardTitle>
-                <CardDescription>{item.description}</CardDescription>
-              </CardHeader>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      <section aria-labelledby="security-title" className="mt-12">
-        <div className="mb-5 max-w-3xl">
-          <h2 id="security-title" className="text-2xl font-semibold">
-            Cosa resta pubblico e cosa resta segreto
-          </h2>
-          <p className="mt-2 text-sm leading-6 text-muted-foreground">
-            La UI mostra solo materiale didattico e risultati aggregati. Le
-            verifiche private non vengono serializzate verso il client.
-          </p>
-        </div>
-        <div className="grid gap-4 md:grid-cols-3">
-          {securityCards.map((item) => (
-            <Card className="bg-card/88" key={item.title}>
-              <CardHeader>
-                <div className="mb-2 flex size-10 items-center justify-center rounded-lg border bg-muted text-primary">
-                  <item.icon aria-hidden="true" />
-                </div>
-                <CardTitle>{item.title}</CardTitle>
-                <CardDescription>{item.description}</CardDescription>
-              </CardHeader>
-            </Card>
-          ))}
-        </div>
+        </ol>
       </section>
 
       <section
-        aria-labelledby="leaderboard-title"
+        aria-labelledby="hidden-tests-title"
         className="mt-12 grid gap-5 lg:grid-cols-[minmax(0,1fr)_24rem]"
       >
-        <Card className="bg-card/88">
+        <Card className="bg-card/90">
           <CardHeader>
+            <div className="mb-2 flex size-10 items-center justify-center rounded-lg border bg-muted text-primary">
+              <LockKeyholeIcon aria-hidden="true" />
+            </div>
             <CardTitle>
-              <h2 id="leaderboard-title">Classifica</h2>
+              <h2 id="hidden-tests-title">Le prove nascoste fanno il gioco</h2>
             </CardTitle>
             <CardDescription>
-              La classifica ordina i solver con regole pubbliche e ripetibili.
+              Gli esempi pubblici ti orientano, ma l'enigma si risolve solo
+              quando la regex funziona anche sui casi che non vedi. Per questo
+              ogni tentativo restituisce indizi numerici, non la risposta.
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col gap-4 text-sm leading-6 text-muted-foreground">
-            <p>
-              Il ranking privilegia chi risolve più sfide. A parità di sfide
-              risolte conta la media tentativi più bassa; se serve un ulteriore
-              spareggio viene usato l'username in ordine alfabetico.
-            </p>
-            <Separator />
-            <p>
-              La classifica non mostra email, id interni, tentativi raw o dati
-              dei controlli nascosti.
-            </p>
-          </CardContent>
         </Card>
 
-        <Card className="bg-card/88">
+        <Card className="bg-primary text-primary-foreground">
           <CardHeader>
-            <CardTitle>Demo consigliata</CardTitle>
-            <CardDescription>
-              Sequenza breve per spiegare prodotto, sicurezza e UX.
+            <div className="mb-2 flex size-10 items-center justify-center rounded-lg border border-primary-foreground/30 bg-primary-foreground/12">
+              <CheckCircle2Icon aria-hidden="true" />
+            </div>
+            <CardTitle>Regola d'oro</CardTitle>
+            <CardDescription className="text-primary-foreground/80">
+              La regex deve descrivere l'intera stringa. Se trova solo una
+              sottoparte, l'enigma non e' ancora risolto.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <ol className="flex list-decimal flex-col gap-3 pl-5 text-sm leading-6 text-muted-foreground">
-              {demoSteps.map((step) => (
-                <li className="break-words" key={step}>
-                  {step}
-                </li>
-              ))}
-            </ol>
-          </CardContent>
         </Card>
       </section>
     </PageContainer>

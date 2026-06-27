@@ -40,8 +40,7 @@ export function AccountSummaryCard({ user }: AccountSummaryCardProps) {
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
         <p className="text-sm leading-6 text-muted-foreground">
-          Questa scheda mostra solo i dati dell'utente autenticato. Nessuna
-          statistica profilo, password o sessione viene renderizzata.
+          Questa scheda riassume come apparirai nelle parti pubbliche del gioco.
         </p>
         <Separator />
         <dl className="grid gap-4 text-sm">

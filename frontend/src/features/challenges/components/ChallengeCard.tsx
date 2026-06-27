@@ -24,7 +24,7 @@ interface ChallengeCardProps {
 
 export function ChallengeCard({ challenge }: ChallengeCardProps) {
   return (
-    <Card className="h-full bg-card/90">
+    <Card className="h-full bg-card/90 transition-[border-color,box-shadow,transform] hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10">
       <CardHeader>
         <CardTitle>
           <h2>{challenge.title}</h2>
@@ -53,7 +53,7 @@ export function ChallengeCard({ challenge }: ChallengeCardProps) {
         </p>
         <Button asChild variant="outline">
           <Link to={challengeDetailPath(challenge.id)}>
-            Apri
+            Gioca
             <ArrowRightIcon aria-hidden="true" data-icon="inline-end" />
           </Link>
         </Button>

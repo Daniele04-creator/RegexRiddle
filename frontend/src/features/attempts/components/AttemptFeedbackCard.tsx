@@ -29,7 +29,7 @@ export function AttemptFeedbackCard({ response }: AttemptFeedbackCardProps) {
     >
       <Card
         aria-live="polite"
-        className={isCorrect ? "border-emerald-500/50" : "border-amber-500/50"}
+        className={isCorrect ? "border-lab-success/60" : "border-lab-warning/70"}
         role="status"
       >
         <CardHeader className="gap-3">
@@ -43,12 +43,12 @@ export function AttemptFeedbackCard({ response }: AttemptFeedbackCardProps) {
             {isCorrect ? (
               <CheckCircle2Icon
                 aria-hidden="true"
-                className="mt-1 size-5 shrink-0 text-emerald-600"
+                className="mt-1 size-5 shrink-0 text-lab-success"
               />
             ) : (
               <CircleAlertIcon
                 aria-hidden="true"
-                className="mt-1 size-5 shrink-0 text-amber-600"
+                className="mt-1 size-5 shrink-0 text-lab-warning"
               />
             )}
             <div>
@@ -57,27 +57,28 @@ export function AttemptFeedbackCard({ response }: AttemptFeedbackCardProps) {
               </CardTitle>
               <CardDescription className="mt-1">
                 {isCorrect
-                  ? "Hai risolto la sfida."
-                  : `Hai soddisfatto ${attempt.positiveMatched} controlli positivi su ${attempt.positiveTotal} e hai accettato ${attempt.negativeMatched} controlli negativi su ${attempt.negativeTotal}.`}
+                  ? "Hai risolto la sfida. La classifica ti aspetta."
+                  : `Hai superato ${attempt.positiveMatched} prove utili su ${attempt.positiveTotal}; restano ${attempt.negativeMatched} falsi positivi da eliminare su ${attempt.negativeTotal}.`}
               </CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent className="grid gap-4 sm:grid-cols-2">
           <AttemptProgressMeter
-            label="Controlli positivi"
+            label="Prove utili superate"
             matched={attempt.positiveMatched}
             tone="positive"
             total={attempt.positiveTotal}
           />
           <AttemptProgressMeter
-            label="Controlli negativi accettati"
+            label="Falsi positivi rimasti"
             matched={attempt.negativeMatched}
             tone="negative"
             total={attempt.negativeTotal}
           />
           <p className="text-sm leading-6 text-muted-foreground sm:col-span-2">
-            I controlli restano segreti: la risposta espone solo conteggi aggregati.
+            Le prove nascoste restano chiuse: usa questi indizi per affinare la
+            prossima regex.
           </p>
         </CardContent>
       </Card>

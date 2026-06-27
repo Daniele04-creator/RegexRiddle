@@ -1,6 +1,6 @@
 # RegexRiddle
 
-RegexRiddle is a Web Technologies exam project scaffold. The repository currently includes the GOAL 08.5 final UX milestone: PostgreSQL, Prisma schema, deterministic demo seed data, public challenge DTOs, read-only challenge endpoints, public leaderboard, backend auth, protected current-user account settings, an internal server-side RE2-compatible evaluator, `POST /api/challenges`, `POST /api/challenges/:id/attempts`, React/Vite pages connected to the public catalog, challenge detail, leaderboard APIs, real login/register/logout UI, a public `/how-it-works` walkthrough page, a protected `/account` settings page, a protected attempt panel on `/challenges/:id`, and a protected authoring form on `/create`. It still has no profile/statistics, password/email change, uploads, or edit/delete workflows.
+RegexRiddle is a Web Technologies exam project that presents regex challenges as a public puzzle game. The repository currently includes the GOAL 08.6 public UX milestone: PostgreSQL, Prisma schema, deterministic demo seed data, public challenge DTOs, read-only challenge endpoints, public leaderboard, backend auth, protected current-user account settings, an internal server-side RE2-compatible evaluator, `POST /api/challenges`, `POST /api/challenges/:id/attempts`, React/Vite pages connected to the public catalog, challenge detail, leaderboard APIs, real login/register/logout UI, a player-facing `/how-it-works` walkthrough page, a protected `/account` settings page, a protected attempt panel on `/challenges/:id`, a protected authoring form on `/create`, and the Regex Lab Arcade visual/copy system. It still has no profile/statistics, password/email change, uploads, or edit/delete workflows.
 
 ## Stack
 
@@ -214,6 +214,15 @@ GOAL 08.5 adds final demo and account polish:
 - account updates call `PATCH /api/auth/me` with `credentials: "include"` and `X-RegexRiddle-CSRF: 1`;
 - username, email, password, profile statistics, uploads, and challenge edit/delete are not implemented in this milestone;
 - no Prisma migration or schema change was added.
+
+GOAL 08.6 cleans up the public product experience:
+
+- the app shell, home, how-it-works, catalog, challenge detail, leaderboard, auth, create, account, and fallback states use player-facing copy instead of implementation jargon;
+- the landing page introduces the Regex Lab Arcade direction with puzzle preview, regex chips, visible CTAs, hidden-test language, and light Motion for React transitions;
+- the catalog and detail pages keep public examples and aggregate stats while avoiding API/backend/security implementation labels;
+- the leaderboard adds a top-three podium and explains ranking in simple solver terms;
+- auth and create pages keep the existing protected flows but remove token, cookie, API, and CSRF wording from public UI;
+- no backend API, database, auth/session, or regex semantics changed.
 
 ## Public leaderboard
 

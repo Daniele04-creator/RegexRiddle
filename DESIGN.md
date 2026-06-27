@@ -1,30 +1,33 @@
-# Regex Lab Design System
+# Regex Lab Arcade Design System
 
 ## Product Personality
 
-Regex Lab is a precise puzzle laboratory: technical, playful, restrained, and exam-ready. The interface should feel like a safe lab console for regex riddles, not a generic SaaS template.
+Regex Lab Arcade is a modern logic game for regex riddles: playful, precise, public-facing, and still exam-ready. The interface should feel like an inviting puzzle arcade layered over a safe lab, not like API documentation or an internal engineering console.
 
-Visual thesis: pale lab surfaces, ink-blue technical text, teal signal accents, amber attention states, compact pattern chips, and quiet motion.
+Visual thesis: bright lab surfaces, deep ink text, teal primary actions, amber arcade highlights, candy accent chips, hidden-test locks, compact regex tokens, and quiet motion.
 
 ## Visual Metaphor
 
-- Lab console: the shell frames the app as a controlled workspace.
-- Pattern cards: regex examples are shown as text chips, never as executable client logic.
+- Arcade puzzle lab: the shell frames the app as a game board with a disciplined lab backbone.
+- Puzzle preview: the home hero shows accepted/rejected examples, a regex-like input, and locked hidden tests.
+- Pattern chips: regex examples are shown as text chips, never as executable client logic.
 - Match and mismatch signals: success, warning, and danger states include text labels, not color alone.
-- Safe sandbox: hidden checks and secret regexes stay server-only.
+- Safe sandbox: hidden tests and secret regexes stay out of public UI.
 
 ## Color Tokens
 
-- `background`: calm lab canvas, near-white with a faint cool tint.
-- `foreground`: deep ink blue for readable technical content.
-- `surface/card`: clean elevated panels for repeated items and placeholders.
+- `background`: luminous lab canvas with a faint teal tint.
+- `foreground`: deep ink violet-blue for readable puzzle content.
+- `surface/card`: clean elevated panels for repeated items, forms, and puzzle preview.
 - `border`: cool neutral separator for scan-friendly layout.
 - `muted`: subdued supporting surfaces and copy.
-- `primary`: teal signal for primary action and API-online state.
-- `accent`: amber lab marker for secondary emphasis.
+- `primary`: teal signal for primary play actions.
+- `accent`: amber arcade marker for secondary emphasis.
+- `secondary`: soft violet support surface for chips and secondary CTAs.
 - `success`: green match state.
 - `warning`: amber caution state.
 - `danger`: red destructive or offline state.
+- `lab-candy`: magenta accent for arcade chips and decorative regex tokens.
 
 Colors are implemented as CSS variables in `frontend/src/styles/globals.css` and exposed through Tailwind v4 theme tokens.
 
@@ -39,6 +42,14 @@ Colors are implemented as CSS variables in `frontend/src/styles/globals.css` and
 - Captions and badges: 12-14 px.
 
 Headings use balanced wrapping. Body copy should stay short, active, and product-facing.
+
+## Public Copy Rules
+
+Public pages should describe the game, not the implementation. Use player-facing words such as regex, challenge, riddle, solution, clue, public examples, hidden tests, leaderboard, and attempts.
+
+Do not render implementation terms in public UI copy: API, endpoint, backend, server-side, RE2, HttpOnly, SameSite, CSRF, DTO, JSON, Fastify, Prisma, Vite, TanStack, Docker, PostgreSQL, Argon2id, token storage, or GOAL labels. Technical documentation may still explain these controls.
+
+When the user needs to understand full-string semantics, say that the regex must cover the whole string. Do not use "full match" as public marketing copy.
 
 ## Spacing, Radius, Shadow
 
@@ -84,7 +95,8 @@ Headings use balanced wrapping. Body copy should stay short, active, and product
 
 - Challenge catalog cards show title, difficulty, public examples, public author identity, aggregate attempts, aggregate solutions, and created date.
 - Challenge detail pages show the same public examples and aggregate stats, plus created/updated dates.
-- Leaderboard desktop views use accessible table headers.
+- Challenge CTAs use play language such as "Gioca".
+- Leaderboard desktop views use accessible table headers and may add a top-three podium.
 - Leaderboard mobile views use stacked list cards to avoid horizontal overflow.
 - Pagination controls use real buttons and URL query state.
 
@@ -117,10 +129,10 @@ Headings use balanced wrapping. Body copy should stay short, active, and product
 ### Attempt Gameplay
 
 - `/challenges/:id` contains the gameplay panel below public examples.
-- Guests see login/register CTAs.
+- Guests see login/register CTAs under the title "Accedi per salvare il tentativo".
 - Authors see a blocked-author message.
 - Authenticated non-authors see the candidate pattern form.
-- The form explains server-side RE2 full-match verification without adding a client-side preview.
+- The form explains hidden tests and whole-string coverage without adding a client-side preview.
 - The candidate pattern stays in form state only.
 - Feedback shows attempt number, positive aggregate progress, negative aggregate result, solved/incorrect state, and created date.
 - Long regex text must wrap or scroll inside the input without causing page overflow.
@@ -152,6 +164,7 @@ Headings use balanced wrapping. Body copy should stay short, active, and product
 - Never use `dangerouslySetInnerHTML`.
 - User regex text is rendered as text only.
 - Regex evaluation happens server-side with the RE2-compatible backend engine.
+- Public UI should communicate the security model through game mechanics, not through implementation jargon.
 
 ## GOAL 08.0 Scope
 
@@ -190,3 +203,11 @@ GOAL 08.5 adds the public `/how-it-works` demo walkthrough, the protected `/acco
 The how-it-works page explains creators, solvers, full match, RE2-compatible regexes, supported flags, public examples, server-only secret controls, aggregate feedback, leaderboard ranking, and the recommended demo flow.
 
 The account page shows a guest login/register gate and, for authenticated users, a current-user summary plus editable `displayName`, `bio`, and `avatarUrl`. It deliberately does not add profile statistics, password change, email change, avatar upload, challenge edit/delete, database migrations, auth/session changes, regex semantic changes, or frontend regex evaluation.
+
+## GOAL 08.6 Scope
+
+GOAL 08.6 turns the public UX from a technical demo into the Regex Lab Arcade presentation layer.
+
+It updates the app shell, home, how-it-works, challenge catalog, challenge detail, leaderboard, login, register, create, account, and fallback copy so unauthenticated users see a game narrative instead of implementation details. It adds a stronger hero, puzzle preview, arcade-grid accents, regex chips, top-three leaderboard podium, friendlier loading/error/empty states, and game-like attempt feedback.
+
+It deliberately does not change backend APIs, auth/session behavior, database schema, regex evaluation semantics, challenge contracts, or frontend regex evaluation. Technical security details remain documented in repository docs and tests, while public UI copy stays player-facing.

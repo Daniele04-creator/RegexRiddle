@@ -2,7 +2,7 @@
 
 ## Current milestone
 
-GOAL 08.5: how-it-works page, account settings, and final UI polish.
+GOAL 08.6: public UX cleanup and Regex Lab Arcade visual redesign.
 
 ## Implemented
 
@@ -86,8 +86,11 @@ GOAL 08.5: how-it-works page, account settings, and final UI polish.
 - Challenge detail attempt panel for guests, authenticated non-authors, and authors.
 - Attempt mutation using `POST /api/challenges/:id/attempts` through the same-origin API client with `credentials: "include"` and `X-RegexRiddle-CSRF: 1`.
 - Attempt feedback for correct, incorrect, invalid regex, already solved, and forbidden author states without rendering secret controls or proposed patterns.
-- Public how-it-works walkthrough explaining creators, solvers, full-match semantics, RE2-compatible regexes, flags, public examples, secret controls, aggregate feedback, leaderboard ranking, and demo flow.
+- Public how-it-works walkthrough explaining the player flow: choose a challenge, study examples, write a regex, receive clues, solve, and climb the leaderboard.
 - Header and mobile navigation with Home, Come funziona, Sfide, Classifica, Crea, plus Account/Logout for authenticated users.
+- Regex Lab Arcade public redesign across shell, home, how-it-works, catalog, challenge detail, leaderboard, auth, create, account, and fallback views.
+- Player-facing public copy that removes implementation jargon from user-facing screens while keeping technical security details in repository docs and tests.
+- Public copy guard test covering `/`, `/how-it-works`, `/challenges`, `/leaderboard`, `/login`, and `/register`.
 
 ## Not implemented
 
@@ -241,3 +244,32 @@ Verified on 2026-06-27 after GOAL 08.5 implementation:
 - Web Interface Guidelines audit: PASS for page hierarchy, labels, focusable controls, mobile tap targets, no nested cards, and text wrapping in the new how-it-works and account views.
 - Source security audit: PASS, no production frontend `dangerouslySetInnerHTML`, `document.cookie`, browser auth-token storage APIs, JavaScript `RegExp` construction, `console.*`, or obsolete `apps/*` path references.
 - Sensitive-field and mass-assignment audit: PASS, account updates accept only `displayName`, `bio`, and `avatarUrl`; forbidden sensitive names appear only in docs, tests, shared challenge-creation request contracts, or backend internals.
+
+Verified on 2026-06-27 after GOAL 08.6 implementation:
+
+- `pnpm db:verify`: PASS, 3 users, 10 challenges, 60 controls, 4 attempts, 2 solutions; no secret values printed.
+- `pnpm lint`: PASS with two pre-existing non-blocking Fast Refresh warnings in generated shadcn `button` and `badge` files.
+- `pnpm typecheck`: PASS.
+- `pnpm test`: PASS, shared 1 test, backend 88 tests, frontend 65 tests.
+- `pnpm build`: PASS, with the existing non-blocking Vite chunk-size warning.
+- `docker compose up --build -d`: PASS, images `regexriddle-api:dev` and `regexriddle-web:dev` rebuilt; db, API, and web containers started.
+- `pnpm e2e`: PASS, 56 Playwright tests.
+- `pnpm check`: PASS, includes lint, typecheck, test, build, and 56 E2E tests.
+- `pnpm audit --audit-level=high`: PASS at the high threshold; one moderate advisory remains in transitive tooling dependencies.
+- `git diff --check`: PASS.
+- `docker compose ps`: PASS, db healthy and API/web running on the expected ports.
+- Public copy audit: PASS, production frontend copy no longer renders API/backend/auth-cookie/framework/database/Docker/GOAL jargon on public screens; DTO matches in source are type imports only.
+- Source security audit: PASS, no production frontend `dangerouslySetInnerHTML`, `document.cookie`, browser auth-token storage APIs, or JavaScript `RegExp` construction.
+- Sensitive-field audit: PASS, public UI and E2E checks do not render secret regexes, hidden controls, submitted candidate patterns outside form state, password hashes, session hashes, raw tokens, or cookie values.
+- Responsive screenshot verification: PASS, desktop `1440x900`, tablet `768x1024`, and mobile `390x844` screenshots were produced for `/`, `/how-it-works`, `/challenges`, `/challenges/:id`, `/leaderboard`, `/login`, `/register`, and guest `/create`.
+
+GOAL 08.6 screenshots are stored in `docs/screenshots/goal-08-6/`:
+
+- `home-{desktop,tablet,mobile}.png`
+- `how-it-works-{desktop,tablet,mobile}.png`
+- `challenges-{desktop,tablet,mobile}.png`
+- `challenge-detail-{desktop,tablet,mobile}.png`
+- `leaderboard-{desktop,tablet,mobile}.png`
+- `login-{desktop,tablet,mobile}.png`
+- `register-{desktop,tablet,mobile}.png`
+- `create-guest-{desktop,tablet,mobile}.png`

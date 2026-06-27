@@ -28,7 +28,8 @@ export function ChallengeCreateSuccessCard({
           Sfida creata
         </CardTitle>
         <CardDescription>
-          La risposta pubblica non contiene regex segreta o controlli nascosti.
+          La sfida e' pronta: i solver vedranno solo titolo, descrizione e
+          indizi pubblici.
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-3 text-sm">
@@ -60,7 +61,7 @@ export function ChallengeCreateSuccessCard({
       <CardFooter>
         <Button asChild>
           <Link to={challengeDetailPath(challenge.id)}>
-            Apri dettaglio pubblico
+            Apri sfida
             <ArrowRightIcon aria-hidden="true" data-icon="inline-end" />
           </Link>
         </Button>

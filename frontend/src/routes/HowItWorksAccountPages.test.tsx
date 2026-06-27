@@ -21,19 +21,18 @@ describe("how-it-works and account pages", () => {
     expect(
       await screen.findByRole("heading", {
         level: 1,
-        name: "RegexRiddle spiegato per la demo"
+        name: "Cinque mosse per risolvere un enigma regex"
       })
     ).toBeInTheDocument();
-    expect(screen.getByText(/full-string/)).toBeInTheDocument();
-    expect(screen.getAllByText(/RE2-compatible/)).not.toHaveLength(0);
-    expect(screen.getByText(/server-only/)).toBeInTheDocument();
-    expect(screen.getAllByText(/feedback aggregato/i)).not.toHaveLength(0);
-    expect(screen.getByText(/più sfide risolte/i)).toBeInTheDocument();
+    expect(screen.getByText(/deve coprire tutta la stringa/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/prove nascoste/i)).not.toHaveLength(0);
+    expect(screen.getByText(/indizi numerici/i)).toBeInTheDocument();
+    expect(screen.getByText(/piu enigmi con meno tentativi/i)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: /Esplora sfide/ })).toHaveAttribute(
       "href",
       "/challenges"
     );
-    expect(screen.getByRole("link", { name: /Guarda classifica/ })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Classifica solver" })).toHaveAttribute(
       "href",
       "/leaderboard"
     );

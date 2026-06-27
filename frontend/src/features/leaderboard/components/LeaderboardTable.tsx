@@ -18,7 +18,9 @@ interface LeaderboardTableProps {
 export function LeaderboardTable({ items }: LeaderboardTableProps) {
   return (
     <Table>
-      <TableCaption>Classifica pubblica dei solver con metriche aggregate.</TableCaption>
+      <TableCaption>
+        Classifica dei solver ordinata per sfide risolte e tentativi usati.
+      </TableCaption>
       <TableHeader>
         <TableRow>
           <TableHead scope="col">Rank</TableHead>

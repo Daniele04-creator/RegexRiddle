@@ -45,14 +45,13 @@ export function ChallengesPage() {
   return (
     <PageContainer className="py-10 sm:py-14">
       <div className="max-w-3xl">
-        <p className="text-sm font-medium text-primary">Catalogo pubblico</p>
+        <p className="text-sm font-medium text-primary">Catalogo sfide</p>
         <h1 className="mt-3 text-4xl font-semibold tracking-normal">
-          Catalogo sfide
+          Scegli il tuo prossimo enigma
         </h1>
         <p className="mt-4 text-base leading-7 text-muted-foreground">
-          Sfide lette da <span className="font-mono text-foreground">GET /api/challenges</span>.
-          La pagina mostra solo esempi pubblici, autore pubblico e statistiche
-          aggregate.
+          Ogni card mostra indizi pubblici, difficolta e risultati della
+          community. Apri una sfida e prova a battere le prove nascoste.
         </p>
       </div>
 
@@ -64,8 +63,8 @@ export function ChallengesPage() {
             <CardHeader>
               <CardTitle>Catalogo non disponibile</CardTitle>
               <CardDescription>
-                Non sono riuscito a caricare le sfide pubbliche. I dati sensibili
-                restano comunque server-only.
+                Non riesco a mostrare le sfide in questo momento. Riprova tra
+                poco.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -81,8 +80,8 @@ export function ChallengesPage() {
             <CardHeader>
               <CardTitle>Nessuna sfida pubblica</CardTitle>
               <CardDescription>
-                Il catalogo e' pronto: quando il backend restituira' sfide, le
-                mostreremo qui senza esporre regex o controlli nascosti.
+                Il laboratorio aspetta il primo enigma. Accedi e pubblica una
+                sfida con esempi visibili e prove nascoste.
               </CardDescription>
             </CardHeader>
           </Card>

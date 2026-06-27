@@ -10,7 +10,7 @@ export function HealthBadge() {
     return (
       <Badge aria-live="polite" variant="outline">
         <ActivityIcon aria-hidden="true" data-icon="inline-start" />
-        API check
+        Controllo...
       </Badge>
     );
   }
@@ -19,7 +19,7 @@ export function HealthBadge() {
     return (
       <Badge aria-live="polite" variant="destructive">
         <WifiOffIcon aria-hidden="true" data-icon="inline-start" />
-        API offline
+        Non pronto
       </Badge>
     );
   }
@@ -27,7 +27,7 @@ export function HealthBadge() {
   return (
     <Badge aria-live="polite" variant="secondary">
       <WifiIcon aria-hidden="true" data-icon="inline-start" />
-      API online
+      Pronto a giocare
     </Badge>
   );
 }

@@ -47,13 +47,13 @@ function attemptErrorMessage(error: unknown, isAuthor: boolean): string {
       case 403:
         return isAuthor
           ? "Gli autori non possono risolvere le proprie sfide."
-          : "Operazione non autorizzata o controllo CSRF non valido.";
+          : "Azione non disponibile. Ricarica la pagina e riprova.";
       case 404:
         return "Sfida non trovata.";
       case 409:
         return "Hai gia risolto questa sfida.";
       case 422:
-        return "Regex non valida o non compatibile con il dialetto RE2.";
+        return "Regex non valida per questo enigma.";
       default:
         return "Tentativo non disponibile. Riprova tra poco.";
     }
@@ -107,10 +107,10 @@ export function AttemptForm({ challengeId, isAuthor }: AttemptFormProps) {
     <div className="flex flex-col gap-4">
       <Card className="bg-card/88">
         <CardHeader>
-          <CardTitle>Regex Lab</CardTitle>
+          <CardTitle>Scrivi la tua soluzione</CardTitle>
           <CardDescription>
-            La verifica avviene solo sul server con RE2 full match. Il frontend
-            non riceve la regex segreta ne' i controlli nascosti.
+            Gli esempi sono indizi pubblici. Le prove nascoste decidono se hai
+            risolto l'enigma.
           </CardDescription>
         </CardHeader>
         <form noValidate onSubmit={handleSubmit(onSubmit)}>
@@ -146,8 +146,8 @@ export function AttemptForm({ challengeId, isAuthor }: AttemptFormProps) {
                   aria-invalid={Boolean(patternError)}
                 />
                 <FieldDescription id="attempt-pattern-description">
-                  Inserisci solo il pattern candidato. Non viene salvato nel
-                  browser, non finisce nell'URL e non viene valutato lato client.
+                  Inserisci solo il pattern candidato. Deve coprire tutta la
+                  stringa che vuoi riconoscere.
                 </FieldDescription>
                 <FieldError id="attempt-pattern-error">{patternError}</FieldError>
               </Field>
@@ -167,7 +167,7 @@ export function AttemptForm({ challengeId, isAuthor }: AttemptFormProps) {
             <p className="text-sm text-muted-foreground" aria-live="polite">
               {isSolved
                 ? "Non servono altri tentativi per questa sfida."
-                : "Riceverai solo conteggi aggregati."}
+                : "Dopo l'invio riceverai un indizio numerico."}
             </p>
           </CardFooter>
         </form>

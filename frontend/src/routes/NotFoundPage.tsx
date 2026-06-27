@@ -8,7 +8,7 @@ export function NotFoundPage() {
   return (
     <PlaceholderLayout
       badge="404"
-      description="Questa route non esiste. La fallback SPA resta sicura e rimanda ai percorsi pubblici."
+      description="Questa pagina non esiste. Puoi tornare subito a una sfida o leggere le regole del gioco."
       title="Pagina non trovata"
     >
       <div className="flex flex-col gap-3 sm:flex-row">

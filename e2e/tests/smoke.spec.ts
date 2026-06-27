@@ -436,13 +436,13 @@ async function fillChallengeCreateForm(
 
   for (const [index, control] of positiveControls.entries()) {
     await page
-      .getByRole("textbox", { name: `Controllo positivo ${index + 1}` })
+      .getByRole("textbox", { name: `Prova da accettare ${index + 1}` })
       .fill(control.value);
   }
 
   for (const [index, control] of negativeControls.entries()) {
     await page
-      .getByRole("textbox", { name: `Controllo negativo ${index + 1}` })
+      .getByRole("textbox", { name: `Prova da rifiutare ${index + 1}` })
       .fill(control.value);
   }
 }
@@ -522,32 +522,35 @@ test("web app renders the Regex Lab landing foundation", async ({ page }) => {
   await page.goto("/");
   const main = page.locator("#main-content");
 
-  await expect(page.getByRole("heading", { name: "RegexRiddle" })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Esplora sfide/ })).toBeVisible();
-  await expect(main.getByRole("link", { name: /Come funziona/ })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Risolvi enigmi nascosti con una sola regex" })
+  ).toBeVisible();
+  await expect(page.getByRole("link", { name: /Inizia una sfida/ })).toBeVisible();
+  await expect(main.getByRole("link", { name: /Scopri come si gioca/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /Guarda classifica/ })).toBeVisible();
-  await expect(page.getByText("GOAL 08.5 adds")).toBeVisible();
+  await expect(page.getByText("Puzzle preview")).toBeVisible();
 });
 
 test("how-it-works loads publicly and exposes demo CTAs", async ({ page }) => {
   await page.goto("/how-it-works");
 
   await expect(
-    page.getByRole("heading", { name: "RegexRiddle spiegato per la demo" })
+    page.getByRole("heading", { name: "Cinque mosse per risolvere un enigma regex" })
   ).toBeVisible();
-  await expect(page.getByText(/full-string/)).toBeVisible();
-  await expect(page.getByText(/RE2-compatible/).first()).toBeVisible();
-  await expect(page.getByText(/server-only/)).toBeVisible();
-  await expect(page.getByText(/feedback aggregato/i).first()).toBeVisible();
-  await expect(page.getByText(/più sfide risolte/i)).toBeVisible();
+  await expect(page.getByText(/deve coprire tutta la stringa/i)).toBeVisible();
+  await expect(page.getByText(/prove nascoste/i).first()).toBeVisible();
+  await expect(page.getByText(/indizi numerici/i)).toBeVisible();
+  await expect(page.getByText(/piu enigmi con meno tentativi/i)).toBeVisible();
   await expectNoForbiddenRenderedFrontendStrings(await page.content());
 
   await page.getByRole("link", { name: /Esplora sfide/ }).click();
   await expect(page).toHaveURL(/\/challenges$/);
-  await expect(page.getByRole("heading", { name: "Catalogo sfide" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Scegli il tuo prossimo enigma" })
+  ).toBeVisible();
 
   await page.goto("/how-it-works");
-  await page.getByRole("link", { name: /Guarda classifica/ }).click();
+  await page.getByRole("link", { name: "Classifica solver" }).click();
   await expect(page).toHaveURL(/\/leaderboard$/);
   await expect(page.getByRole("heading", { name: "Classifica solver" })).toBeVisible();
 
@@ -560,10 +563,12 @@ test("how-it-works loads publicly and exposes demo CTAs", async ({ page }) => {
 test("landing CTA navigates to the public challenge catalog", async ({ page }) => {
   await page.goto("/");
 
-  await page.getByRole("link", { name: /Esplora sfide/ }).click();
+  await page.getByRole("link", { name: /Inizia una sfida/ }).click();
 
   await expect(page).toHaveURL(/\/challenges$/);
-  await expect(page.getByRole("heading", { name: "Catalogo sfide" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Scegli il tuo prossimo enigma" })
+  ).toBeVisible();
   await expect(page.getByRole("heading", { name: "Slug URL" })).toBeVisible();
 });
 
@@ -578,12 +583,14 @@ test("desktop SPA navigation reaches public read routes", async ({ page }) => {
   await primaryNavigation.getByRole("link", { exact: true, name: "Come funziona" }).click();
   await expect(page).toHaveURL(/\/how-it-works$/);
   await expect(
-    page.getByRole("heading", { name: "RegexRiddle spiegato per la demo" })
+    page.getByRole("heading", { name: "Cinque mosse per risolvere un enigma regex" })
   ).toBeVisible();
 
   await primaryNavigation.getByRole("link", { exact: true, name: "Sfide" }).click();
   await expect(page).toHaveURL(/\/challenges$/);
-  await expect(page.getByRole("heading", { name: "Catalogo sfide" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Scegli il tuo prossimo enigma" })
+  ).toBeVisible();
 
   await primaryNavigation.getByRole("link", { exact: true, name: "Classifica" }).click();
   await expect(page).toHaveURL(/\/leaderboard$/);
@@ -591,11 +598,11 @@ test("desktop SPA navigation reaches public read routes", async ({ page }) => {
 
   await banner.getByRole("link", { exact: true, name: "Accedi" }).click();
   await expect(page).toHaveURL(/\/login$/);
-  await expect(page.getByRole("heading", { name: "Login" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Bentornato nel laboratorio" })).toBeVisible();
 
   await banner.getByRole("link", { exact: true, name: "Registrati" }).click();
   await expect(page).toHaveURL(/\/register$/);
-  await expect(page.getByRole("heading", { name: "Register" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Crea il tuo profilo solver" })).toBeVisible();
 
   await primaryNavigation.getByRole("link", { exact: true, name: "Crea" }).click();
   await expect(page).toHaveURL(/\/create$/);
@@ -618,7 +625,7 @@ test("mobile navigation opens and routes to public pages", async ({ page }) => {
   await page.getByRole("link", { exact: true, name: "Come funziona" }).click();
   await expect(page).toHaveURL(/\/how-it-works$/);
   await expect(
-    page.getByRole("heading", { name: "RegexRiddle spiegato per la demo" })
+    page.getByRole("heading", { name: "Cinque mosse per risolvere un enigma regex" })
   ).toBeVisible();
 
   await page.getByRole("button", { name: "Open navigation menu" }).click();
@@ -655,7 +662,7 @@ test("mobile navigation exposes guest and authenticated auth actions", async ({
 test("login form rejects invalid credentials generically", async ({ page }) => {
   await page.goto("/login");
 
-  await expect(page.getByRole("heading", { name: "Login" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Bentornato nel laboratorio" })).toBeVisible();
   await expect(page.getByLabel("Username o email")).toBeVisible();
   await expect(page.getByLabel("Password")).toHaveAttribute("type", "password");
 
@@ -744,7 +751,7 @@ test("mobile how-it-works and account stay within the viewport", async ({
   await page.goto("/how-it-works");
 
   await expect(
-    page.getByRole("heading", { name: "RegexRiddle spiegato per la demo" })
+    page.getByRole("heading", { name: "Cinque mosse per risolvere un enigma regex" })
   ).toBeVisible();
   expect(
     await page.evaluate(
@@ -770,7 +777,7 @@ test("registration validates passwords and logs in a new deterministic user", as
 }) => {
   await page.goto("/register");
 
-  await expect(page.getByRole("heading", { name: "Register" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Crea il tuo profilo solver" })).toBeVisible();
   await page.getByLabel("Username").fill(e2eAuthUsername);
   await page.getByLabel("Email").fill(e2eAuthEmail);
   await page.getByLabel("Nome visibile").fill(e2eAuthDisplayName);
@@ -824,7 +831,7 @@ test("authenticated user sees the protected challenge creation form", async ({
   await expect(page.getByRole("heading", { name: "Crea una sfida" })).toBeVisible();
   await expect(page.getByLabel("Titolo")).toBeVisible();
   await expect(page.getByLabel("Regex segreta")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Crea sfida" })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "Pubblica sfida" })).toBeEnabled();
   await expect(page.getByText("Demo Player").first()).toBeVisible();
   await expectNoAuthStorage(page);
 });
@@ -836,13 +843,13 @@ test("challenge creation UI blocks dropping below the minimum secret controls", 
   await page.goto("/create");
 
   const positiveRemoveButtons = page.getByRole("button", {
-    name: /Rimuovi controllo positivo/
+    name: /Rimuovi prova da accettare/
   });
 
   await expect(positiveRemoveButtons).toHaveCount(3);
   await expect(positiveRemoveButtons.first()).toBeDisabled();
 
-  await page.getByRole("button", { name: "Aggiungi positivo" }).click();
+  await page.getByRole("button", { name: "Aggiungi prova accettata" }).click();
   await expect(positiveRemoveButtons).toHaveCount(4);
   await expect(positiveRemoveButtons.nth(3)).toBeEnabled();
 
@@ -852,7 +859,7 @@ test("challenge creation UI blocks dropping below the minimum secret controls", 
   await expectNoAuthStorage(page);
 });
 
-test("challenge creation UI reports backend incoherence safely", async ({
+test("challenge creation UI reports incoherence safely", async ({
   page
 }) => {
   await loginDemoPlayerThroughUi(page);
@@ -864,11 +871,11 @@ test("challenge creation UI reports backend incoherence safely", async ({
   };
 
   await fillChallengeCreateForm(page, payload);
-  await page.getByRole("button", { name: "Crea sfida" }).click();
+  await page.getByRole("button", { name: "Pubblica sfida" }).click();
 
   await expect(
     page.getByText(
-      "La regex segreta, gli esempi pubblici o i controlli non sono coerenti con il motore RE2."
+      "La soluzione, gli indizi o le prove nascoste non sono coerenti."
     )
   ).toBeVisible();
   await expect(
@@ -890,7 +897,7 @@ test("challenge creation UI creates a challenge and public pages stay secret-fre
   const payload = makeValidChallengeCreatePayload("frontend-valid");
 
   await fillChallengeCreateForm(page, payload);
-  await page.getByRole("button", { name: "Crea sfida" }).click();
+  await page.getByRole("button", { name: "Pubblica sfida" }).click();
 
   await expect(page.getByText("Sfida creata")).toBeVisible();
   await expect(page.getByLabel("Regex segreta")).toHaveValue("");
@@ -901,7 +908,7 @@ test("challenge creation UI creates a challenge and public pages stay secret-fre
     ...payload.controls.map((control) => control.value)
   ]);
 
-  await page.getByRole("link", { name: "Apri dettaglio pubblico" }).click();
+  await page.getByRole("link", { name: "Apri sfida" }).click();
 
   await expect(page).toHaveURL(/\/challenges\/[0-9a-f-]+$/);
   await expect(page.getByRole("heading", { name: payload.title })).toBeVisible();
@@ -927,9 +934,9 @@ test("mobile challenge creation form avoids horizontal overflow", async ({
   await page.goto("/create");
 
   await expect(page.getByRole("heading", { name: "Crea una sfida" })).toBeVisible();
-  await page.getByRole("button", { name: "Aggiungi positivo" }).click();
+  await page.getByRole("button", { name: "Aggiungi prova accettata" }).click();
   await page
-    .getByRole("textbox", { name: "Controllo positivo 4" })
+    .getByRole("textbox", { name: "Prova da accettare 4" })
     .fill("123456789012345678901234567890");
 
   expect(
@@ -940,12 +947,14 @@ test("mobile challenge creation form avoids horizontal overflow", async ({
   await expectNoAuthStorage(page);
 });
 
-test("public challenge catalog renders API cards with public examples and stats", async ({
+test("public challenge catalog renders puzzle cards with public examples and stats", async ({
   page
 }) => {
   await page.goto("/challenges");
 
-  await expect(page.getByRole("heading", { name: "Catalogo sfide" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Scegli il tuo prossimo enigma" })
+  ).toBeVisible();
   await expect(page.getByRole("heading", { name: "Slug URL" })).toBeVisible();
   await expect(page.getByText("regex-riddle-2026")).toBeVisible();
   await expect(page.getByText("-regex-riddle")).toBeVisible();
@@ -959,13 +968,13 @@ test("challenge card opens public detail without leaking secret fields", async (
   await page.goto("/challenges");
 
   const slugCard = page.locator('[data-slot="card"]').filter({ hasText: "Slug URL" });
-  await slugCard.getByRole("link", { name: /Apri/ }).click();
+  await slugCard.getByRole("link", { name: /Gioca/ }).click();
 
   await expect(page).toHaveURL(/\/challenges\/aaaaaaaa-0010-4000-8000-000000000010$/);
   await expect(page.getByRole("heading", { name: "Slug URL" })).toBeVisible();
   await expect(page.getByText("regex-riddle-2026")).toBeVisible();
   await expect(page.getByText("-regex-riddle")).toBeVisible();
-  await expect(page.getByText("Accedi per risolvere")).toBeVisible();
+  await expect(page.getByText("Accedi per salvare il tentativo")).toBeVisible();
   await expect(page.getByRole("link", { exact: true, name: "Accedi" }).first()).toBeVisible();
   await expectNoForbiddenRenderedFrontendStrings(await page.content());
 });
@@ -975,7 +984,7 @@ test("logged-out challenge detail shows the attempt login gate", async ({ page }
 
   await expect(page.getByRole("heading", { name: "Codice prodotto" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Prova a risolvere" })).toBeVisible();
-  await expect(page.getByText("Accedi per risolvere")).toBeVisible();
+  await expect(page.getByText("Accedi per salvare il tentativo")).toBeVisible();
   await expect(
     page.getByRole("link", { exact: true, name: "Registrati" }).first()
   ).toBeVisible();
@@ -1004,7 +1013,7 @@ test("attempt UI shows safe invalid-regex feedback", async ({ page }) => {
   await page.getByRole("button", { name: "Invia tentativo" }).click();
 
   await expect(
-    page.getByText("Regex non valida o non compatibile con il dialetto RE2.")
+    page.getByText("Regex non valida per questo enigma.")
   ).toBeVisible();
   await expect(page.getByText("Submitted regex is invalid or unsupported.")).toHaveCount(
     0
@@ -1022,7 +1031,7 @@ test("attempt UI renders incorrect aggregate feedback only", async ({ page }) =>
   await expect(page.getByText("Non ancora")).toBeVisible();
   await expect(
     page.getByText(
-      "Hai soddisfatto 3 controlli positivi su 3 e hai accettato 3 controlli negativi su 3."
+      "Hai superato 3 prove utili su 3; restano 3 falsi positivi da eliminare su 3."
     )
   ).toBeVisible();
   const content = await page.content();
@@ -1041,7 +1050,7 @@ test("attempt UI renders solved state and disables repeated submissions", async 
   await page.getByRole("button", { name: "Invia tentativo" }).click();
 
   await expect(page.getByText("Soluzione corretta")).toBeVisible();
-  await expect(page.getByText("Hai risolto la sfida.")).toBeVisible();
+  await expect(page.getByText("Hai risolto la sfida. La classifica ti aspetta.")).toBeVisible();
   await expect(page.getByRole("button", { name: "Sfida risolta" })).toBeDisabled();
   await expect(page.getByText("1 tentativo")).toBeVisible();
   await expect(page.getByText("1 soluzione")).toBeVisible();
@@ -1094,7 +1103,7 @@ test("desktop and tablet attempt states avoid horizontal overflow", async ({
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto(`/challenges/${attemptChallengeId}`);
 
-  await expect(page.getByText("Accedi per risolvere")).toBeVisible();
+  await expect(page.getByText("Accedi per salvare il tentativo")).toBeVisible();
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth > document.documentElement.clientWidth
@@ -1117,7 +1126,7 @@ test("desktop and tablet attempt states avoid horizontal overflow", async ({
   await page.getByRole("button", { name: "Invia tentativo" }).click();
 
   await expect(
-    page.getByText("Regex non valida o non compatibile con il dialetto RE2.")
+    page.getByText("Regex non valida per questo enigma.")
   ).toBeVisible();
   expect(
     await page.evaluate(
@@ -1163,7 +1172,9 @@ test("mobile catalog and leaderboard stay readable without horizontal overflow",
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/challenges");
 
-  await expect(page.getByRole("heading", { name: "Catalogo sfide" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Scegli il tuo prossimo enigma" })
+  ).toBeVisible();
   await expect(page.getByRole("heading", { name: "Slug URL" })).toBeVisible();
   expect(
     await page.evaluate(

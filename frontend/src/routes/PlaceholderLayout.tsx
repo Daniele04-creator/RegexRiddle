@@ -34,8 +34,7 @@ export function PlaceholderLayout({
         <CardHeader>
           <CardTitle>Percorsi disponibili</CardTitle>
           <CardDescription>
-            Usa un percorso pubblico per rientrare nell'app senza esporre dati
-            sensibili.
+            Scegli dove ripartire e torna al gioco.
           </CardDescription>
         </CardHeader>
         <CardContent>{children}</CardContent>

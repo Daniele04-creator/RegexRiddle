@@ -84,8 +84,7 @@ export function LoginForm() {
       <CardHeader>
         <CardTitle>Accedi</CardTitle>
         <CardDescription>
-          Usa username o email. La sessione resta in un cookie HttpOnly gestito
-          dal backend.
+          Usa username o email per tornare alle tue sfide.
         </CardDescription>
       </CardHeader>
       <form noValidate onSubmit={handleSubmit(onSubmit)}>
@@ -132,7 +131,7 @@ export function LoginForm() {
                 disabled={isPending}
               />
               <FieldDescription>
-                Non viene salvata nel browser e non finisce nell'URL.
+                Usa la password scelta alla registrazione.
               </FieldDescription>
               <FieldError id="login-password-error">{passwordError}</FieldError>
             </Field>

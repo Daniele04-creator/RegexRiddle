@@ -18,13 +18,12 @@ export function CreateChallengePage() {
   return (
     <PageContainer className="py-10 sm:py-14">
       <div className="mb-8 max-w-3xl">
-        <p className="text-sm font-medium text-primary">Authoring</p>
+        <p className="text-sm font-medium text-primary">Crea</p>
         <h1 className="mt-2 text-4xl font-semibold tracking-normal">
           Crea una sfida
         </h1>
         <p className="mt-3 text-sm leading-6 text-muted-foreground">
-          Pubblica un riddle regex con esempi pubblici e controlli segreti. La
-          valutazione della regex resta sul backend.
+          Pubblica un enigma con esempi visibili e prove nascoste.
         </p>
       </div>
 

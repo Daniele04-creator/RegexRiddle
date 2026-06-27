@@ -1,27 +1,23 @@
 # Design
 
-The visual source of truth for GOAL 08.0 is the root `DESIGN.md`.
+The visual source of truth for GOAL 08.6 is the root `DESIGN.md`.
 
-## GOAL 08.5 summary
+## GOAL 08.6 summary
 
-Regex Lab is now documented as a technical, playful, precise, exam-ready frontend foundation.
+RegexRiddle now uses the "Regex Lab Arcade" direction: a public puzzle-game interface over the existing safe lab architecture.
 
 The implemented design system defines:
 
-- product personality and lab-console metaphor;
-- semantic color tokens for background, foreground, surface, border, muted, primary, accent, success, warning, and danger;
-- typography scale and pattern-chip rules;
-- spacing, radius, and shadow rules;
-- app shell, buttons, cards, badges, forms, feedback panel, and pattern display rules;
-- subtle Motion for React rules with reduced-motion support;
-- accessibility baseline for landmarks, heading hierarchy, keyboard navigation, focus states, and contrast;
+- a player-facing product personality for riddles, clues, hidden tests, attempts, and leaderboard progress;
+- a brighter arcade-lab palette with teal primary actions, amber highlights, violet support surfaces, magenta regex chips, and readable ink text;
+- a home hero with a puzzle preview instead of implementation health/status copy;
+- public copy rules that remove API, backend, auth-cookie, DTO, framework, database, Docker, and GOAL labels from user-facing screens;
+- challenge catalog cards with difficulty chips, public examples, author identity, aggregate stats, and "Gioca" CTAs;
+- challenge detail attempt states for guests, authors, authenticated solvers, incorrect feedback, and solved feedback;
+- leaderboard rules with a top-three podium and simple ranking explanation;
+- auth and create copy that stays human and avoids implementation details;
+- Motion for React rules for restrained entrance, hover, and feedback animation;
+- responsive and accessibility rules for heading hierarchy, focus states, readable tap targets, and no horizontal overflow;
 - security-aware UI rules that prohibit secret rendering, browser token storage, client regex evaluation, and `dangerouslySetInnerHTML`.
-- auth form rules for labels, autocomplete, field-level errors, form alerts, pending states, and safe generic credential errors.
-- attempt gameplay rules for guest/auth/author states, native flag controls, aggregate feedback panels, `aria-live` status, and no client-side regex preview.
-- challenge authoring rules for guest/auth states, controlled field groups, native flag controls, secret-control add/remove guards, public success feedback, and no client-side regex preview.
-- how-it-works rules for concise demo/oral explanation of creators, solvers, full match, RE2-compatible regexes, public examples, server-only secret controls, aggregate feedback, and leaderboard ranking.
-- account settings rules for guest/auth states, current-user summary, scoped editable fields, read-only username/email/date, accessible form errors, and no profile statistics.
 
-GOAL 08.5 adds the public `/how-it-works` walkthrough and protected `/account` settings page while keeping regex evaluation server-side.
-
-GOAL 08.5 does not introduce React Bits, Magic UI, profile statistics, password/email change, upload storage, challenge edit/delete, or frontend regex evaluation. Those remain possible only after explicit future scope and review.
+GOAL 08.6 does not introduce backend/API changes, database changes, auth/session changes, regex semantic changes, new large UI dependencies, or frontend regex evaluation.

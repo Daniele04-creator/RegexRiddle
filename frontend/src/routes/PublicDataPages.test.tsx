@@ -120,7 +120,7 @@ describe("public data pages", () => {
     const success = renderRoute("/challenges");
 
     expect(
-      await screen.findByRole("heading", { name: "Catalogo sfide" })
+      await screen.findByRole("heading", { name: "Scegli il tuo prossimo enigma" })
     ).toBeInTheDocument();
     expect(await screen.findByRole("heading", { name: "Solo cifre" })).toBeInTheDocument();
     expect(screen.getByText("12345")).toBeInTheDocument();
@@ -175,7 +175,7 @@ describe("public data pages", () => {
     expect(screen.getByText("abc123")).toBeInTheDocument();
     expect(screen.getByText("2 tentativi")).toBeInTheDocument();
     expect(screen.getByText("1 soluzione")).toBeInTheDocument();
-    expect(await screen.findByText("Accedi per risolvere")).toBeInTheDocument();
+    expect(await screen.findByText("Accedi per salvare il tentativo")).toBeInTheDocument();
     expect(screen.getAllByRole("link", { name: "Accedi" })[0]).toHaveAttribute(
       "href",
       "/login"

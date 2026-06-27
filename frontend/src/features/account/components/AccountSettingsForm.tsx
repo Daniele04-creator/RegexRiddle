@@ -42,7 +42,7 @@ interface AccountSettingsFormProps {
 
 function accountUpdateErrorMessage(error: unknown): string {
   if (error instanceof ApiClientError && error.status === 400) {
-    return "Controlla i campi: il backend ha rifiutato il payload.";
+    return "Controlla i campi e riprova.";
   }
 
   if (error instanceof ApiClientError && error.status === 401) {
@@ -50,7 +50,7 @@ function accountUpdateErrorMessage(error: unknown): string {
   }
 
   if (error instanceof ApiClientError && error.status === 403) {
-    return "Protezione CSRF non valida. Ricarica la pagina e riprova.";
+    return "Azione non disponibile. Ricarica la pagina e riprova.";
   }
 
   return "Impostazioni non salvate. Riprova tra poco.";
@@ -99,7 +99,7 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
         <CardTitle>Impostazioni</CardTitle>
         <CardDescription>
           Modifica solo nome visibile, bio e avatar URL. Username, email e
-          password non cambiano in questo milestone.
+          password non cambiano da questa pagina.
         </CardDescription>
       </CardHeader>
       <form noValidate onSubmit={handleSubmit(onSubmit)}>
@@ -158,7 +158,7 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
                 disabled={isPending}
               />
               <FieldDescription>
-                Massimo 280 caratteri. Un campo vuoto viene salvato come null.
+                Massimo 280 caratteri. Lascia vuoto se non vuoi mostrare una bio.
               </FieldDescription>
               <FieldError id="account-bio-error">{bioError}</FieldError>
             </Field>
@@ -180,8 +180,7 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
                 disabled={isPending}
               />
               <FieldDescription>
-                Solo URL http o https. Il server salva la stringa e non scarica
-                immagini esterne.
+                Solo URL http o https.
               </FieldDescription>
               <FieldError id="account-avatar-url-error">
                 {avatarUrlError}
@@ -195,7 +194,7 @@ export function AccountSettingsForm({ user }: AccountSettingsFormProps) {
             {isPending ? "Salvataggio…" : "Salva impostazioni"}
           </Button>
           <p className="text-sm text-muted-foreground">
-            Invia solo displayName, bio e avatarUrl.
+            Salva solo le informazioni visibili del profilo.
           </p>
         </CardFooter>
       </form>

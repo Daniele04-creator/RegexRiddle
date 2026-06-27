@@ -90,8 +90,7 @@ export function RegisterForm() {
       <CardHeader>
         <CardTitle>Registrati</CardTitle>
         <CardDescription>
-          Crea un account solver. Il backend imposta la sessione con un cookie
-          HttpOnly, senza token JSON da conservare nel browser.
+          Crea un profilo solver e inizia subito dal catalogo.
         </CardDescription>
       </CardHeader>
       <form noValidate onSubmit={handleSubmit(onSubmit)}>
@@ -121,7 +120,7 @@ export function RegisterForm() {
                   disabled={isPending}
                 />
                 <FieldDescription>
-                  Minuscole, numeri o underscore. Normalizzato prima dell'invio.
+                  Sara il tuo nome in classifica.
                 </FieldDescription>
                 <FieldError id="register-username-error">
                   {usernameError}
@@ -142,7 +141,7 @@ export function RegisterForm() {
                   disabled={isPending}
                 />
                 <FieldDescription>
-                  Usata solo dalle API auth; non viene mostrata nella header.
+                  Serve solo per il tuo account.
                 </FieldDescription>
                 <FieldError id="register-email-error">{emailError}</FieldError>
               </Field>
@@ -206,7 +205,7 @@ export function RegisterForm() {
                   disabled={isPending}
                 />
                 <FieldDescription>
-                  Campo solo frontend: non viene mandato al backend.
+                  Ripeti la password per evitare errori di battitura.
                 </FieldDescription>
                 <FieldError id="register-confirm-password-error">
                   {confirmPasswordError}

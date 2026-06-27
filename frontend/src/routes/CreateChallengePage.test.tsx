@@ -45,16 +45,16 @@ async function fillValidChallengeForm() {
   fireEvent.change(screen.getByLabelText("Regex segreta"), {
     target: { value: String.raw`[0-9]{5}` }
   });
-  await user.click(screen.getByLabelText("Ignore case"));
-  await user.click(screen.getByLabelText("Multiline"));
+  await user.click(screen.getByLabelText("Ignora maiuscole"));
+  await user.click(screen.getByLabelText("Piu righe"));
   await user.type(screen.getByLabelText("Esempio pubblico positivo"), "80125");
   await user.type(screen.getByLabelText("Esempio pubblico negativo"), "8012A");
-  await user.type(screen.getByLabelText("Controllo positivo 1"), "00100");
-  await user.type(screen.getByLabelText("Controllo positivo 2"), "20121");
-  await user.type(screen.getByLabelText("Controllo positivo 3"), "99999");
-  await user.type(screen.getByLabelText("Controllo negativo 1"), "1234");
-  await user.type(screen.getByLabelText("Controllo negativo 2"), "ABCDE");
-  await user.type(screen.getByLabelText("Controllo negativo 3"), "123456");
+  await user.type(screen.getByLabelText("Prova da accettare 1"), "00100");
+  await user.type(screen.getByLabelText("Prova da accettare 2"), "20121");
+  await user.type(screen.getByLabelText("Prova da accettare 3"), "99999");
+  await user.type(screen.getByLabelText("Prova da rifiutare 1"), "1234");
+  await user.type(screen.getByLabelText("Prova da rifiutare 2"), "ABCDE");
+  await user.type(screen.getByLabelText("Prova da rifiutare 3"), "123456");
 
   return user;
 }
@@ -89,7 +89,7 @@ describe("create challenge route", () => {
     expect(await screen.findByRole("heading", { name: "Crea una sfida" })).toBeVisible();
     expect(await screen.findByLabelText("Titolo")).toBeVisible();
     expect(screen.getByLabelText("Regex segreta")).toBeVisible();
-    expect(screen.getByRole("button", { name: "Crea sfida" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Pubblica sfida" })).toBeEnabled();
     expect(screen.getByText("Autore: Demo Player (@demo_player)")).toBeVisible();
   });
 
@@ -100,7 +100,7 @@ describe("create challenge route", () => {
     renderRoute("/create");
     const user = await fillValidChallengeForm();
 
-    await user.click(screen.getByRole("button", { name: "Crea sfida" }));
+    await user.click(screen.getByRole("button", { name: "Pubblica sfida" }));
 
     await waitFor(() => {
       expect(authoringApiMocks.createChallenge).toHaveBeenCalledWith({
@@ -123,7 +123,7 @@ describe("create challenge route", () => {
       });
     });
     expect(await screen.findByText("Sfida creata")).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Apri dettaglio pubblico" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Apri sfida" })).toHaveAttribute(
       "href",
       "/challenges/aaaaaaaa-1000-4000-8000-000000000001"
     );
@@ -143,11 +143,11 @@ describe("create challenge route", () => {
     renderRoute("/create");
     const user = await fillValidChallengeForm();
 
-    await user.click(screen.getByRole("button", { name: "Crea sfida" }));
+    await user.click(screen.getByRole("button", { name: "Pubblica sfida" }));
 
     expect(
       await screen.findByText(
-        "La regex segreta, gli esempi pubblici o i controlli non sono coerenti con il motore RE2."
+        "La soluzione, gli indizi o le prove nascoste non sono coerenti."
       )
     ).toBeInTheDocument();
     expect(

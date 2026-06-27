@@ -17,9 +17,12 @@ describe("app routing foundation", () => {
     renderRoute("/");
 
     expect(
-      await screen.findByRole("heading", { level: 1, name: "RegexRiddle" })
+      await screen.findByRole("heading", {
+        level: 1,
+        name: "Risolvi enigmi nascosti con una sola regex"
+      })
     ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Esplora sfide/ })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: /Inizia una sfida/ })).toHaveAttribute(
       "href",
       "/challenges"
     );

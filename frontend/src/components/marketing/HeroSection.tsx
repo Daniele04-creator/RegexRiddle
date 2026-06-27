@@ -1,59 +1,63 @@
-import { ArrowRightIcon, BookOpenIcon, PlusIcon, TrophyIcon } from "lucide-react";
+import { ArrowRightIcon, BookOpenIcon, SparklesIcon, TrophyIcon } from "lucide-react";
 import { motion } from "motion/react";
 import { Link } from "react-router";
 
-import { HealthBadge } from "@/components/layout/HealthBadge";
 import { RegexPreviewPanel } from "@/components/marketing/RegexPreviewPanel";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+
+const regexChips = ["[a-z]", "\\d", "?", "+", "*", "^", "$"];
 
 export function HeroSection() {
   return (
     <section className="relative overflow-hidden border-b">
-      <div className="mx-auto grid min-h-[min(760px,calc(100svh-4rem))] w-full max-w-6xl items-center gap-10 px-4 py-14 sm:px-6 lg:grid-cols-[1.02fr_0.98fr] lg:px-8">
+      <div className="arcade-grid pointer-events-none absolute inset-0 opacity-55" />
+      <div className="pointer-events-none absolute inset-x-0 top-10 mx-auto hidden max-w-6xl justify-end gap-2 px-8 lg:flex">
+        {regexChips.map((chip, index) => (
+          <span
+            className="rounded-lg border bg-card/72 px-3 py-1 font-mono text-sm text-muted-foreground shadow-sm"
+            key={chip}
+            style={{ transform: `translateY(${(index % 3) * 14}px)` }}
+          >
+            {chip}
+          </span>
+        ))}
+      </div>
+      <div className="mx-auto grid min-h-[min(760px,calc(100svh-4rem))] w-full max-w-6xl items-center gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1.02fr_0.98fr] lg:px-8">
         <motion.div
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-3xl"
+          className="relative max-w-3xl"
           initial={{ opacity: 0, y: 18 }}
           transition={{ duration: 0.45, ease: "easeOut" }}
         >
-          <div className="mb-5 flex flex-wrap items-center gap-2">
-            <HealthBadge />
-            <span className="rounded-lg border bg-card px-2.5 py-1 text-xs font-medium text-muted-foreground">
-              GOAL 08.5 final UX polish
-            </span>
-          </div>
-          <h1 className="max-w-4xl text-5xl font-semibold tracking-normal text-foreground sm:text-6xl lg:text-7xl">
-            RegexRiddle
+          <Badge variant="secondary">
+            <SparklesIcon aria-hidden="true" data-icon="inline-start" />
+            Regex Lab Arcade
+          </Badge>
+          <h1 className="mt-5 max-w-4xl text-5xl font-semibold tracking-normal text-foreground sm:text-6xl lg:text-7xl">
+            Risolvi enigmi nascosti con una sola regex
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-muted-foreground sm:text-xl">
-            Regex puzzle game for Web Technologies: explore public riddles,
-            register or login with server-side sessions, create protected
-            challenges, and follow solver rankings without exposing hidden
-            answers.
+            Ogni sfida ti mostra pochi indizi. Scrivi la regex giusta, supera
+            le prove nascoste e scala la classifica.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button asChild size="lg">
               <Link to="/challenges">
-                Esplora sfide
+                Inizia una sfida
                 <ArrowRightIcon aria-hidden="true" data-icon="inline-end" />
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline">
               <Link to="/how-it-works">
                 <BookOpenIcon aria-hidden="true" data-icon="inline-start" />
-                Come funziona
+                Scopri come si gioca
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline">
               <Link to="/leaderboard">
                 <TrophyIcon aria-hidden="true" data-icon="inline-start" />
                 Guarda classifica
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="secondary">
-              <Link to="/create">
-                <PlusIcon aria-hidden="true" data-icon="inline-start" />
-                Crea una sfida
               </Link>
             </Button>
           </div>

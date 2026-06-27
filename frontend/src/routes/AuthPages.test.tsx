@@ -184,7 +184,7 @@ describe("auth pages and shell state", () => {
     renderRoute("/create");
 
     expect(await screen.findByLabelText("Regex segreta")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Crea sfida" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Pubblica sfida" })).toBeEnabled();
     expect(screen.getAllByText(/Demo Player/)).not.toHaveLength(0);
   });
 });

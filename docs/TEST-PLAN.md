@@ -97,6 +97,21 @@ pnpm check
 Current frontend test count after GOAL 08.0: 11 tests.
 Current E2E count after GOAL 08.0: 24 tests.
 
+## GOAL 08.1 public read UI checks
+
+- Frontend tests cover public API functions for catalog, detail, and leaderboard using the same-origin API client with `credentials: "include"`.
+- Frontend route tests cover catalog loading, success, empty, and error states.
+- Frontend route tests cover challenge card anti-leak behavior when mock data contains extra private keys.
+- Frontend route tests cover challenge detail public examples and stats.
+- Frontend route tests cover leaderboard aggregate metrics and anti-leak behavior for private identity fields.
+- Frontend route tests cover catalog pagination URL state.
+- Source security tests assert no `dangerouslySetInnerHTML`, no browser-readable auth token APIs, no frontend `RegExp` construction, reduced-motion CSS, and no raw `fetch` outside the API client boundary.
+- E2E tests cover landing CTA navigation, public catalog data, challenge detail navigation, public leaderboard data, keyboard/click pagination, mobile catalog/leaderboard overflow, rendered anti-leak checks, and browser storage auth-token checks.
+- GOAL 08.1 must keep backend API, database schema, auth/session/cookie behavior, and regex semantics unchanged.
+
+Current frontend test count after GOAL 08.1: 20 tests.
+Current E2E count after GOAL 08.1: 30 tests.
+
 ## Final delivery target
 
 The final project must include at least 10 meaningful E2E tests. Later milestones should add tests for:

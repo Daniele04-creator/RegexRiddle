@@ -1,5 +1,22 @@
 # Difesa orale
 
+## Cosa contiene GOAL 08.1
+
+Nel GOAL 08.1 ho collegato le pagine pubbliche della SPA alle API gia' presenti. Il catalogo legge GET /api/challenges, il dettaglio legge GET /api/challenges/:id e la classifica legge GET /api/leaderboard. Uso TanStack Query perche' questi dati sono server state: vengono caricati, messi in cache e aggiornati senza gestire stato manuale complesso. La UI mostra solo dati pubblici: esempi pubblici, autore pubblico e statistiche aggregate. Regex segreta, controlli nascosti e pattern proposti non arrivano mai nel frontend e non vengono renderizzati.
+
+GOAL 08.1 aggiunge:
+
+- catalogo pubblico `/challenges` con dati reali e paginazione;
+- dettaglio pubblico `/challenges/:id`;
+- classifica pubblica `/leaderboard`;
+- hook TanStack Query per catalogo, dettaglio e leaderboard;
+- tabella leaderboard accessibile su desktop/tablet;
+- lista leaderboard impilata su mobile;
+- stati loading, error, empty e success;
+- test frontend e E2E per UI pubblica, paginazione e anti-leak.
+
+Non aggiunge login, registrazione, logout, tentativi, creazione sfide, profilo, statistiche o edit/delete.
+
 ## Cosa contiene GOAL 08.0
 
 Nel GOAL 08.0 ho trasformato il frontend da semplice smoke app a vera base SPA. Ho configurato Tailwind, shadcn/ui, routing client-side, TanStack Query e un proxy same-origin verso il backend. Il design system si chiama Regex Lab ed e' documentato in DESIGN.md. Non ho ancora implementato login, tentativi o creazione sfide: ho preparato la struttura in modo sicuro, responsive e accessibile. L'autenticazione resta basata su cookie HttpOnly, quindi il frontend non salva token in localStorage o sessionStorage.

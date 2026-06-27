@@ -66,13 +66,17 @@ Leaderboard routes are public read-only. `GET /api/leaderboard` validates only `
 - `frontend/src/components/marketing`: landing-page foundation components.
 - `frontend/src/components/ui`: shadcn/ui source components.
 - `frontend/src/features/health`: optional health query using TanStack Query.
+- `frontend/src/features/challenges`: public challenge catalog/detail API functions, query hooks, cards, examples, stats, difficulty badges, and pagination controls.
+- `frontend/src/features/leaderboard`: public leaderboard API function, query hook, desktop table, and mobile stacked list.
 - `frontend/src/lib`: API client, CSRF helper, route metadata, and class merge utility.
-- `frontend/src/routes`: public SPA routes and safe placeholders.
+- `frontend/src/routes`: public SPA routes, public read-only data pages, and safe placeholders for future write/auth workflows.
 - `frontend/src/styles/globals.css`: Tailwind v4 import, shadcn theme variables, Regex Lab tokens, focus, reduced-motion, and touch defaults.
 
 The frontend API client accepts same-origin paths only, sends `credentials: "include"`, supports JSON responses, and has a small CSRF header helper for future protected mutations. It does not read cookies and does not use browser storage for auth.
 
-GOAL 08.0 routes are foundation routes only. They do not fetch or render real challenge catalog rows, leaderboard rows, attempt data, auth forms, or challenge creation workflows.
+GOAL 08.1 routes connect public read-only data only. `/challenges` fetches `GET /api/challenges`, `/challenges/:id` fetches `GET /api/challenges/:id`, and `/leaderboard` fetches `GET /api/leaderboard` through TanStack Query and the same-origin API client.
+
+The frontend still does not fetch or render attempt data, auth forms, challenge creation workflows, user emails, user ids, hidden challenge controls, secret regexes, or submitted candidate patterns.
 
 ## Future architecture notes
 

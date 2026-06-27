@@ -8,7 +8,8 @@
 - GOAL 06 may add protected challenge creation because it explicitly requests that API.
 - GOAL 07 may add the public solver leaderboard because it explicitly requests that API.
 - GOAL 08.0 may add frontend foundation dependencies, design system, routing, app shell, same-origin proxy, Query provider, and placeholder pages because it explicitly requests the frontend foundation.
-- Do not implement additional authentication endpoints, challenge edit/delete APIs, profile/statistics pages, real frontend auth forms, real attempt UI, real challenge authoring UI, or real leaderboard data UI until a later goal explicitly requests them.
+- GOAL 08.1 may connect public read-only frontend pages for catalog, challenge detail, and leaderboard because it explicitly requests those existing public APIs.
+- Do not implement additional authentication endpoints, challenge edit/delete APIs, profile/statistics pages, real frontend auth forms, real attempt UI, or real challenge authoring UI until a later goal explicitly requests them.
 - Do not introduce large dependencies without a clear goal requirement and human confirmation.
 - Do not commit, push, branch, checkout, stash, or reset unless the user explicitly asks.
 - Do not edit real `.env` files or store secrets in code, logs, tests, documentation, or generated files.

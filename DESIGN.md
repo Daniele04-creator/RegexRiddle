@@ -75,9 +75,17 @@ Headings use balanced wrapping. Body copy should stay short, active, and product
 
 ### Cards
 
-- Use cards only for repeated items, placeholder panels, and the hero preview.
+- Use cards only for repeated items, placeholder panels, public data summaries, and the hero preview.
 - Do not put cards inside cards.
 - Use `CardHeader`, `CardTitle`, `CardDescription`, and `CardContent` composition.
+
+### Public Data Views
+
+- Challenge catalog cards show title, difficulty, public examples, public author identity, aggregate attempts, aggregate solutions, and created date.
+- Challenge detail pages show the same public examples and aggregate stats, plus created/updated dates.
+- Leaderboard desktop views use accessible table headers.
+- Leaderboard mobile views use stacked list cards to avoid horizontal overflow.
+- Pagination controls use real buttons and URL query state.
 
 ### Badges
 
@@ -134,3 +142,9 @@ Headings use balanced wrapping. Body copy should stay short, active, and product
 GOAL 08.0 ships the frontend foundation only: Tailwind, shadcn/ui, routing, shell, Query provider, same-origin API client, proxy, accessible placeholders, and visual documentation.
 
 It does not ship real login/register forms, attempt UI, challenge creation UI, challenge catalog data rendering, or leaderboard data rendering.
+
+## GOAL 08.1 Scope
+
+GOAL 08.1 connects public read-only data views for `/challenges`, `/challenges/:id`, and `/leaderboard`.
+
+It still does not ship real login/register forms, logout UI, attempt submission UI, challenge creation UI, profile/statistics, edit/delete, or frontend regex evaluation.

@@ -13,9 +13,9 @@
 - Use opaque server-side sessions with `HttpOnly` and `SameSite` cookies when auth is implemented.
 - Use Argon2id when passwords are implemented.
 
-## GOAL 08.0 security posture
+## GOAL 08.1 security posture
 
-GOAL 08.0 adds the frontend foundation. The project still has no real frontend auth forms, no frontend challenge authoring workflow, no real frontend leaderboard data UI, no frontend attempt UI, no uploads, and no profile/statistics page.
+GOAL 08.1 connects public read-only frontend pages to existing public APIs. The project still has no real frontend auth forms, no frontend challenge authoring workflow, no frontend attempt UI, no uploads, no profile/statistics page, and no challenge edit/delete UI.
 
 Regex engine decisions:
 
@@ -78,6 +78,17 @@ Frontend foundation decisions:
 - The frontend does not use `dangerouslySetInnerHTML`.
 - Placeholder pages avoid rendering sensitive field names in the DOM.
 - Disabled placeholder forms are clearly marked as not active and do not submit data.
+
+Frontend public-read decisions:
+
+- `/challenges`, `/challenges/:id`, and `/leaderboard` are public read-only pages.
+- TanStack Query owns server state for these pages.
+- Public reads use same-origin relative API paths through the existing API client.
+- Public reads keep `credentials: "include"` for cookie compatibility but do not require auth.
+- Challenge UI renders only public examples, public author identity, difficulty, dates, and aggregate counts.
+- Leaderboard UI renders only public display name, username, rank, solved count, average attempts, and total attempts used.
+- Leaderboard UI does not render user ids, emails, avatar URLs, password hashes, session hashes, raw tokens, or cookie values.
+- Public UI does not render secret regexes, hidden controls, or submitted candidate patterns.
 
 Authentication decisions:
 

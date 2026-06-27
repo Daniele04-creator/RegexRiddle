@@ -25,7 +25,10 @@ export function MobileNav() {
           <MenuIcon aria-hidden="true" data-icon="inline-start" />
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-[min(22rem,calc(100vw-2rem))]" side="right">
+      <SheetContent
+        className="w-[min(22rem,calc(100vw-2rem))] bg-card shadow-xl ring-1 ring-border/80"
+        side="right"
+      >
         <SheetHeader>
           <SheetTitle>RegexRiddle</SheetTitle>
           <SheetDescription>Regex Lab navigation</SheetDescription>
@@ -50,7 +53,7 @@ export function MobileNav() {
             <Button asChild className="mt-2 justify-start">
               <Link to="/create">
                 <PlusIcon aria-hidden="true" data-icon="inline-start" />
-                Crea una sfida
+                Crea · in arrivo
               </Link>
             </Button>
           </SheetClose>

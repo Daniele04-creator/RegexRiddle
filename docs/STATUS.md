@@ -2,7 +2,7 @@
 
 ## Current milestone
 
-GOAL 08.0: Regex Lab design system and frontend foundation.
+GOAL 08.1: public challenge catalog, challenge detail, and leaderboard UI.
 
 ## Implemented
 
@@ -51,7 +51,7 @@ GOAL 08.0: Regex Lab design system and frontend foundation.
 - Regex Lab visual system documented in root `DESIGN.md`.
 - Tailwind CSS v4 configured through `@tailwindcss/vite`.
 - shadcn/ui initialized in `frontend/` with a small component set.
-- React Router SPA shell with public routes for home, challenges, challenge detail placeholder, leaderboard, login, register, create, and not found.
+- React Router SPA shell with public routes for home, challenges, challenge detail, leaderboard, login, register, create, and not found.
 - Semantic app shell with header, nav, main, footer, skip link, and responsive mobile sheet navigation.
 - TanStack Query provider configured for server state.
 - Typed same-origin API client with `credentials: "include"`.
@@ -60,16 +60,23 @@ GOAL 08.0: Regex Lab design system and frontend foundation.
 - Vite dev proxy for `/api/*` and `/health`.
 - Docker frontend server proxy for `/api/*` and `/health` through `API_ORIGIN`.
 - Compose web service sets `API_ORIGIN=http://api:4000`.
-- Disabled, clearly marked placeholder pages for future auth, registration, challenge creation, challenge detail, catalog, and leaderboard UI.
+- Disabled, clearly marked placeholder pages for future auth, registration, and challenge creation UI.
 - Frontend tests for routing, API client credentials, CSRF helper, source security baseline, and reduced-motion CSS.
+- Public `/challenges` frontend page connected to `GET /api/challenges?page=1&limit=9`.
+- Public `/challenges/:id` frontend page connected to `GET /api/challenges/:id`.
+- Public `/leaderboard` frontend page connected to `GET /api/leaderboard?page=1&limit=10`.
+- TanStack Query hooks for challenge catalog, challenge detail, and leaderboard data.
+- Public challenge cards showing difficulty, title, description, public examples, public author identity, aggregate attempts, aggregate solutions, and created date.
+- Public challenge detail showing title, description, public examples, public author identity, aggregate stats, created date, and updated date.
+- Public leaderboard UI showing rank, display name, username, solved count, average attempts, and total attempts used.
+- Leaderboard desktop/tablet table and mobile stacked layout.
+- Catalog and leaderboard URL pagination.
 
 ## Not implemented
 
 - Real frontend authentication forms.
 - Frontend attempt UI.
 - Real frontend challenge creation UI.
-- Frontend leaderboard data UI.
-- Frontend challenge catalog data UI.
 - Challenge update or deletion.
 
 ## Verification status
@@ -117,3 +124,21 @@ Verified on 2026-06-27 after GOAL 08.0 implementation:
 - `pnpm e2e`: PASS, 24 Playwright tests.
 - `pnpm check`: PASS, includes lint, typecheck, test, build, and 24 E2E tests.
 - Visual viewport verification: PASS for desktop `1440x900`, tablet `768x1024`, mobile `390x844`, and mobile nav; no horizontal overflow detected.
+
+Verified on 2026-06-27 after GOAL 08.1 implementation:
+
+- `docker compose up -d db`: PASS.
+- `pnpm db:seed`: PASS, 3 users, 10 challenges, 60 controls, 4 attempts, 2 solutions.
+- `pnpm db:verify`: PASS, 3 users, 10 challenges, 60 controls, 4 attempts, 2 solutions; no secret values printed.
+- `pnpm lint`: PASS with two non-blocking Fast Refresh warnings in generated shadcn `button` and `badge` files.
+- `pnpm typecheck`: PASS.
+- `pnpm test`: PASS, shared 1 test, backend 79 tests, frontend 20 tests.
+- `pnpm build`: PASS, with the existing non-blocking Vite chunk-size warning.
+- `docker compose up --build -d`: PASS, images `regexriddle-api:dev` and `regexriddle-web:dev` rebuilt; db, API, and web containers started.
+- `pnpm e2e`: PASS, 30 Playwright tests.
+- `pnpm check`: PASS, includes lint, typecheck, test, build, and 30 E2E tests.
+- `pnpm audit --audit-level=high`: PASS; one moderate transitive tooling advisory remains in `@hono/node-server` through Prisma/shadcn tooling.
+- `git diff --check`: PASS.
+- `docker compose ps`: PASS, db healthy and API/web running on the existing ports.
+- Visual viewport verification: PASS for desktop `1440x900`, tablet `768x1024`, mobile `390x844`, and mobile nav; no horizontal overflow detected.
+- Source security audit: PASS, no production frontend `dangerouslySetInnerHTML`, browser-readable auth-token storage APIs, JavaScript `RegExp` construction, or raw `fetch` outside the API client boundary.

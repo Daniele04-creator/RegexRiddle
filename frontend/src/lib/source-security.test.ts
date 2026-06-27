@@ -58,6 +58,18 @@ describe("frontend source security baseline", () => {
     }
   });
 
+  it("keeps raw fetch calls inside the API client boundary", () => {
+    for (const source of readSources()) {
+      const relativePath = source.filePath.replace(`${frontendRoot}${sep}`, "");
+
+      if (relativePath === join("src", "lib", "api-client.ts")) {
+        continue;
+      }
+
+      expect(source.text, relativePath).not.toMatch(/\bfetch\s*\(/);
+    }
+  });
+
   it("keeps a reduced-motion baseline in global CSS", () => {
     const css = readFileSync(join(srcRoot, "styles", "globals.css"), "utf8");
 

@@ -84,8 +84,12 @@ DONE_TECH:
 
 ## GOAL 08.1
 
+DONE_TECH:
+
 - Connect public challenge catalog and leaderboard UI to existing read APIs.
 - Keep secret regexes and hidden controls server-only.
+- Connect public challenge detail UI to `GET /api/challenges/:id`.
+- Keep auth UI, attempt UI, and challenge creation UI out of scope.
 
 ## GOAL 09
 

@@ -5,7 +5,7 @@ import {
 } from "react-router";
 
 import { AppShell } from "@/components/layout/AppShell";
-import { ChallengeDetailPlaceholderPage } from "@/routes/ChallengeDetailPlaceholderPage";
+import { ChallengeDetailPage } from "@/routes/ChallengeDetailPage";
 import { ChallengesPage } from "@/routes/ChallengesPage";
 import { CreateChallengePage } from "@/routes/CreateChallengePage";
 import { HomePage } from "@/routes/HomePage";
@@ -36,7 +36,7 @@ export const appRoutes: RouteObject[] = [
       { path: "challenges", element: <ChallengesPage /> },
       {
         path: "challenges/:challengeId",
-        element: <ChallengeDetailPlaceholderPage />
+        element: <ChallengeDetailPage />
       },
       { path: "leaderboard", element: <LeaderboardPage /> },
       { path: "login", element: <LoginPage /> },

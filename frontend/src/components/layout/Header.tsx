@@ -44,7 +44,7 @@ export function Header() {
           <Button asChild>
             <Link to="/create">
               <PlusIcon aria-hidden="true" data-icon="inline-start" />
-              Crea una sfida
+              Crea · in arrivo
             </Link>
           </Button>
         </div>

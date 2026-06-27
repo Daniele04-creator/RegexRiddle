@@ -145,7 +145,18 @@
 - Provide a CSRF header helper for future protected mutations without building mutation UI yet.
 - Do not store auth tokens in `localStorage` or `sessionStorage`, do not read `document.cookie`, and do not introduce JWT.
 - Do not evaluate regex in the frontend and do not use `dangerouslySetInnerHTML`.
-- Keep `/challenges`, `/leaderboard`, `/login`, `/register`, `/create`, and `/challenges/:id` as useful placeholders until later GOAL 08.x work.
+- In GOAL 08.0, keep `/challenges`, `/leaderboard`, `/login`, `/register`, `/create`, and `/challenges/:id` as useful placeholders until later GOAL 08.x work.
+
+## GOAL 08.1 decisions
+
+- Connect only public read pages to existing APIs; do not change backend behavior, database schema, auth/session/cookie semantics, regex semantics, or regex engine.
+- Use TanStack Query hooks for catalog, challenge detail, and leaderboard server state.
+- Use the existing same-origin API client and keep `credentials: "include"` on public reads.
+- Use URL query state for catalog and leaderboard pagination with fixed limits: 9 challenges and 10 leaderboard rows.
+- Use shadcn cards and badges for challenge data; use an accessible shadcn table on desktop/tablet and stacked cards on mobile for leaderboard data.
+- Render only public examples, public author identity, public solver identity, and aggregate stats.
+- Do not render emails, user ids, secret regexes, hidden controls, submitted patterns, password/session hashes, raw tokens, or cookie values.
+- Keep login/register forms, logout UI, attempt submission UI, challenge creation UI, profile/statistics, and edit/delete out of scope.
 
 ## Rejected for GOAL 00
 

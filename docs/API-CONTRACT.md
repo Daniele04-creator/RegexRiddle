@@ -17,7 +17,7 @@ Response `200 application/json`:
 
 ## Frontend same-origin boundary
 
-GOAL 08.0 adds a frontend API client foundation without changing backend endpoint behavior.
+GOAL 08.0 adds a frontend API client foundation without changing backend endpoint behavior. GOAL 08.1 uses that client for public read-only catalog, challenge detail, and leaderboard UI.
 
 Frontend rules:
 
@@ -27,6 +27,11 @@ Frontend rules:
 - All frontend API calls send `credentials: "include"` for future cookie-authenticated flows.
 - A CSRF header helper exists for future protected mutations: `X-RegexRiddle-CSRF: 1`.
 - GOAL 08.0 does not implement real mutation UI and does not change any backend auth, challenge, attempt, or leaderboard contract.
+- GOAL 08.1 public pages do not require auth and do not implement mutations.
+- `/challenges` calls `GET /api/challenges?page=1&limit=9`.
+- `/challenges/:id` calls `GET /api/challenges/:id`.
+- `/leaderboard` calls `GET /api/leaderboard?page=1&limit=10`.
+- Public frontend rendering must stay limited to DTO fields documented below.
 
 ## GOAL 01 note
 
@@ -487,6 +492,7 @@ The following areas are intentionally TODO after GOAL 07:
 
 - Challenge edit/delete workflows.
 - Frontend authoring UI.
-- Frontend leaderboard UI.
+- Frontend auth UI.
+- Frontend attempt UI.
 
 Future protected routes must include authorization checks and must not expose secret regexes or secret controls.

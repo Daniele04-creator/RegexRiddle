@@ -1,6 +1,6 @@
 # RegexRiddle
 
-RegexRiddle is a Web Technologies exam project scaffold. The repository currently includes the GOAL 08.0 Regex Lab frontend foundation plus the GOAL 07 public solver leaderboard API: PostgreSQL, Prisma schema, deterministic demo seed data, public challenge DTOs, read-only challenge endpoints, public leaderboard, backend auth, an internal server-side RE2-compatible evaluator, `POST /api/challenges`, and `POST /api/challenges/:id/attempts`. It still has no real frontend auth forms, real challenge creation UI, real leaderboard data UI, or real attempt UI.
+RegexRiddle is a Web Technologies exam project scaffold. The repository currently includes the GOAL 08.1 public read frontend UI: PostgreSQL, Prisma schema, deterministic demo seed data, public challenge DTOs, read-only challenge endpoints, public leaderboard, backend auth, an internal server-side RE2-compatible evaluator, `POST /api/challenges`, `POST /api/challenges/:id/attempts`, and React/Vite pages connected to the public catalog, challenge detail, and leaderboard APIs. It still has no real frontend auth forms, real challenge creation UI, real attempt UI, profile/statistics, or edit/delete workflows.
 
 ## Stack
 
@@ -63,6 +63,8 @@ Useful local URLs:
 - Public challenges API: http://127.0.0.1:4000/api/challenges
 - Public leaderboard API: http://127.0.0.1:4000/api/leaderboard
 - Same-origin frontend health proxy: http://127.0.0.1:5173/health
+- Frontend public catalog: http://127.0.0.1:5173/challenges
+- Frontend public leaderboard: http://127.0.0.1:5173/leaderboard
 - Protected challenge creation API: http://127.0.0.1:4000/api/challenges
 - Protected attempt API: http://127.0.0.1:4000/api/challenges/{id}/attempts
 - PostgreSQL from host tools: 127.0.0.1:55432
@@ -83,6 +85,8 @@ Docker URLs:
 - Public challenges API: http://127.0.0.1:4000/api/challenges
 - Public leaderboard API: http://127.0.0.1:4000/api/leaderboard
 - Same-origin frontend health proxy: http://127.0.0.1:5173/health
+- Frontend public catalog: http://127.0.0.1:5173/challenges
+- Frontend public leaderboard: http://127.0.0.1:5173/leaderboard
 - Protected challenge creation API: http://127.0.0.1:4000/api/challenges
 - Protected attempt API: http://127.0.0.1:4000/api/challenges/{id}/attempts
 - PostgreSQL from host tools: 127.0.0.1:55432
@@ -150,11 +154,21 @@ GOAL 08.0 replaces the smoke screen with the Regex Lab SPA foundation:
 - Vite dev server proxies `/api/*` and `/health` to the backend.
 - The production Docker web server proxies `/api/*` and `/health` to `API_ORIGIN`, set to `http://api:4000` in Compose.
 
-The frontend placeholders are intentionally non-functional for product writes. They do not implement real login, registration, attempt submission, challenge creation, challenge catalog data rendering, or leaderboard data rendering.
+GOAL 08.1 connects the public read-only pages:
 
-## Public leaderboard API smoke
+- `/challenges` reads `GET /api/challenges?page=1&limit=9`.
+- `/challenges/:id` reads `GET /api/challenges/:id`.
+- `/leaderboard` reads `GET /api/leaderboard?page=1&limit=10`.
 
-The backend exposes the public solver leaderboard. No frontend leaderboard UI exists yet.
+TanStack Query owns this server state. Browser calls use same-origin relative API paths through the existing API client, and every request keeps `credentials: "include"` for cookie-compatible auth.
+
+The public UI shows only public examples, public author identity, public solver identity, and aggregate stats. It does not show secret regexes, hidden controls, submitted patterns, emails, user ids, password/session hashes, raw tokens, or cookie values.
+
+The frontend placeholders are intentionally non-functional for product writes. They do not implement real login, registration, attempt submission, or challenge creation.
+
+## Public leaderboard
+
+The backend exposes the public solver leaderboard and the frontend renders it at `/leaderboard`.
 
 ```powershell
 curl "http://127.0.0.1:4000/api/leaderboard?limit=20&page=1"
@@ -172,7 +186,7 @@ Ranking order:
 2. Lower `averageAttempts`.
 3. `username` ascending.
 
-The endpoint is public read-only and does not require auth or CSRF. Responses expose only `username`, `displayName`, and aggregate stats. They must not include user emails, user ids, secret regexes, control values, submitted patterns, password hashes, session hashes, token values, or cookie values.
+The endpoint and frontend page are public read-only and do not require auth or CSRF. Responses and UI expose only `username`, `displayName`, and aggregate stats. They must not include user emails, user ids, secret regexes, control values, submitted patterns, password hashes, session hashes, token values, or cookie values.
 
 ## Auth API smoke
 
@@ -251,7 +265,7 @@ The frontend must not store auth tokens in `localStorage` or `sessionStorage`, m
 
 ## Safe regex engine
 
-GOAL 04 added an internal backend regex engine based on `re2-wasm`; GOAL 05 uses it from the protected attempt endpoint and GOAL 06 uses it from protected challenge creation. GOAL 07 and GOAL 08.0 do not change regex evaluation.
+GOAL 04 added an internal backend regex engine based on `re2-wasm`; GOAL 05 uses it from the protected attempt endpoint and GOAL 06 uses it from protected challenge creation. GOAL 07, GOAL 08.0, and GOAL 08.1 do not change regex evaluation.
 
 - Evaluation happens server-side only.
 - User candidate patterns are compiled with RE2-compatible semantics, not JavaScript `RegExp`.

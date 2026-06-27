@@ -359,20 +359,30 @@ test("web app renders the Regex Lab landing foundation", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "RegexRiddle" })).toBeVisible();
   await expect(page.getByRole("link", { name: /Esplora sfide/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /Guarda classifica/ })).toBeVisible();
-  await expect(page.getByText("GOAL 08.0 frontend foundation")).toBeVisible();
+  await expect(page.getByText("GOAL 08.1 public read UI")).toBeVisible();
 });
 
-test("desktop SPA navigation reaches placeholder routes", async ({ page }) => {
+test("landing CTA navigates to the public challenge catalog", async ({ page }) => {
+  await page.goto("/");
+
+  await page.getByRole("link", { name: /Esplora sfide/ }).click();
+
+  await expect(page).toHaveURL(/\/challenges$/);
+  await expect(page.getByRole("heading", { name: "Catalogo sfide" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Slug URL" })).toBeVisible();
+});
+
+test("desktop SPA navigation reaches public read routes", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
 
   await page.getByRole("link", { exact: true, name: "Sfide" }).click();
   await expect(page).toHaveURL(/\/challenges$/);
-  await expect(page.getByRole("heading", { name: "Challenge catalog" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Catalogo sfide" })).toBeVisible();
 
   await page.getByRole("link", { exact: true, name: "Classifica" }).click();
   await expect(page).toHaveURL(/\/leaderboard$/);
-  await expect(page.getByRole("heading", { name: "Solver leaderboard" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Classifica solver" })).toBeVisible();
 
   await page.getByRole("link", { exact: true, name: "Accedi" }).click();
   await expect(page).toHaveURL(/\/login$/);
@@ -382,7 +392,7 @@ test("desktop SPA navigation reaches placeholder routes", async ({ page }) => {
   await expect(page).toHaveURL(/\/register$/);
   await expect(page.getByRole("heading", { name: "Register" })).toBeVisible();
 
-  await page.getByRole("link", { name: "Crea una sfida" }).first().click();
+  await page.getByRole("link", { name: /Crea/ }).first().click();
   await expect(page).toHaveURL(/\/create$/);
   await expect(page.getByRole("heading", { name: "Create a challenge" })).toBeVisible();
 });
@@ -396,7 +406,92 @@ test("mobile navigation opens and routes to public pages", async ({ page }) => {
 
   await page.getByRole("link", { exact: true, name: "Classifica" }).click();
   await expect(page).toHaveURL(/\/leaderboard$/);
-  await expect(page.getByRole("heading", { name: "Solver leaderboard" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Classifica solver" })).toBeVisible();
+});
+
+test("public challenge catalog renders API cards with public examples and stats", async ({
+  page
+}) => {
+  await page.goto("/challenges");
+
+  await expect(page.getByRole("heading", { name: "Catalogo sfide" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Slug URL" })).toBeVisible();
+  await expect(page.getByText("regex-riddle-2026")).toBeVisible();
+  await expect(page.getByText("-regex-riddle")).toBeVisible();
+  await expect(page.getByText("0 tentativi").first()).toBeVisible();
+  await expect(page.getByText("0 soluzioni").first()).toBeVisible();
+});
+
+test("challenge card opens public detail without leaking secret fields", async ({
+  page
+}) => {
+  await page.goto("/challenges");
+
+  const slugCard = page.locator('[data-slot="card"]').filter({ hasText: "Slug URL" });
+  await slugCard.getByRole("link", { name: /Apri/ }).click();
+
+  await expect(page).toHaveURL(/\/challenges\/aaaaaaaa-0010-4000-8000-000000000010$/);
+  await expect(page.getByRole("heading", { name: "Slug URL" })).toBeVisible();
+  await expect(page.getByText("regex-riddle-2026")).toBeVisible();
+  await expect(page.getByText("-regex-riddle")).toBeVisible();
+  await expect(page.getByRole("button", { name: /Prova a risolvere/ })).toBeDisabled();
+  await expectNoForbiddenRenderedFrontendStrings(await page.content());
+});
+
+test("public leaderboard renders aggregate solver metrics only", async ({ page }) => {
+  await page.goto("/leaderboard");
+
+  await expect(page.getByRole("heading", { name: "Classifica solver" })).toBeVisible();
+  await expect(page.getByText("Daniele Demo").first()).toBeVisible();
+  await expect(page.getByText("@daniele_demo").first()).toBeVisible();
+  await expect(page.getByText("#1").first()).toBeVisible();
+  await expect(page.getByRole("columnheader", { name: "Sfide risolte" })).toBeVisible();
+  await expect(page.getByRole("columnheader", { name: "Media tentativi" })).toBeVisible();
+  await expect(page.getByRole("columnheader", { name: "Tentativi totali" })).toBeVisible();
+  await expect(page.getByText("demo_player@example.test")).toHaveCount(0);
+  await expectNoForbiddenRenderedFrontendStrings(await page.content());
+});
+
+test("catalog pagination supports keyboard and click navigation", async ({
+  page
+}) => {
+  await page.goto("/challenges");
+
+  await expect(page.getByRole("heading", { name: "Slug URL" })).toBeVisible();
+  await page.getByRole("button", { name: /Successiva/ }).focus();
+  await page.keyboard.press("Enter");
+
+  await expect(page).toHaveURL(/\/challenges\?page=2$/);
+  await expect(page.getByRole("heading", { name: "Solo cifre" })).toBeVisible();
+
+  await page.getByRole("button", { name: /Precedente/ }).click();
+  await expect(page).toHaveURL(/\/challenges$/);
+});
+
+test("mobile catalog and leaderboard stay readable without horizontal overflow", async ({
+  page
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/challenges");
+
+  await expect(page.getByRole("heading", { name: "Catalogo sfide" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Slug URL" })).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth
+    )
+  ).toBe(false);
+
+  await page.goto("/leaderboard");
+
+  await expect(page.getByRole("heading", { name: "Classifica solver" })).toBeVisible();
+  await expect(page.getByText("Risolte", { exact: true }).first()).toBeVisible();
+  await expect(page.getByText("Media", { exact: true }).first()).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth
+    )
+  ).toBe(false);
 });
 
 test("frontend proxy exposes health through same-origin path", async ({ page }) => {
@@ -414,9 +509,15 @@ test("frontend proxy exposes health through same-origin path", async ({ page }) 
 test("rendered frontend shell does not leak sensitive field names or auth tokens", async ({
   page
 }) => {
-  await page.goto("/");
-
-  await expectNoForbiddenRenderedFrontendStrings(await page.content());
+  for (const path of [
+    "/",
+    "/challenges",
+    "/challenges/aaaaaaaa-0010-4000-8000-000000000010",
+    "/leaderboard"
+  ]) {
+    await page.goto(path);
+    await expectNoForbiddenRenderedFrontendStrings(await page.content());
+  }
 
   const storageKeys = await page.evaluate(() => ({
     localStorageKeys: Object.keys(window.localStorage),

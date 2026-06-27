@@ -17,19 +17,19 @@ const howItWorks = [
   {
     title: "Creators publish riddles",
     description:
-      "A challenge has public examples and hidden server-side checks. The secret pattern never becomes client data.",
+      "The public catalog is live with safe examples and aggregate stats. Hidden checks stay server-only.",
     icon: FlaskConicalIcon
   },
   {
     title: "Solvers submit candidates",
     description:
-      "Future attempt UI will send candidate patterns to the API. This milestone only prepares the shell.",
+      "Future attempt UI will send candidate patterns to the API. Public pages remain read-only in this milestone.",
     icon: ListChecksIcon
   },
   {
     title: "Leaderboard rewards precision",
     description:
-      "The backend already ranks solved challenges and lower average attempts through public aggregates.",
+      "The leaderboard now renders public aggregate rankings without emails, ids, or private attempt data.",
     icon: TrophyIcon
   }
 ];
@@ -66,8 +66,8 @@ export function HomePage() {
               </h2>
             </div>
             <p className="max-w-xl text-sm leading-6 text-muted-foreground">
-              The UI foundation shows the product model without pretending that
-              later gameplay screens are already implemented.
+              The public catalog, challenge detail, and leaderboard are wired to
+              existing read APIs. Gameplay and authoring stay upcoming.
             </p>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
@@ -108,13 +108,13 @@ export function HomePage() {
         <section aria-labelledby="milestone-title" className="mt-14 rounded-lg border bg-card/82 p-6">
           <Badge variant="outline">Current milestone</Badge>
           <h2 id="milestone-title" className="mt-3 text-2xl font-semibold">
-            Backend ready, frontend foundation now in place
+            Public read UI is now connected
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
-            GOAL 08.0 adds design tokens, routing, app shell, Query provider,
-            same-origin API plumbing, proxy behavior, placeholder pages,
-            accessibility baseline, and tests. Real auth, attempt, creation,
-            catalog, and leaderboard UIs remain later GOAL 08.x work.
+            GOAL 08.1 connects the catalog, challenge detail, and leaderboard
+            pages to the existing public APIs through TanStack Query and the
+            same-origin API client. Auth forms, attempt submission, and challenge
+            creation UI remain later work.
           </p>
         </section>
       </PageContainer>

@@ -13,9 +13,9 @@
 - Use opaque server-side sessions with `HttpOnly` and `SameSite` cookies when auth is implemented.
 - Use Argon2id when passwords are implemented.
 
-## GOAL 08.3 security posture
+## GOAL 08.4 security posture
 
-GOAL 08.3 connects frontend attempt gameplay to the existing protected attempt API. The project still has no frontend challenge authoring workflow, no uploads, no profile/statistics page, and no challenge edit/delete UI.
+GOAL 08.4 connects frontend challenge authoring to the existing protected challenge creation API. The project still has no uploads, no profile/statistics page, and no challenge edit/delete UI.
 
 Regex engine decisions:
 
@@ -77,7 +77,7 @@ Frontend foundation decisions:
 - The frontend does not evaluate user regex with JavaScript `RegExp`.
 - The frontend does not use `dangerouslySetInnerHTML`.
 - Auth pages avoid rendering sensitive field names or token/cookie values in the DOM.
-- The `/create` placeholder is auth-aware but still does not submit challenge creation data.
+- `/create` is auth-aware and submits challenge creation data only for authenticated users.
 
 Frontend public-read decisions:
 
@@ -102,6 +102,19 @@ Frontend attempt UI decisions:
 - Attempt feedback renders only aggregate counts: positive matched/total, negative matched/total, attempt number, solved status, and date.
 - The frontend does not render secret regexes, hidden controls, `Attempt.proposedPattern`, password hashes, session hashes, raw tokens, or cookie values.
 - `401`, `403`, `404`, `409`, and `422` attempt errors map to safe user-facing messages without stack traces or raw response bodies.
+
+Frontend challenge authoring UI decisions:
+
+- `/create` shows login/register CTAs to guests and does not render authoring fields.
+- Authenticated users submit challenge creation through the existing same-origin API client with `credentials: "include"`.
+- Challenge creation sets `X-RegexRiddle-CSRF: 1` through `protectedMutation: true`.
+- The UI sends only the documented creation DTO fields: title, description, difficulty, secret regex, flags, public examples, and controls.
+- The author is never accepted from the browser; the backend derives it from the server-side session.
+- Client validation covers shape and UX constraints only. Server validation remains authoritative for regex syntax, RE2 compatibility, and example/control coherence.
+- Secret regexes and secret controls stay in React form state only; they are not put in URLs, localStorage, sessionStorage, custom token stores, or logs.
+- The frontend does not run JavaScript `RegExp` against the secret regex and does not provide a client-side match preview.
+- Successful creation resets secret form inputs and renders only the public challenge detail DTO.
+- `400`, `401`, `403`, and `422` creation errors map to safe user-facing messages without stack traces or raw response bodies.
 
 Frontend auth UI decisions:
 

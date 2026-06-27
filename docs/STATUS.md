@@ -2,7 +2,7 @@
 
 ## Current milestone
 
-GOAL 08.3: frontend attempt/gameplay UI on challenge detail.
+GOAL 08.4: frontend challenge creation UI.
 
 ## Implemented
 
@@ -64,7 +64,7 @@ GOAL 08.3: frontend attempt/gameplay UI on challenge detail.
 - Header and mobile nav guest/authenticated states.
 - Frontend logout action.
 - Current-session restoration through `GET /api/auth/me`.
-- Auth-aware `/create` placeholder for guest and authenticated users.
+- Auth-aware `/create` gate for guests and protected challenge creation form for authenticated users.
 - Frontend tests for routing, API client credentials, CSRF helper, source security baseline, and reduced-motion CSS.
 - Public `/challenges` frontend page connected to `GET /api/challenges?page=1&limit=9`.
 - Public `/challenges/:id` frontend page connected to `GET /api/challenges/:id`.
@@ -75,7 +75,8 @@ GOAL 08.3: frontend attempt/gameplay UI on challenge detail.
 - Public leaderboard UI showing rank, display name, username, solved count, average attempts, and total attempts used.
 - Leaderboard desktop/tablet table and mobile stacked layout.
 - Catalog and leaderboard URL pagination.
-- Auth feature folder with typed API functions, TanStack Query hooks, Zod schemas, form components, session menu, and protected-placeholder component.
+- Auth feature folder with typed API functions, TanStack Query hooks, Zod schemas, form components, and session menu.
+- Challenge authoring feature folder with typed protected API function, TanStack Query mutation, Zod schema, authoring form, secret-control editor, guest gate, and public success card.
 - Attempt feature folder with typed protected API function, TanStack Query mutation, Zod schema, candidate form, flag selector, aggregate feedback, and guest/author gates.
 - Challenge detail attempt panel for guests, authenticated non-authors, and authors.
 - Attempt mutation using `POST /api/challenges/:id/attempts` through the same-origin API client with `credentials: "include"` and `X-RegexRiddle-CSRF: 1`.
@@ -83,8 +84,8 @@ GOAL 08.3: frontend attempt/gameplay UI on challenge detail.
 
 ## Not implemented
 
-- Real frontend challenge creation UI.
 - Challenge update or deletion.
+- Profile/statistics UI.
 
 ## Verification status
 
@@ -188,3 +189,24 @@ Verified on 2026-06-27 after GOAL 08.3 implementation:
 - Web Interface Guidelines audit: PASS for the attempt UI after checking labels, focus states, ellipses, `aria-live`, long-content handling, and responsive overflow.
 - Source security audit: PASS, no production frontend `dangerouslySetInnerHTML`, `document.cookie`, browser auth-token storage APIs, JavaScript `RegExp` construction, `console.*`, or obsolete `apps/*` path references.
 - Sensitive-field audit: PASS, sensitive names appear only in docs, tests, shared challenge-creation contracts, or backend internals; production attempt UI does not render secret regexes, hidden controls, `Attempt.proposedPattern`, password hashes, session hashes, raw tokens, or cookie values.
+
+Verified on 2026-06-27 after GOAL 08.4 implementation:
+
+- `docker compose up -d db`: PASS.
+- `pnpm db:seed`: PASS, 3 users, 10 challenges, 60 controls, 4 attempts, 2 solutions.
+- `pnpm db:verify`: PASS, 3 users, 10 challenges, 60 controls, 4 attempts, 2 solutions; no secret values printed.
+- `pnpm lint`: PASS with two pre-existing non-blocking Fast Refresh warnings in generated shadcn `button` and `badge` files.
+- `pnpm typecheck`: PASS.
+- `pnpm test`: PASS, shared 1 test, backend 79 tests, frontend 51 tests.
+- `pnpm build`: PASS, with the existing non-blocking Vite chunk-size warning.
+- `docker compose up --build -d`: PASS, images `regexriddle-api:dev` and `regexriddle-web:dev` rebuilt; db, API, and web containers started.
+- `pnpm db:verify` after Compose rebuild: PASS, 3 users, 10 challenges, 60 controls, 4 attempts, 2 solutions; no secret values printed.
+- `pnpm e2e`: PASS, 49 Playwright tests.
+- `pnpm check`: PASS, includes lint, typecheck, test, build, and 49 E2E tests.
+- `pnpm audit --audit-level=high`: PASS at the high threshold; one moderate advisory remains in tooling dependencies (`@hono/node-server` through Prisma/shadcn tooling).
+- `git diff --check`: PASS.
+- `docker compose ps`: PASS, db healthy and API/web running on the expected ports.
+- Visual viewport verification: PASS for mobile `390x844` challenge creation form; no horizontal overflow detected.
+- Web Interface Guidelines audit: PASS for the authoring UI after checking labels, focus states, ellipses, control add/remove states, mobile tap behavior, and responsive overflow.
+- Source security audit: PASS through frontend source-security tests; no production frontend `dangerouslySetInnerHTML`, `document.cookie`, browser auth-token storage APIs, JavaScript `RegExp` construction, or raw `fetch` outside the API client boundary.
+- Sensitive-field audit: PASS through frontend, backend, and E2E anti-leak tests; created challenge public detail/catalog responses do not render secret regexes, hidden controls, raw tokens, cookie values, password hashes, or session hashes.

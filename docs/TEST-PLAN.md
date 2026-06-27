@@ -137,6 +137,18 @@ Current E2E count after GOAL 08.2: 36 tests.
 Current frontend test count after GOAL 08.3: 42 tests.
 Current E2E count after GOAL 08.3: 44 tests.
 
+## GOAL 08.4 frontend challenge creation UI checks
+
+- Frontend tests cover the challenge creation API function sending `POST /api/challenges` with `credentials: "include"`, JSON body, `X-RegexRiddle-CSRF: 1`, and only creation DTO fields.
+- Frontend tests cover authoring schema validation for public metadata, supported `i`/`m` flags, required examples, 3-10 controls per kind, duplicate controls, contradictory controls, and deterministic flag normalization.
+- Frontend route tests cover guest login/register gate, authenticated authoring form, sanitized submission payload, public success card, secret input reset after success, and safe `422` error mapping.
+- Source security tests assert no `dangerouslySetInnerHTML`, no production frontend `document.cookie`, no browser auth-token storage APIs, no frontend `RegExp` construction, and no raw `fetch` outside the API client boundary.
+- E2E tests cover logged-out create gate, authenticated create form, minimum-control UI guard, backend incoherence feedback without raw error exposure, valid creation through the UI, public detail/catalog anti-leak checks for created challenges, mobile create layout overflow, and storage anti-token/anti-secret checks.
+- GOAL 08.4 must keep backend API, database schema, auth/session/cookie behavior, CSRF behavior, and regex semantics unchanged.
+
+Current frontend test count after GOAL 08.4: 51 tests.
+Current E2E count after GOAL 08.4: 49 tests.
+
 ## Final delivery target
 
 The final project must include at least 10 meaningful E2E tests. Later milestones should add tests for:

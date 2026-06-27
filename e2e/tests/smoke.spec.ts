@@ -185,6 +185,21 @@ async function expectNoAuthStorage(page: Page): Promise<void> {
   expect(serializedStorage).not.toMatch(/auth|token|session|rr_session/i);
 }
 
+async function expectNoSecretStorage(
+  page: Page,
+  values: string[]
+): Promise<void> {
+  const storage = await page.evaluate(() => [
+    ...Object.entries(window.localStorage),
+    ...Object.entries(window.sessionStorage)
+  ]);
+  const serializedStorage = JSON.stringify(storage);
+
+  for (const value of values) {
+    expect(serializedStorage).not.toContain(value);
+  }
+}
+
 async function loginDemoPlayerThroughUi(page: Page): Promise<void> {
   await page.goto("/login");
   await page.getByLabel("Username o email").fill("demo_player");
@@ -369,6 +384,40 @@ function makeValidChallengeCreatePayload(suffix: string) {
   };
 }
 
+async function fillChallengeCreateForm(
+  page: Page,
+  payload: ReturnType<typeof makeValidChallengeCreatePayload>
+): Promise<void> {
+  await page.getByLabel("Titolo").fill(payload.title);
+  await page.getByLabel("Descrizione").fill(payload.description);
+  await page.getByLabel("Regex segreta").fill(payload.secretPattern);
+  await page.getByLabel("Esempio pubblico positivo").fill(
+    payload.publicPositiveExample
+  );
+  await page.getByLabel("Esempio pubblico negativo").fill(
+    payload.publicNegativeExample
+  );
+
+  const positiveControls = payload.controls.filter(
+    (control) => control.kind === "POSITIVE"
+  );
+  const negativeControls = payload.controls.filter(
+    (control) => control.kind === "NEGATIVE"
+  );
+
+  for (const [index, control] of positiveControls.entries()) {
+    await page
+      .getByRole("textbox", { name: `Controllo positivo ${index + 1}` })
+      .fill(control.value);
+  }
+
+  for (const [index, control] of negativeControls.entries()) {
+    await page
+      .getByRole("textbox", { name: `Controllo negativo ${index + 1}` })
+      .fill(control.value);
+  }
+}
+
 async function createE2ELeaderboardUser(suffix: string): Promise<string> {
   const user = await prisma.user.create({
     data: {
@@ -444,7 +493,7 @@ test("web app renders the Regex Lab landing foundation", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "RegexRiddle" })).toBeVisible();
   await expect(page.getByRole("link", { name: /Esplora sfide/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /Guarda classifica/ })).toBeVisible();
-  await expect(page.getByText("GOAL 08.3 adds")).toBeVisible();
+  await expect(page.getByText("GOAL 08.4 adds")).toBeVisible();
 });
 
 test("landing CTA navigates to the public challenge catalog", async ({ page }) => {
@@ -479,7 +528,7 @@ test("desktop SPA navigation reaches public read routes", async ({ page }) => {
 
   await page.goto("/create");
   await expect(page).toHaveURL(/\/create$/);
-  await expect(page.getByRole("heading", { name: "Create a challenge" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Crea una sfida" })).toBeVisible();
   await expect(page.getByText("Accedi per creare una sfida")).toBeVisible();
 });
 
@@ -589,27 +638,139 @@ test("registration conflict shows a friendly error", async ({ page }) => {
   await expectNoForbiddenRenderedFrontendStrings(await page.content());
 });
 
-test("create route is auth-aware without rendering a challenge creation form", async ({
+test("create route asks guests to authenticate without rendering authoring fields", async ({
   page
 }) => {
   await page.goto("/create");
 
   await expect(page.getByText("Accedi per creare una sfida")).toBeVisible();
-  await expect(page.getByText("Creazione sfida in arrivo nel GOAL 08.4.")).toHaveCount(
-    0
-  );
+  await expect(page.getByLabel("Regex segreta")).toHaveCount(0);
   await expectNoForbiddenRenderedFrontendStrings(await page.content());
+});
 
+test("authenticated user sees the protected challenge creation form", async ({
+  page
+}) => {
   await loginDemoPlayerThroughUi(page);
   await page.goto("/create");
 
-  await expect(
-    page.getByText("Creazione sfida in arrivo nel GOAL 08.4.")
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Crea una sfida" })).toBeVisible();
+  await expect(page.getByLabel("Titolo")).toBeVisible();
+  await expect(page.getByLabel("Regex segreta")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Crea sfida" })).toBeEnabled();
   await expect(page.getByText("Demo Player").first()).toBeVisible();
-  await expect(page.getByLabel("Secret pattern")).toHaveCount(0);
-  await expect(page.getByRole("textbox", { name: /Pattern/ })).toHaveCount(0);
+  await expectNoAuthStorage(page);
+});
+
+test("challenge creation UI blocks dropping below the minimum secret controls", async ({
+  page
+}) => {
+  await loginDemoPlayerThroughUi(page);
+  await page.goto("/create");
+
+  const positiveRemoveButtons = page.getByRole("button", {
+    name: /Rimuovi controllo positivo/
+  });
+
+  await expect(positiveRemoveButtons).toHaveCount(3);
+  await expect(positiveRemoveButtons.first()).toBeDisabled();
+
+  await page.getByRole("button", { name: "Aggiungi positivo" }).click();
+  await expect(positiveRemoveButtons).toHaveCount(4);
+  await expect(positiveRemoveButtons.nth(3)).toBeEnabled();
+
+  await positiveRemoveButtons.nth(3).click();
+  await expect(positiveRemoveButtons).toHaveCount(3);
+  await expect(positiveRemoveButtons.first()).toBeDisabled();
+  await expectNoAuthStorage(page);
+});
+
+test("challenge creation UI reports backend incoherence safely", async ({
+  page
+}) => {
+  await loginDemoPlayerThroughUi(page);
+  await page.goto("/create");
+
+  const payload = {
+    ...makeValidChallengeCreatePayload("frontend-incoherent"),
+    publicPositiveExample: "ABCDE"
+  };
+
+  await fillChallengeCreateForm(page, payload);
+  await page.getByRole("button", { name: "Crea sfida" }).click();
+
+  await expect(
+    page.getByText(
+      "La regex segreta, gli esempi pubblici o i controlli non sono coerenti con il motore RE2."
+    )
+  ).toBeVisible();
+  await expect(
+    page.getByText("Challenge examples or controls do not match the secret regex.")
+  ).toHaveCount(0);
+  await expectNoAuthStorage(page);
+  await expectNoSecretStorage(page, [
+    payload.secretPattern,
+    ...payload.controls.map((control) => control.value)
+  ]);
+});
+
+test("challenge creation UI creates a challenge and public pages stay secret-free", async ({
+  page
+}) => {
+  await loginDemoPlayerThroughUi(page);
+  await page.goto("/create");
+
+  const payload = makeValidChallengeCreatePayload("frontend-valid");
+
+  await fillChallengeCreateForm(page, payload);
+  await page.getByRole("button", { name: "Crea sfida" }).click();
+
+  await expect(page.getByText("Sfida creata")).toBeVisible();
+  await expect(page.getByLabel("Regex segreta")).toHaveValue("");
+  await expect(page.getByText(payload.secretPattern)).toHaveCount(0);
+  await expectNoAuthStorage(page);
+  await expectNoSecretStorage(page, [
+    payload.secretPattern,
+    ...payload.controls.map((control) => control.value)
+  ]);
+
+  await page.getByRole("link", { name: "Apri dettaglio pubblico" }).click();
+
+  await expect(page).toHaveURL(/\/challenges\/[0-9a-f-]+$/);
+  await expect(page.getByRole("heading", { name: payload.title })).toBeVisible();
+  await expect(page.getByText(payload.publicPositiveExample)).toBeVisible();
+  await expect(page.getByText(payload.publicNegativeExample)).toBeVisible();
+  await expect(page.getByText(payload.secretPattern)).toHaveCount(0);
+  for (const control of payload.controls) {
+    await expect(page.getByText(control.value)).toHaveCount(0);
+  }
   await expectNoForbiddenRenderedFrontendStrings(await page.content());
+
+  await page.goto("/challenges");
+
+  await expect(page.getByRole("heading", { name: payload.title })).toBeVisible();
+  await expectNoForbiddenRenderedFrontendStrings(await page.content());
+});
+
+test("mobile challenge creation form avoids horizontal overflow", async ({
+  page
+}) => {
+  await loginDemoPlayerThroughUi(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/create");
+
+  await expect(page.getByRole("heading", { name: "Crea una sfida" })).toBeVisible();
+  await page.getByRole("button", { name: "Aggiungi positivo" }).click();
+  await page
+    .getByRole("textbox", { name: "Controllo positivo 4" })
+    .fill("123456789012345678901234567890");
+
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth
+    )
+  ).toBe(false);
+  await expectNoAuthStorage(page);
 });
 
 test("public challenge catalog renders API cards with public examples and stats", async ({

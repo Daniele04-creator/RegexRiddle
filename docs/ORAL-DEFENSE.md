@@ -1,5 +1,23 @@
 # Difesa orale
 
+## Cosa contiene GOAL 08.4
+
+Nel GOAL 08.4 ho aggiunto la UI reale di creazione sfide su `/create`. Un utente non autenticato vede il gate login/register; un utente autenticato vede una form protetta per titolo, descrizione, difficolta, regex segreta, flag supportati, esempi pubblici e controlli segreti. Il frontend invia il payload all'endpoint gia' esistente `POST /api/challenges`, con `credentials: include` e header CSRF. La regex segreta non viene valutata nel browser: coerenza di regex, esempi e controlli resta responsabilita' del backend con RE2 full match.
+
+GOAL 08.4 aggiunge:
+
+- form reale `/create` collegata a `POST /api/challenges`;
+- gate login/register per utenti guest;
+- validazione client di forma, lunghezze, flag `i`/`m`, numero controlli, duplicati e contraddizioni semplici;
+- editor controlli segreti con minimo 3 e massimo 10 per tipo;
+- mutation TanStack Query protetta con CSRF centralizzato nell'API client;
+- reset dei campi segreti dopo creazione riuscita;
+- card di successo con solo DTO pubblico e link al dettaglio;
+- mapping sicuro per errori `400`, `401`, `403` e `422`;
+- test frontend e E2E per stati UI, payload, errori, responsive, anti-leak e storage.
+
+Non aggiunge modifiche backend, modifiche database, profilo, statistiche, edit/delete, JWT, storage token nel browser o valutazione regex nel frontend.
+
 ## Cosa contiene GOAL 08.3
 
 Nel GOAL 08.3 ho aggiunto la UI di gioco nel dettaglio sfida. Un utente non autenticato vede l'invito ad accedere; un autore vede che non puo' risolvere la propria sfida; un utente autenticato non autore puo' inviare una regex candidata. Il frontend manda solo pattern candidato e flag supportati all'endpoint protetto POST /api/challenges/:id/attempts, con credentials include e header CSRF. La regex non viene valutata nel browser: viene valutata dal backend con RE2 full match. La risposta contiene solo conteggi aggregati, quindi la regex segreta, i controlli nascosti e il pattern proposto non vengono esposti nelle response pubbliche.
@@ -120,9 +138,9 @@ Il seed crea utenti e sfide demo ripetibili. Serve per provare il progetto e per
 
 ## Cosa non contiene ancora
 
-Non ci sono ancora creazione sfide da UI, profilo/statistiche o edit/delete.
+Non ci sono ancora profilo/statistiche o edit/delete.
 
-Questa scelta e' intenzionale: GOAL 08.3 chiude l'esperienza di gameplay per tentativi e lascia authoring, profilo e gestione sfide ai goal successivi.
+Questa scelta e' intenzionale: GOAL 08.4 chiude l'esperienza di authoring base e lascia profilo e gestione sfide ai goal successivi.
 
 ## Punto di sicurezza principale
 

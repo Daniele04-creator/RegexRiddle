@@ -186,6 +186,19 @@
 - Invalidate challenge detail/list queries after successful attempts and leaderboard queries when `solved` is true.
 - Keep challenge creation UI, profile/statistics, challenge edit/delete, backend API changes, database changes, and frontend regex evaluation out of scope.
 
+## GOAL 08.4 decisions
+
+- Connect only frontend challenge creation UI to the existing protected creation API; do not change backend behavior, database schema, auth/session/cookie semantics, CSRF rules, attempt APIs, regex semantics, or regex engine.
+- Keep authoring on `/create` and reuse the existing current-user query for guest/authenticated states.
+- Use React Hook Form and Zod for authoring form shape validation only; do not validate regex syntax or coherence in the browser.
+- Support only `i` and `m` flag controls in the UI and map them to a deterministic backend flag string.
+- Limit the UI to 3-10 positive controls and 3-10 negative controls, while leaving the backend 30-control total limit authoritative.
+- Detect duplicate same-kind controls and contradictory positive/negative controls client-side for fast feedback.
+- Use the same-origin API client for `POST /api/challenges` with `protectedMutation: true`, so credentials and CSRF stay centralized.
+- Send only documented creation DTO fields; do not send author ids, challenge ids, counts, dates, or mass-assignment fields from the client.
+- Show only the public creation response after success, reset secret inputs, and prime the created challenge detail query.
+- Keep profile/statistics, challenge edit/delete, backend API changes, database changes, and frontend regex evaluation out of scope.
+
 ## Rejected for GOAL 00
 
 - Prisma schema.

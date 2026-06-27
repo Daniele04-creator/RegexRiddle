@@ -15,9 +15,9 @@ import { Badge } from "@/components/ui/badge";
 
 const howItWorks = [
   {
-    title: "Register or login",
+    title: "Register, login, or author",
     description:
-      "Auth UI is live and uses the existing backend session cookie flow.",
+      "Auth UI and challenge creation use the existing backend session cookie flow.",
     icon: FlaskConicalIcon
   },
   {
@@ -67,8 +67,8 @@ export function HomePage() {
             </div>
             <p className="max-w-xl text-sm leading-6 text-muted-foreground">
               The public catalog, challenge detail, leaderboard, login,
-              registration, logout, and session restoration are wired to
-              existing APIs. Gameplay is live; authoring stays upcoming.
+              registration, logout, session restoration, gameplay, and
+              challenge authoring are wired to existing APIs.
             </p>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
@@ -110,12 +110,12 @@ export function HomePage() {
         <section aria-labelledby="milestone-title" className="mt-14 rounded-lg border bg-card/82 p-6">
           <Badge variant="outline">Current milestone</Badge>
           <h2 id="milestone-title" className="mt-3 text-2xl font-semibold">
-            Frontend attempt gameplay is now connected
+            Frontend authoring is now connected
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
-            GOAL 08.3 adds the protected attempt panel to challenge detail pages.
-            Authenticated non-author users can submit candidate regexes and get
-            aggregate feedback. Challenge creation UI remains later work.
+            GOAL 08.4 adds the protected challenge creation form on `/create`.
+            Authenticated users can publish challenges through the existing
+            protected API while regex verification stays server-side.
           </p>
         </section>
       </PageContainer>

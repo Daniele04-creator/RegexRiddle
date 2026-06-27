@@ -183,9 +183,8 @@ describe("auth pages and shell state", () => {
     mockAppFetch({ initialUser: demoUser });
     renderRoute("/create");
 
-    expect(
-      await screen.findByText("Creazione sfida in arrivo nel GOAL 08.4.")
-    ).toBeInTheDocument();
+    expect(await screen.findByLabelText("Regex segreta")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Crea sfida" })).toBeEnabled();
     expect(screen.getAllByText(/Demo Player/)).not.toHaveLength(0);
   });
 });

@@ -36,8 +36,7 @@ export function AuthStatusCard({ mode, user }: AuthStatusCardProps) {
       <CardContent>
         <p className="text-sm leading-6 text-muted-foreground">
           Puoi continuare a esplorare il catalogo pubblico oppure passare alla
-          sezione protetta di creazione, che resta un placeholder fino al GOAL
-          08.4.
+          sezione protetta di creazione.
         </p>
       </CardContent>
       <CardFooter className="flex flex-wrap gap-3">

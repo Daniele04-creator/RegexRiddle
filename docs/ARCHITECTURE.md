@@ -68,10 +68,11 @@ Leaderboard routes are public read-only. `GET /api/leaderboard` validates only `
 - `frontend/src/features/health`: optional health query using TanStack Query.
 - `frontend/src/features/challenges`: public challenge catalog/detail API functions, query hooks, cards, examples, stats, difficulty badges, and pagination controls.
 - `frontend/src/features/leaderboard`: public leaderboard API function, query hook, desktop table, and mobile stacked list.
-- `frontend/src/features/auth`: auth API functions, current-user query, login/register/logout mutations, Zod schemas, forms, session menu, and protected-placeholder UI.
+- `frontend/src/features/auth`: auth API functions, current-user query, login/register/logout mutations, Zod schemas, forms, and session menu.
+- `frontend/src/features/challenge-authoring`: protected challenge creation API function, mutation hook, Zod schema, authoring form, guest gate, secret-control editor, and public success card.
 - `frontend/src/features/attempts`: protected attempt API function, mutation hook, Zod schema, candidate form, flag selector, aggregate feedback card, and guest/author gate cards.
 - `frontend/src/lib`: API client, CSRF helper, route metadata, and class merge utility.
-- `frontend/src/routes`: public SPA routes, public read-only data pages, real auth pages, challenge detail gameplay, and safe placeholders for future write workflows.
+- `frontend/src/routes`: public SPA routes, public read-only data pages, real auth pages, challenge detail gameplay, and protected challenge authoring.
 - `frontend/src/styles/globals.css`: Tailwind v4 import, shadcn theme variables, Regex Lab tokens, focus, reduced-motion, and touch defaults.
 
 The frontend API client accepts same-origin paths only, sends `credentials: "include"`, supports JSON responses, and has a small CSRF header helper for future protected mutations. It does not read cookies and does not use browser storage for auth.
@@ -82,7 +83,9 @@ GOAL 08.2 routes connect auth UI only. `/login` calls `POST /api/auth/login`, `/
 
 GOAL 08.3 connects attempt gameplay on `/challenges/:id`. Guests see login/register CTAs, authors see a blocked state, and authenticated non-authors submit candidate `pattern` plus supported `flags` to `POST /api/challenges/:id/attempts` through the same-origin API client. The mutation uses `protectedMutation: true`, so `credentials: "include"` and `X-RegexRiddle-CSRF: 1` are applied at the client boundary. On success, challenge detail/list queries are invalidated, and leaderboard queries are invalidated when a challenge is solved.
 
-The frontend still does not render challenge creation form workflows, user ids, hidden challenge controls, secret regexes, `Attempt.proposedPattern`, password hashes, session hashes, raw tokens, or cookie values. Header and mobile navigation display public `displayName` and `username` only, not email. Candidate regex text stays in normal form state and is not placed in URLs or browser storage.
+GOAL 08.4 connects challenge authoring on `/create`. Guests see login/register CTAs, and authenticated users submit title, description, difficulty, supported `i`/`m` flags, public examples, a secret regex, and secret controls to `POST /api/challenges` through the same-origin API client. The mutation uses `protectedMutation: true`, so `credentials: "include"` and `X-RegexRiddle-CSRF: 1` are applied at the client boundary. On success, challenge list queries are invalidated, the created detail query is primed with the public response, and the form resets secret inputs.
+
+The frontend still does not render user ids, hidden challenge controls to solver clients, `Attempt.proposedPattern`, password hashes, session hashes, raw tokens, or cookie values. Header and mobile navigation display public `displayName` and `username` only, not email. Candidate regex text and authoring secret inputs stay in normal form state only and are not placed in URLs or browser storage. Regex validation remains server-side; the browser does not evaluate user regexes with JavaScript `RegExp`.
 
 ## Future architecture notes
 

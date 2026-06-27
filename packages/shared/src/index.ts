@@ -72,6 +72,24 @@ export interface ChallengeDetailDTO extends ChallengeListItemDTO {
   updatedAt: string;
 }
 
+export type ChallengeControlKindDTO = "POSITIVE" | "NEGATIVE";
+
+export interface ChallengeCreateControlDTO {
+  kind: ChallengeControlKindDTO;
+  value: string;
+}
+
+export interface ChallengeCreateRequestDTO {
+  title: string;
+  description: string;
+  difficulty: ChallengeDifficulty;
+  secretPattern: string;
+  flags?: string;
+  publicPositiveExample: string;
+  publicNegativeExample: string;
+  controls: ChallengeCreateControlDTO[];
+}
+
 export interface AttemptSubmissionRequestDTO {
   pattern: string;
   flags?: string;

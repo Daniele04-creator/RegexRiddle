@@ -99,6 +99,20 @@
 - Do not change API routes, DTOs, database schema, auth/session behavior, or regex semantics.
 - Use `git mv` for the tracked directory moves to preserve Git history.
 
+## GOAL 06 decisions
+
+- Add `POST /api/challenges` as a protected cookie-authenticated mutation.
+- Keep the frontend challenge creation UI out of scope.
+- Reuse the existing opaque `rr_session` cookie; do not introduce JWT.
+- Reuse CSRF guard v1 for protected JSON mutations: require `Content-Type: application/json` and `X-RegexRiddle-CSRF: 1`.
+- Use the current authenticated user id as `Challenge.authorId`; reject client-provided `authorId` and other unknown fields.
+- Validate the secret regex, public examples, and secret controls with the existing server-side RE2-compatible full-match engine before persistence.
+- Return `422 Unprocessable Entity` for invalid/unsupported secret regexes, invalid flags, or examples/controls that are incoherent with the secret regex.
+- Create `Challenge` and `ChallengeControl` rows transactionally without creating `Attempt` or `Solution` rows.
+- Return the existing public challenge detail DTO and set `Location: /api/challenges/:id`.
+- Do not return `Challenge.secretPattern`, control lists, `ChallengeControl.value`, `Attempt.proposedPattern`, password hashes, session hashes, token values, or cookie values.
+- Do not add a Prisma migration because the existing schema already supports challenge creation.
+
 ## Rejected for GOAL 00
 
 - Prisma schema.

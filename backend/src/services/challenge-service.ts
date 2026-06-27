@@ -8,7 +8,21 @@ import {
   toChallengeDetailDTO,
   toChallengeListItemDTO
 } from "../dto/challenge-dto.js";
-import type { ChallengeListQuery } from "../validation/challenge-validation.js";
+import { isSafeRegexError } from "../regex/regex-errors.js";
+import {
+  compileSafeRegex,
+  type CompiledSafeRegex
+} from "../regex/regex-engine.js";
+import type {
+  ChallengeCreateInput,
+  ChallengeListQuery
+} from "../validation/challenge-validation.js";
+
+export type CreateChallengeResult =
+  | { status: "created"; challenge: ChallengeDetailDTO }
+  | { status: "invalid_regex" }
+  | { status: "incoherent_examples" }
+  | { status: "incoherent_controls" };
 
 const publicChallengeSelect = {
   id: true,
@@ -36,6 +50,44 @@ const publicChallengeDetailSelect = {
   ...publicChallengeSelect,
   updatedAt: true
 } as const;
+
+function validateChallengeCoherence(input: ChallengeCreateInput): Exclude<
+  CreateChallengeResult["status"],
+  "created"
+> | null {
+  let regex: CompiledSafeRegex;
+
+  try {
+    regex = compileSafeRegex(input.secretPattern, input.flags);
+  } catch (error) {
+    if (isSafeRegexError(error)) {
+      return "invalid_regex";
+    }
+
+    throw error;
+  }
+
+  if (
+    !regex.test(input.publicPositiveExample) ||
+    regex.test(input.publicNegativeExample)
+  ) {
+    return "incoherent_examples";
+  }
+
+  for (const control of input.controls) {
+    const matched = regex.test(control.value);
+
+    if (control.kind === "POSITIVE" && !matched) {
+      return "incoherent_controls";
+    }
+
+    if (control.kind === "NEGATIVE" && matched) {
+      return "incoherent_controls";
+    }
+  }
+
+  return null;
+}
 
 export async function listPublicChallenges(
   query: ChallengeListQuery
@@ -73,4 +125,42 @@ export async function getPublicChallengeById(
   }
 
   return toChallengeDetailDTO(challenge);
+}
+
+export async function createChallengeForAuthor(
+  authorId: string,
+  input: ChallengeCreateInput
+): Promise<CreateChallengeResult> {
+  const coherenceError = validateChallengeCoherence(input);
+
+  if (coherenceError !== null) {
+    return { status: coherenceError };
+  }
+
+  const challenge = await prisma.$transaction(async (tx) => {
+    return tx.challenge.create({
+      data: {
+        authorId,
+        title: input.title,
+        description: input.description,
+        difficulty: input.difficulty,
+        secretPattern: input.secretPattern,
+        flags: input.flags,
+        publicPositiveExample: input.publicPositiveExample,
+        publicNegativeExample: input.publicNegativeExample,
+        controls: {
+          create: input.controls.map((control) => ({
+            kind: control.kind,
+            value: control.value
+          }))
+        }
+      },
+      select: publicChallengeDetailSelect
+    });
+  });
+
+  return {
+    status: "created",
+    challenge: toChallengeDetailDTO(challenge)
+  };
 }

@@ -107,6 +107,98 @@ Public challenge responses never include:
 - `Attempt.proposedPattern`
 - user password or session hashes
 
+## POST /api/challenges
+
+Creates a challenge for the authenticated user. This endpoint is protected and state-changing. No frontend authoring UI is implemented yet.
+
+Authentication and mutation guard:
+
+- Requires a valid `rr_session` cookie.
+- Requires `Content-Type: application/json`.
+- Requires `X-RegexRiddle-CSRF: 1`.
+- Missing, invalid, or expired auth returns `401 Unauthorized`.
+- Missing or wrong CSRF header returns `403 Forbidden`.
+- Non-JSON content type returns the existing JSON mutation guard response: `400 Bad Request`.
+
+Request `application/json`:
+
+```json
+{
+  "title": "Italian postal codes",
+  "description": "Create a regex that matches valid five-digit Italian postal codes.",
+  "difficulty": "EASY",
+  "secretPattern": "\\d{5}",
+  "flags": "",
+  "publicPositiveExample": "80125",
+  "publicNegativeExample": "8012A",
+  "controls": [
+    { "kind": "POSITIVE", "value": "00100" },
+    { "kind": "POSITIVE", "value": "20121" },
+    { "kind": "POSITIVE", "value": "99999" },
+    { "kind": "NEGATIVE", "value": "1234" },
+    { "kind": "NEGATIVE", "value": "ABCDE" },
+    { "kind": "NEGATIVE", "value": "123456" }
+  ]
+}
+```
+
+Validation:
+
+- Unknown top-level keys are rejected, including mass-assignment fields such as `authorId`, `id`, `_count`, `createdAt`, `updatedAt`, and `secretControls`.
+- `title`: required string, trimmed, 3-100 characters.
+- `description`: required string, trimmed, 20-1000 characters.
+- `difficulty`: `EASY`, `MEDIUM`, or `HARD`.
+- `secretPattern`: required string, trimmed, 1-300 characters.
+- `flags`: optional string, default `""`; engine-supported flags are `i` and `m`, with duplicates rejected.
+- `publicPositiveExample` and `publicNegativeExample`: required strings, 1-200 characters.
+- `controls`: required array, at most 30 items.
+- At least 3 `POSITIVE` and 3 `NEGATIVE` controls are required.
+- Duplicate controls within the same kind are rejected.
+- The same value cannot appear as both `POSITIVE` and `NEGATIVE`.
+- The secret regex, public examples, and secret controls are validated server-side with the RE2-compatible full-match engine before persistence.
+
+Response `201 application/json`:
+
+```json
+{
+  "id": "44444444-4444-4444-8444-444444444444",
+  "title": "Italian postal codes",
+  "description": "Create a regex that matches valid five-digit Italian postal codes.",
+  "difficulty": "EASY",
+  "author": {
+    "username": "demo_player",
+    "displayName": "Demo Player"
+  },
+  "publicPositiveExample": "80125",
+  "publicNegativeExample": "8012A",
+  "createdAt": "2026-06-27T12:00:00.000Z",
+  "updatedAt": "2026-06-27T12:00:00.000Z",
+  "stats": {
+    "attemptsTotal": 0,
+    "solutionsTotal": 0
+  }
+}
+```
+
+The response includes `Location: /api/challenges/:id`.
+
+Errors:
+
+- `400 Bad Request`: invalid body shape, invalid field types, unknown fields, duplicate controls, contradictory controls, or too few controls.
+- `401 Unauthorized`: missing, invalid, or expired session.
+- `403 Forbidden`: missing or wrong CSRF header.
+- `422 Unprocessable Entity`: secret regex or flags are invalid/unsupported, or examples/controls are incoherent with the secret regex.
+
+Challenge creation responses never include:
+
+- `Challenge.secretPattern`
+- `ChallengeControl.value`
+- secret challenge control lists
+- `Attempt.proposedPattern`
+- `User.passwordHash`
+- `Session.sessionTokenHash`
+- raw session tokens or cookie values
+
 ## POST /api/challenges/:id/attempts
 
 Submits a candidate regex for a challenge. This endpoint is protected and state-changing.
@@ -314,9 +406,10 @@ Auth responses never include:
 
 ## Future endpoints
 
-The following areas are intentionally TODO after GOAL 05:
+The following areas are intentionally TODO after GOAL 06:
 
 - Leaderboard.
-- Admin or authoring workflows.
+- Challenge edit/delete workflows.
+- Frontend authoring UI.
 
 Future protected routes must include authorization checks and must not expose secret regexes or secret controls.

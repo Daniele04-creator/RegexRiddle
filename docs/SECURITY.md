@@ -13,9 +13,9 @@
 - Use opaque server-side sessions with `HttpOnly` and `SameSite` cookies when auth is implemented.
 - Use Argon2id when passwords are implemented.
 
-## GOAL 05 security posture
+## GOAL 06 security posture
 
-GOAL 05 adds protected attempt submission. The project still has no frontend auth UI, no challenge creation endpoint, no uploads, and no leaderboard.
+GOAL 06 adds protected challenge creation. The project still has no frontend auth UI, no frontend challenge authoring UI, no uploads, and no leaderboard.
 
 Regex engine decisions:
 
@@ -42,6 +42,18 @@ Attempt endpoint decisions:
 - Invalid or RE2-incompatible candidate regexes return `422 Unprocessable Entity` and do not create an `Attempt`.
 - Successful and failed attempt responses return only aggregate counts.
 - `Attempt.proposedPattern` is stored for future private history/audit use but is not returned by the public attempt response.
+
+Challenge creation endpoint decisions:
+
+- `POST /api/challenges` requires a valid `rr_session` cookie.
+- The route uses CSRF guard v1: protected JSON mutations require `Content-Type: application/json` and `X-RegexRiddle-CSRF: 1`.
+- The current author is derived only from the server-side session; clients cannot submit `authorId`.
+- Unknown body keys are rejected to prevent mass assignment.
+- The secret regex, flags, public examples, and secret controls are validated server-side with the RE2-compatible full-match engine before persistence.
+- Invalid or RE2-incompatible secret regexes and invalid flags return `422 Unprocessable Entity` and do not create a challenge.
+- Incoherent examples or controls return `422 Unprocessable Entity` and do not create a challenge.
+- Successful creation creates `Challenge` and `ChallengeControl` rows transactionally.
+- Successful creation returns only the public challenge detail DTO and never returns `Challenge.secretPattern`, control lists, or `ChallengeControl.value`.
 
 Authentication decisions:
 
@@ -77,7 +89,7 @@ These fields must not be exposed through public DTOs or logs. Seed and verify sc
 
 Public API tests and E2E tests include anti-leak assertions for forbidden response keys including `secretPattern`, `controls`, `value`, `proposedPattern`, `passwordHash`, `sessionTokenHash`, `token`, and `sessionToken`.
 
-CSRF guard v1 is implemented for the protected attempt mutation because it is a cookie-authenticated product write. Future protected mutations must reuse or strengthen this guard before release.
+CSRF guard v1 is implemented for protected cookie-authenticated product writes. Future protected mutations must reuse or strengthen this guard before release.
 
 ## Future review checklist
 

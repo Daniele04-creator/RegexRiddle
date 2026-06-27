@@ -5,7 +5,8 @@
 - Work in this repository root. Do not create a nested `RegexRiddle/` directory.
 - Keep each goal tightly scoped.
 - GOAL 01 may add Prisma schema, migrations, seed, and database verification because it explicitly requests the data layer.
-- Do not implement authentication endpoints, challenge APIs, attempt engine, leaderboard, or regex evaluation until a later goal explicitly requests them.
+- GOAL 06 may add protected challenge creation because it explicitly requests that API.
+- Do not implement additional authentication endpoints, challenge edit/delete APIs, leaderboard, or frontend authoring UI until a later goal explicitly requests them.
 - Do not introduce large dependencies without a clear goal requirement and human confirmation.
 - Do not commit, push, branch, checkout, stash, or reset unless the user explicitly asks.
 - Do not edit real `.env` files or store secrets in code, logs, tests, documentation, or generated files.

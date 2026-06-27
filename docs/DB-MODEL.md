@@ -20,6 +20,10 @@ The safe regex engine uses existing challenge, control, and attempt-shaped field
 
 Protected attempt submission uses the existing `Attempt` and `Solution` models without a schema migration. The service creates attempts only for the authenticated user, blocks authors from attempting their own challenges, blocks already solved challenge attempts, and creates one solution row when the submitted regex satisfies all positive controls and zero negative controls.
 
+## GOAL 06 status
+
+Protected challenge creation uses the existing `Challenge` and `ChallengeControl` models without a schema migration. The service creates both rows transactionally, sets `authorId` from the authenticated `rr_session` user, validates public examples and secret controls with the server-side RE2 full-match engine before writing, and returns only the public challenge detail DTO.
+
 ## Models
 
 ### User
@@ -46,6 +50,8 @@ Relations: author, controls, attempts, solutions.
 
 Security note: `secretPattern` is sensitive and must not be returned by public DTOs.
 
+GOAL 06 writes this model from `POST /api/challenges`; client-provided `authorId`, `id`, counts, and timestamps are rejected.
+
 ### ChallengeControl
 
 Fields: `id`, `challengeId`, `kind`, `value`, `createdAt`.
@@ -53,6 +59,8 @@ Fields: `id`, `challengeId`, `kind`, `value`, `createdAt`.
 Unique constraints: `challengeId + kind + value`.
 
 Security note: `value` is sensitive and must not be returned by public DTOs.
+
+GOAL 06 writes at least three positive and three negative controls for each created challenge. Duplicate controls within the same kind and contradictory positive/negative values are rejected before persistence.
 
 ### Attempt
 

@@ -2,7 +2,7 @@
 
 ## Current milestone
 
-GOAL 05.5: delivery directory restructure.
+GOAL 06: protected challenge creation with ownership.
 
 ## Implemented
 
@@ -32,7 +32,12 @@ GOAL 05.5: delivery directory restructure.
   - `negativeMatched` counts NEGATIVE controls matched by the submitted regex.
   - `isCorrect` requires all positives and zero negatives.
 - Protected `POST /api/challenges/:id/attempts`.
+- Protected `POST /api/challenges`.
 - CSRF guard v1 for protected JSON mutations through `X-RegexRiddle-CSRF: 1`.
+- Challenge creation ownership from the authenticated `rr_session` user.
+- Challenge creation validation for unknown keys, mass assignment, public examples, secret controls, and RE2-compatible full-match regex semantics.
+- Transactional challenge and control persistence.
+- Public challenge detail DTO response for creation without secret regexes or control values.
 - Attempt persistence with aggregate public DTO response.
 - Solution creation for correct attempts.
 - Author self-attempt block.
@@ -44,7 +49,8 @@ GOAL 05.5: delivery directory restructure.
 
 - Frontend authentication UI.
 - Frontend attempt UI.
-- Challenge creation, update, or deletion.
+- Frontend challenge creation UI.
+- Challenge update or deletion.
 - Leaderboard.
 
 ## Verification status
@@ -53,32 +59,27 @@ Verified on 2026-06-27:
 
 - `git switch main`: PASS, already on `main`.
 - `git pull --ff-only`: PASS, already up to date.
-- `pnpm install`: PASS, lockfile updated to importer paths `backend`, `frontend`, and `e2e`; no dependency upgrades.
 - `docker compose up -d db`: PASS.
 - `pnpm db:seed`: PASS, 3 users, 10 challenges, 60 controls, 4 attempts, 2 solutions.
 - `pnpm db:verify`: PASS, 3 users, 10 challenges, 60 controls, 4 attempts, 2 solutions; no secret values printed.
 - `pnpm lint`: PASS.
 - `pnpm typecheck`: PASS.
-- `pnpm test`: PASS, shared 1 test, frontend 1 test, backend 46 tests.
+- `pnpm test`: PASS, shared 1 test, frontend 1 test, backend 67 tests.
 - `pnpm build`: PASS.
 - `docker compose up --build -d`: PASS, images `regexriddle-api:dev` and `regexriddle-web:dev` built from `backend/Dockerfile` and `frontend/Dockerfile`; db, API, and web containers started.
-- `pnpm e2e`: PASS, 12 Playwright tests.
-- `pnpm check`: PASS.
+- `pnpm e2e`: PASS, 17 Playwright tests.
+- `pnpm check`: PASS, includes lint, typecheck, test, build, and 17 E2E tests.
 - `docker compose ps`: PASS, db healthy and API/web running on the existing ports.
-- Old path audit: PASS, no obsolete nested app-directory references remain outside ignored/generated paths.
-- Lockfile audit: PASS, no obsolete nested app-directory importer paths remain.
-- `git ls-files apps`: PASS, no tracked files remain under `apps/`.
-- `git grep -n "new RegExp\|RegExp(" -- . ':!node_modules' ':!dist'`: PASS before the restructure; no source code constructs JavaScript `RegExp` for user patterns.
+- `rg -n "new RegExp|RegExp\(" backend frontend packages e2e`: PASS, no matches.
+- Sensitive-field audit: PASS, `secretPattern`, `ChallengeControl`, `proposedPattern`, `sessionTokenHash`, and `passwordHash` appear only in docs, tests, shared request contracts, or internal backend auth/service code.
+- Ownership/raw-field audit: PASS, `authorId`, `createdAt`, `updatedAt`, and `_count` appear in explicit selects, validation/tests, or the protected create service; public responses still use DTO serializers.
+- Old path audit: PASS, no obsolete `apps/api`, `apps/web`, or `apps/e2e` references remain outside ignored/generated paths.
 
-Smoke attempt response summary:
+Smoke challenge creation response summary:
 
-- `challengeId=aaaaaaaa-0006-4000-8000-000000000006`
-- `attemptNumber=1`
-- `positiveMatched=3`
-- `positiveTotal=3`
-- `negativeMatched=3`
-- `negativeTotal=3`
-- `isCorrect=false`
-- `solved=false`
+- `POST /api/challenges` returned `201 Created`.
+- Response included `Location: /api/challenges/:id`.
+- The persisted `Challenge.authorId` matched the authenticated `rr_session` user.
+- The response used the public challenge detail DTO with `stats.attemptsTotal=0` and `stats.solutionsTotal=0`.
 
-The smoke response did not include `secretPattern`, `ChallengeControl.value`, `controls`, `proposedPattern`, `passwordHash`, `sessionTokenHash`, token values, or cookie values.
+The challenge creation response and public detail response did not include `secretPattern`, `ChallengeControl.value`, `controls`, `proposedPattern`, `passwordHash`, `sessionTokenHash`, token values, or cookie values.

@@ -14,7 +14,6 @@ import { prisma } from "../db/prisma.js";
 import type { FastifyInstance } from "fastify";
 import type { OutgoingHttpHeaders } from "node:http";
 
-const DEMO_PLAYER_ID = "22222222-2222-4222-8222-222222222222";
 const DEMO_USERNAME = "demo_player";
 const DEMO_EMAIL = "demo_player@example.test";
 const DEMO_PASSWORD = "Password123!";
@@ -119,9 +118,7 @@ async function cleanupAuthTestData(): Promise<void> {
   const testUserIds = testUsers.map((user) => user.id);
 
   await prisma.session.deleteMany({
-    where: {
-      OR: [{ userId: { in: testUserIds } }, { userId: DEMO_PLAYER_ID }]
-    }
+    where: { userId: { in: testUserIds } }
   });
   await prisma.user.deleteMany({
     where: { id: { in: testUserIds } }

@@ -1,8 +1,8 @@
 # Difesa orale
 
-## Cosa contiene GOAL 05
+## Cosa contiene GOAL 06
 
-GOAL 05 aggiunge l'endpoint protetto di invio tentativi sopra il motore regex sicuro server-side.
+GOAL 06 aggiunge la creazione protetta delle sfide sopra il motore regex sicuro server-side.
 
 Il repository contiene:
 
@@ -21,17 +21,20 @@ Il repository contiene:
 - DTO pubblici per utente autenticato;
 - motore regex interno basato su `re2-wasm`;
 - semantica full match con ancore assolute RE2;
+- endpoint `POST /api/challenges` protetto da sessione e CSRF guard v1;
 - endpoint `POST /api/challenges/:id/attempts` protetto da sessione e CSRF guard v1;
 - DTO pubblici per risultato tentativo con soli conteggi aggregati;
 - documentazione iniziale per architettura, sicurezza, test e piano di sviluppo.
 
-La API espone `GET /health`, due endpoint pubblici read-only sulle sfide, quattro endpoint auth backend e un endpoint protetto per inviare tentativi.
+La API espone `GET /health`, due endpoint pubblici read-only sulle sfide, quattro endpoint auth backend, un endpoint protetto per creare sfide e un endpoint protetto per inviare tentativi.
+
+La creazione sfide e' protetta: solo utenti autenticati possono creare una sfida. Il client manda regex segreta, esempi pubblici e controlli segreti, ma il backend valida tutto con RE2 full match prima di salvare. L'autore non viene preso dal body: viene preso dalla sessione `rr_session`. La risposta torna come DTO pubblico e non contiene ne' la regex segreta ne' i valori dei controlli.
 
 ## Perche' serve
 
 Il backend carica i controlli segreti, valuta la regex dell'utente con RE2 full match, salva solo conteggi aggregati e non manda mai i controlli al frontend.
 
-In GOAL 05 questi controlli devono passare: migration, seed, verify, lint, typecheck, unit test, build ed E2E. Docker Compose avvia PostgreSQL, API e web.
+In GOAL 06 questi controlli devono passare: seed, verify, lint, typecheck, unit test, build ed E2E. Docker Compose avvia PostgreSQL, API e web.
 
 Il progetto e' un monorepo pnpm, ma per chiarezza di consegna ho separato le directory principali in backend, frontend ed e2e. Il codice condiviso resta in packages/shared. Docker Compose orchestra backend, frontend e PostgreSQL.
 
@@ -43,7 +46,7 @@ Il seed crea utenti e sfide demo ripetibili. Serve per provare il progetto e per
 
 Non ci sono ancora frontend auth UI, creazione sfide da UI, leaderboard o UI di gioco.
 
-Questa scelta e' intenzionale: GOAL 05 aggiunge solo il workflow backend per i tentativi, senza introdurre UI o feature di classifica.
+Questa scelta e' intenzionale: GOAL 06 aggiunge solo il workflow backend per creare sfide, senza introdurre UI o feature di classifica.
 
 ## Punto di sicurezza principale
 
@@ -61,4 +64,6 @@ Per le regex non usiamo `RegExp` JavaScript sui pattern utente. Usiamo RE2 trami
 
 Il motore restituisce solo conteggi aggregati come `positiveMatched`, `negativeMatched` e `isCorrect`. `positiveMatched` conta i controlli positivi soddisfatti, `negativeMatched` conta i controlli negativi che la regex ha erroneamente accettato, e una soluzione e' corretta solo se tutti i positivi passano e zero negativi passano. Non restituisce controlli segreti, regex segrete o pattern candidati.
 
-L'endpoint tentativi richiede cookie `rr_session`, `Content-Type: application/json` e header `X-RegexRiddle-CSRF: 1`. Se la regex candidata e' invalida o non compatibile con RE2, il backend risponde `422` e non salva nessun tentativo.
+L'endpoint creazione sfide richiede cookie `rr_session`, `Content-Type: application/json` e header `X-RegexRiddle-CSRF: 1`. Se la regex segreta, gli esempi pubblici o i controlli segreti non sono coerenti, il backend risponde `422` e non salva la sfida.
+
+L'endpoint tentativi richiede gli stessi requisiti di sessione, JSON e CSRF. Se la regex candidata e' invalida o non compatibile con RE2, il backend risponde `422` e non salva nessun tentativo.

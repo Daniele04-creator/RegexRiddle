@@ -34,11 +34,29 @@ interface AttemptSubmissionResponseBody {
   solved: boolean;
 }
 
+interface ChallengeCreateResponseBody {
+  id: string;
+  title: string;
+  description: string;
+  difficulty: string;
+  author: {
+    username: string;
+    displayName: string;
+  };
+  publicPositiveExample: string;
+  publicNegativeExample: string;
+  stats: {
+    attemptsTotal: number;
+    solutionsTotal: number;
+  };
+}
+
 const demoPlayerId = "22222222-2222-4222-8222-222222222222";
 const attemptChallengeId = "aaaaaaaa-0006-4000-8000-000000000006";
 const correctAttemptChallengeId = "aaaaaaaa-0007-4000-8000-000000000007";
 const csrfHeaderName = "X-RegexRiddle-CSRF";
 const csrfHeaderValue = "1";
+const e2eChallengeTitlePrefix = "E2E Challenge Create";
 
 function apiBaseUrl(): string {
   const apiPort = Number(process.env.API_PORT ?? 4000);
@@ -113,6 +131,24 @@ async function cleanupE2EAttemptData(): Promise<void> {
   });
 }
 
+async function cleanupE2EChallengeCreateData(): Promise<void> {
+  const challenges = await prisma.challenge.findMany({
+    where: { title: { startsWith: e2eChallengeTitlePrefix } },
+    select: { id: true }
+  });
+  const challengeIds = challenges.map((challenge) => challenge.id);
+
+  await prisma.solution.deleteMany({
+    where: { challengeId: { in: challengeIds } }
+  });
+  await prisma.attempt.deleteMany({
+    where: { challengeId: { in: challengeIds } }
+  });
+  await prisma.challenge.deleteMany({
+    where: { id: { in: challengeIds } }
+  });
+}
+
 async function loginDemoPlayer(
   request: APIRequestContext
 ): Promise<{ cookie: string; sessionToken: string }> {
@@ -133,11 +169,34 @@ async function loginDemoPlayer(
   };
 }
 
+function makeValidChallengeCreatePayload(suffix: string) {
+  return {
+    title: `${e2eChallengeTitlePrefix} ${suffix}`,
+    description:
+      "Create a regex that matches valid five-digit Italian postal codes.",
+    difficulty: "EASY",
+    secretPattern: String.raw`\d{5}`,
+    flags: "",
+    publicPositiveExample: "80125",
+    publicNegativeExample: "8012A",
+    controls: [
+      { kind: "POSITIVE", value: "00100" },
+      { kind: "POSITIVE", value: "20121" },
+      { kind: "POSITIVE", value: "99999" },
+      { kind: "NEGATIVE", value: "1234" },
+      { kind: "NEGATIVE", value: "ABCDE" },
+      { kind: "NEGATIVE", value: "123456" }
+    ]
+  };
+}
+
 test.beforeEach(async () => {
+  await cleanupE2EChallengeCreateData();
   await cleanupE2EAttemptData();
 });
 
 test.afterAll(async () => {
+  await cleanupE2EChallengeCreateData();
   await cleanupE2EAttemptData();
   await prisma.$disconnect();
 });
@@ -272,6 +331,148 @@ test("attempt API rejects an author attempting their own challenge", async ({
     message: "Authors cannot attempt their own challenges."
   });
   expectNoSensitiveKeys(body, String.raw`[A-Z]{2}-\d{4}`);
+});
+
+test("challenge creation API lets a demo user create a valid challenge", async ({
+  request
+}) => {
+  const { cookie, sessionToken } = await loginDemoPlayer(request);
+  const payload = makeValidChallengeCreatePayload("valid");
+  const response = await request.post(`${apiBaseUrl()}/api/challenges`, {
+    headers: {
+      cookie,
+      [csrfHeaderName]: csrfHeaderValue
+    },
+    data: payload
+  });
+  const body = (await response.json()) as ChallengeCreateResponseBody;
+  const storedChallenge = await prisma.challenge.findUnique({
+    where: { id: body.id },
+    select: { authorId: true }
+  });
+
+  expect(response.status()).toBe(201);
+  expect(response.headers().location).toBe(`/api/challenges/${body.id}`);
+  expect(body).toMatchObject({
+    title: payload.title,
+    difficulty: "EASY",
+    author: {
+      username: "demo_player"
+    },
+    publicPositiveExample: payload.publicPositiveExample,
+    publicNegativeExample: payload.publicNegativeExample,
+    stats: {
+      attemptsTotal: 0,
+      solutionsTotal: 0
+    }
+  });
+  expect(storedChallenge?.authorId).toBe(demoPlayerId);
+  expectNoSensitiveKeys(body, payload.secretPattern);
+  expectNoSensitiveKeys(body, sessionToken);
+  for (const control of payload.controls) {
+    expectNoSensitiveKeys(body, control.value);
+  }
+});
+
+test("public detail for a created challenge does not expose secrets or controls", async ({
+  request
+}) => {
+  const { cookie } = await loginDemoPlayer(request);
+  const payload = makeValidChallengeCreatePayload("detail-antileak");
+  const createResponse = await request.post(`${apiBaseUrl()}/api/challenges`, {
+    headers: {
+      cookie,
+      [csrfHeaderName]: csrfHeaderValue
+    },
+    data: payload
+  });
+  const created = (await createResponse.json()) as ChallengeCreateResponseBody;
+  const detailResponse = await request.get(
+    `${apiBaseUrl()}/api/challenges/${created.id}`
+  );
+  const detail = await detailResponse.json();
+
+  expect(createResponse.status()).toBe(201);
+  expect(detailResponse.ok()).toBe(true);
+  expect(detail.id).toBe(created.id);
+  expectNoSensitiveKeys(detail, payload.secretPattern);
+  for (const control of payload.controls) {
+    expectNoSensitiveKeys(detail, control.value);
+  }
+});
+
+test("challenge creation API rejects unauthenticated requests", async ({
+  request
+}) => {
+  const payload = makeValidChallengeCreatePayload("unauthenticated");
+  const response = await request.post(`${apiBaseUrl()}/api/challenges`, {
+    headers: {
+      [csrfHeaderName]: csrfHeaderValue
+    },
+    data: payload
+  });
+  const body = await response.json();
+
+  expect(response.status()).toBe(401);
+  expect(body).toEqual({
+    error: "Unauthorized",
+    message: "Authentication required."
+  });
+  expectNoSensitiveKeys(body, payload.secretPattern);
+});
+
+test("challenge creation API rejects missing CSRF", async ({ request }) => {
+  const { cookie, sessionToken } = await loginDemoPlayer(request);
+  const payload = makeValidChallengeCreatePayload("missing-csrf");
+  const response = await request.post(`${apiBaseUrl()}/api/challenges`, {
+    headers: {
+      cookie
+    },
+    data: payload
+  });
+  const body = await response.json();
+
+  expect(response.status()).toBe(403);
+  expect(body).toEqual({
+    error: "Forbidden",
+    message: "CSRF header is required."
+  });
+  expectNoSensitiveKeys(body, payload.secretPattern);
+  expectNoSensitiveKeys(body, sessionToken);
+});
+
+test("challenge creation API rejects incoherent controls without leaking secrets", async ({
+  request
+}) => {
+  const { cookie, sessionToken } = await loginDemoPlayer(request);
+  const payload = {
+    ...makeValidChallengeCreatePayload("incoherent-controls"),
+    controls: [
+      { kind: "POSITIVE", value: "00100" },
+      { kind: "POSITIVE", value: "20121" },
+      { kind: "POSITIVE", value: "ABCDE" },
+      { kind: "NEGATIVE", value: "1234" },
+      { kind: "NEGATIVE", value: "ZZ999" },
+      { kind: "NEGATIVE", value: "123456" }
+    ]
+  };
+  const response = await request.post(`${apiBaseUrl()}/api/challenges`, {
+    headers: {
+      cookie,
+      [csrfHeaderName]: csrfHeaderValue
+    },
+    data: payload
+  });
+  const body = await response.json();
+  const persistedCount = await prisma.challenge.count({
+    where: { title: payload.title }
+  });
+
+  expect(response.status()).toBe(422);
+  expect(persistedCount).toBe(0);
+  expectNoSensitiveKeys(body, payload.secretPattern);
+  expectNoSensitiveKeys(body, "ABCDE");
+  expectNoSensitiveKeys(body, sessionToken);
 });
 
 test("api health endpoint responds", async ({ request }) => {

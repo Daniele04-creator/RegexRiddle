@@ -56,7 +56,13 @@ DONE_TECH:
 
 ## GOAL 06
 
-- Add challenge creation with author ownership checks.
+DONE_TECH:
+
+- Add protected challenge creation with author ownership from `rr_session`.
+- Validate secret regexes, public examples, and secret controls with RE2 full-match semantics before persistence.
+- Create `Challenge` and `ChallengeControl` rows transactionally.
+- Keep public responses free of secret regexes and control values.
+- Keep frontend challenge creation UI out of scope.
 
 ## GOAL 07
 

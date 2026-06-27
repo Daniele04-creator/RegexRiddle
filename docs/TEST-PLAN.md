@@ -66,11 +66,18 @@ pnpm check
 - The restructure must not change API contracts, auth/session behavior, database schema, regex semantics, or test coverage.
 - Full gates after the move must pass: `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`, `pnpm e2e`, `pnpm check`, `pnpm db:verify`, and `docker compose up --build -d`.
 
+## GOAL 06 protected challenge creation checks
+
+- Backend tests cover unauthenticated challenge creation rejection, missing and wrong CSRF rejection, valid creation, `Location` header, current-session ownership, mass-assignment rejection, unknown-key rejection, invalid difficulty, invalid and duplicate flags, invalid and RE2-incompatible secret regexes, incoherent public examples, incoherent controls, duplicate controls, contradictory controls, too few controls, internal control persistence, no-write-on-invalid cases, and anti-leak assertions on creation/detail/list responses.
+- E2E API tests cover demo-user challenge creation, public detail anti-leak behavior for a created challenge, unauthenticated rejection, missing CSRF rejection, and incoherent control rejection without persistence or secret leakage.
+- Challenge creation tests assert public JSON does not contain `secretPattern`, control lists, `ChallengeControl.value`, `proposedPattern`, `passwordHash`, `sessionTokenHash`, token values, or cookie values.
+- Current backend test count after GOAL 06: 67 tests.
+- Current E2E count after GOAL 06: 17 tests.
+
 ## Final delivery target
 
 The final project must include at least 10 meaningful E2E tests. Later milestones should add tests for:
 
-- Authenticated challenge ownership/authorization.
 - Leaderboard visibility.
 - IDOR prevention.
 - Deterministic seed data.

@@ -1,6 +1,6 @@
 # RegexRiddle
 
-RegexRiddle is a Web Technologies exam project scaffold. The repository currently includes the GOAL 05 protected attempt submission API: PostgreSQL, Prisma schema, deterministic demo seed data, public challenge DTOs, read-only challenge endpoints, backend auth, an internal server-side RE2-compatible evaluator, and `POST /api/challenges/:id/attempts`. It still has no frontend auth UI, challenge mutation API, leaderboard, or frontend attempt UI.
+RegexRiddle is a Web Technologies exam project scaffold. The repository currently includes the GOAL 06 protected challenge creation API: PostgreSQL, Prisma schema, deterministic demo seed data, public challenge DTOs, read-only challenge endpoints, backend auth, an internal server-side RE2-compatible evaluator, `POST /api/challenges`, and `POST /api/challenges/:id/attempts`. It still has no frontend auth UI, frontend challenge creation UI, leaderboard, or frontend attempt UI.
 
 ## Stack
 
@@ -60,6 +60,7 @@ Useful local URLs:
 - API health: http://127.0.0.1:4000/health
 - Auth API: http://127.0.0.1:4000/api/auth/me
 - Public challenges API: http://127.0.0.1:4000/api/challenges
+- Protected challenge creation API: http://127.0.0.1:4000/api/challenges
 - Protected attempt API: http://127.0.0.1:4000/api/challenges/{id}/attempts
 - PostgreSQL from host tools: 127.0.0.1:55432
 
@@ -77,6 +78,7 @@ Docker URLs:
 - API health: http://127.0.0.1:4000/health
 - Auth API: http://127.0.0.1:4000/api/auth/me
 - Public challenges API: http://127.0.0.1:4000/api/challenges
+- Protected challenge creation API: http://127.0.0.1:4000/api/challenges
 - Protected attempt API: http://127.0.0.1:4000/api/challenges/{id}/attempts
 - PostgreSQL from host tools: 127.0.0.1:55432
 - PostgreSQL from Compose services: `db:5432`
@@ -155,6 +157,25 @@ Auth endpoints:
 
 The session token is returned only as the `rr_session` cookie. API responses must not include `passwordHash`, `sessionTokenHash`, token values, or cookie values.
 
+## Challenge creation API smoke
+
+The backend exposes protected challenge creation. No frontend creation UI exists yet.
+
+Challenge creation requires:
+
+- a valid `rr_session` cookie;
+- `Content-Type: application/json`;
+- `X-RegexRiddle-CSRF: 1`.
+
+Use a cookie jar and create a challenge:
+
+```powershell
+curl.exe -i -c .\.tmp-auth-cookies.txt -H "Content-Type: application/json" -d '{"usernameOrEmail":"demo_player","password":"Password123!"}' http://127.0.0.1:4000/api/auth/login
+curl.exe -i -b .\.tmp-auth-cookies.txt -H "Content-Type: application/json" -H "X-RegexRiddle-CSRF: 1" -d '{"title":"Italian postal codes","description":"Create a regex that matches valid five-digit Italian postal codes.","difficulty":"EASY","secretPattern":"\\d{5}","flags":"","publicPositiveExample":"80125","publicNegativeExample":"8012A","controls":[{"kind":"POSITIVE","value":"00100"},{"kind":"POSITIVE","value":"20121"},{"kind":"POSITIVE","value":"99999"},{"kind":"NEGATIVE","value":"1234"},{"kind":"NEGATIVE","value":"ABCDE"},{"kind":"NEGATIVE","value":"123456"}]}' http://127.0.0.1:4000/api/challenges
+```
+
+The authenticated user from `rr_session` becomes the author. The backend validates the secret regex, public examples, and secret controls server-side with RE2 full-match semantics before saving. Successful responses use the public challenge detail DTO and must not include `secretPattern`, control lists, `ChallengeControl.value`, password hashes, session hashes, token values, or cookie values.
+
 ## Attempt API smoke
 
 The backend exposes protected attempt submission. The frontend attempt UI is still out of scope.
@@ -184,7 +205,7 @@ This public review repository must never contain real secrets. `.env.example` va
 
 ## Safe regex engine
 
-GOAL 04 added an internal backend regex engine based on `re2-wasm`; GOAL 05 uses it from the protected attempt endpoint.
+GOAL 04 added an internal backend regex engine based on `re2-wasm`; GOAL 05 uses it from the protected attempt endpoint and GOAL 06 uses it from protected challenge creation.
 
 - Evaluation happens server-side only.
 - User candidate patterns are compiled with RE2-compatible semantics, not JavaScript `RegExp`.

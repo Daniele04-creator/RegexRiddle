@@ -17,7 +17,7 @@ Response `200 application/json`:
 
 ## Frontend same-origin boundary
 
-GOAL 08.0 adds a frontend API client foundation without changing backend endpoint behavior. GOAL 08.1 uses that client for public read-only catalog, challenge detail, and leaderboard UI. GOAL 08.2 uses the same boundary for frontend login, registration, logout, and current-session restoration. GOAL 08.3 uses it for protected attempt submission from `/challenges/:id`. GOAL 08.4 uses it for protected challenge creation from `/create`.
+GOAL 08.0 adds a frontend API client foundation without changing backend endpoint behavior. GOAL 08.1 uses that client for public read-only catalog, challenge detail, and leaderboard UI. GOAL 08.2 uses the same boundary for frontend login, registration, logout, and current-session restoration. GOAL 08.3 uses it for protected attempt submission from `/challenges/:id`. GOAL 08.4 uses it for protected challenge creation from `/create`. GOAL 08.5 uses it for scoped current-user account settings from `/account`.
 
 Frontend rules:
 
@@ -31,6 +31,7 @@ Frontend rules:
 - GOAL 08.2 auth UI does not change backend auth behavior, cookie name, cookie attributes, database schema, CSRF rules, challenge APIs, attempt APIs, or regex semantics.
 - GOAL 08.3 attempt UI does not change backend attempt behavior, cookie name, cookie attributes, database schema, auth/session behavior, CSRF rules, or regex semantics.
 - GOAL 08.4 authoring UI does not change backend challenge creation behavior, cookie name, cookie attributes, database schema, auth/session behavior, CSRF rules, or regex semantics.
+- GOAL 08.5 account UI does not change database schema, cookie name, cookie attributes, auth/session behavior, challenge APIs, attempt APIs, leaderboard APIs, regex semantics, or public DTO boundaries.
 - `/challenges` calls `GET /api/challenges?page=1&limit=9`.
 - `/challenges/:id` calls `GET /api/challenges/:id`.
 - `/leaderboard` calls `GET /api/leaderboard?page=1&limit=10`.
@@ -38,10 +39,13 @@ Frontend rules:
 - `/register` calls `POST /api/auth/register`.
 - Logout calls `POST /api/auth/logout`.
 - The current user source of truth is `GET /api/auth/me`; a `401` response means guest in the frontend state.
+- `/account` calls `PATCH /api/auth/me` only for authenticated users submitting the settings form.
+- Account UI requests send only `displayName`, `bio`, and `avatarUrl`.
 - `/challenges/:id` calls `POST /api/challenges/:id/attempts` only for authenticated non-author users submitting the attempt form.
 - Attempt UI requests send only `pattern` and `flags`.
 - `/create` calls `POST /api/challenges` only for authenticated users submitting the authoring form.
 - Authoring UI requests send only the documented challenge creation DTO fields.
+- Account UI does not implement password change, email change, profile statistics, file upload, or avatar upload storage.
 - The frontend authoring form does not evaluate secret regexes in the browser and does not store secret regexes or controls in browser storage.
 - Public frontend rendering must stay limited to DTO fields documented below.
 - The frontend must not read `document.cookie`, must not store auth tokens in `localStorage` or `sessionStorage`, and must not create a custom token store.
@@ -431,6 +435,8 @@ Response `201 application/json`:
     "username": "student_demo",
     "email": "student_demo@example.test",
     "displayName": "Student Demo",
+    "bio": null,
+    "avatarUrl": null,
     "createdAt": "2026-06-27T10:00:00.000Z"
   }
 }
@@ -475,6 +481,8 @@ Response `200 application/json`:
     "username": "demo_player",
     "email": "demo_player@example.test",
     "displayName": "Demo Player",
+    "bio": "Demo solver account with solved and unsolved attempts.",
+    "avatarUrl": null,
     "createdAt": "2026-06-27T10:00:00.000Z"
   }
 }
@@ -528,6 +536,8 @@ Response `200 application/json`:
     "username": "demo_player",
     "email": "demo_player@example.test",
     "displayName": "Demo Player",
+    "bio": "Demo solver account with solved and unsolved attempts.",
+    "avatarUrl": null,
     "createdAt": "2026-06-27T10:00:00.000Z"
   }
 }
@@ -544,11 +554,87 @@ Auth responses never include:
 - raw session token
 - cookie value in JSON
 
+## PATCH /api/auth/me
+
+Updates scoped settings for the current authenticated user. This endpoint never accepts a user id in the route or body; the user is derived only from the server-side `rr_session`.
+
+Frontend consumption:
+
+- `/account` shows login/register CTAs to guests.
+- Authenticated users can edit only display name, bio, and avatar URL.
+- The frontend uses the same-origin API client with `credentials: "include"` and `protectedMutation: true`.
+- The frontend sends only `displayName`, `bio`, and `avatarUrl`.
+- The frontend does not store account data, auth tokens, or secrets in `localStorage` or `sessionStorage`.
+
+Authentication and mutation guard:
+
+- Requires a valid `rr_session` cookie.
+- Requires `Content-Type: application/json`.
+- Requires `X-RegexRiddle-CSRF: 1`.
+- Missing, invalid, or expired auth returns `401 Unauthorized`.
+- Missing or wrong CSRF header returns `403 Forbidden`.
+- Non-JSON content type returns `400 Bad Request`.
+
+Request `application/json`:
+
+```json
+{
+  "displayName": "Daniele Demo",
+  "bio": "Preparazione orale di Tecnologie Web.",
+  "avatarUrl": "https://example.com/avatar.png"
+}
+```
+
+Validation:
+
+- Body must be a JSON object with at least one allowed key.
+- Unknown keys are rejected.
+- Mass-assignment keys are rejected, including `id`, `username`, `email`, `password`, `passwordHash`, `sessionTokenHash`, `createdAt`, `updatedAt`, relation names, and `_count`.
+- `displayName`: optional string if present, trimmed, 1-80 characters.
+- `bio`: optional nullable string, trimmed, max 280 characters; empty string maps to `null`.
+- `avatarUrl`: optional nullable string, trimmed, max 500 characters; empty string maps to `null`.
+- Non-empty `avatarUrl` must be `http://` or `https://`.
+- The server stores the avatar URL string only and does not fetch external URLs.
+
+Response `200 application/json`:
+
+```json
+{
+  "user": {
+    "id": "22222222-2222-4222-8222-222222222222",
+    "username": "demo_player",
+    "email": "demo_player@example.test",
+    "displayName": "Daniele Demo",
+    "bio": "Preparazione orale di Tecnologie Web.",
+    "avatarUrl": "https://example.com/avatar.png",
+    "createdAt": "2026-06-27T10:00:00.000Z"
+  }
+}
+```
+
+Errors:
+
+- `400 Bad Request`: invalid body shape, invalid field types, unknown keys, invalid lengths, or invalid avatar URL.
+- `401 Unauthorized`: missing, invalid, or expired session.
+- `403 Forbidden`: missing or wrong CSRF header.
+
+Account update does not implement:
+
+- email change;
+- username change;
+- password change;
+- profile statistics;
+- avatar file upload or upload storage;
+- challenge edit/delete;
+- auth/session/cookie semantic changes.
+
 ## Future endpoints
 
-The following areas are intentionally TODO after GOAL 08.4:
+The following areas are intentionally TODO after GOAL 08.5:
 
 - Challenge edit/delete workflows.
 - Profile/statistics UI.
+- Password or email change workflows.
+- Avatar file upload.
 
 Future protected routes must include authorization checks and must not expose secret regexes or secret controls.

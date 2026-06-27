@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 
 import {
   API_AUTH_PATH,
+  type AccountUpdateResponseDTO,
   type AuthMeResponseDTO,
   type AuthSuccessResponseDTO,
   type AuthUserResponseDTO,
@@ -19,6 +20,9 @@ import {
   logoutSession,
   registerUser
 } from "../services/auth-service.js";
+import { updateCurrentUserAccount } from "../services/account-service.js";
+import { validateProtectedJsonMutationHeaders } from "../security/csrf-guard.js";
+import { parseAccountUpdateBody } from "../validation/account-validation.js";
 import {
   parseLoginBody,
   parseRegisterBody
@@ -111,6 +115,41 @@ export function registerAuthRoutes(app: FastifyInstance): void {
     }
 
     const response: AuthMeResponseDTO = { user };
+
+    return response;
+  });
+
+  app.patch(`${API_AUTH_PATH}/me`, async (request, reply) => {
+    const sessionToken = readSessionTokenFromCookieHeader(request.headers.cookie);
+
+    if (sessionToken === null) {
+      return reply.status(401).send(unauthorizedResponse());
+    }
+
+    const user = await getCurrentUserFromSessionToken(sessionToken);
+
+    if (user === null) {
+      return reply.status(401).send(unauthorizedResponse());
+    }
+
+    const mutationGuard = validateProtectedJsonMutationHeaders(request.headers);
+
+    if (!mutationGuard.success) {
+      return reply
+        .status(mutationGuard.statusCode)
+        .send(errorResponse(mutationGuard.error, mutationGuard.message));
+    }
+
+    const validation = parseAccountUpdateBody(request.body);
+
+    if (!validation.success) {
+      return reply
+        .status(400)
+        .send(errorResponse("Bad Request", validation.message));
+    }
+
+    const updatedUser = await updateCurrentUserAccount(user.id, validation.value);
+    const response: AccountUpdateResponseDTO = { user: updatedUser };
 
     return response;
   });

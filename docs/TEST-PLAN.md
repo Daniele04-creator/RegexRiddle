@@ -149,6 +149,20 @@ Current E2E count after GOAL 08.3: 44 tests.
 Current frontend test count after GOAL 08.4: 51 tests.
 Current E2E count after GOAL 08.4: 49 tests.
 
+## GOAL 08.5 how-it-works and account settings checks
+
+- Backend tests cover `PATCH /api/auth/me` unauthenticated rejection, missing/wrong CSRF rejection, non-JSON rejection, valid update, empty `bio`/`avatarUrl` to `null`, invalid avatar URL rejection, unknown-key rejection, mass-assignment rejection, safe current-user DTO response, and public challenge/leaderboard DTO boundaries.
+- Frontend tests cover the account API function sending `PATCH /api/auth/me` with `credentials: "include"`, JSON body, `X-RegexRiddle-CSRF: 1`, and only `displayName`, `bio`, and `avatarUrl`.
+- Frontend tests cover account schema validation, valid avatar URL, invalid avatar URL, trim behavior, and empty optional fields mapping to `null`.
+- Frontend route tests cover `/how-it-works` explanation content and CTAs, `/account` guest gate, authenticated account summary/form, account update success, malicious extra response fields not rendering, no browser storage, and auth-only Account nav.
+- Source security tests assert no `dangerouslySetInnerHTML`, no production frontend `document.cookie`, no browser auth-token storage APIs, no frontend `RegExp` construction, and no raw `fetch` outside the API client boundary.
+- E2E tests cover public `/how-it-works`, how-it-works CTAs, account guest gate, seeded login, authenticated account update, logout returning account to guest gate, mobile how-it-works/account overflow, mobile nav Account link, account API rejection paths, account API valid update, mass-assignment rejection, storage anti-token checks, and sensitive-render anti-leak checks.
+- GOAL 08.5 must keep database schema, migrations, auth/session/cookie semantics, challenge APIs, attempt APIs, leaderboard APIs, regex semantics, and frontend regex evaluation unchanged.
+
+Current backend test count after GOAL 08.5: 88 tests.
+Current frontend test count after GOAL 08.5: 59 tests.
+Current E2E count after GOAL 08.5: 56 tests.
+
 ## Final delivery target
 
 The final project must include at least 10 meaningful E2E tests. Later milestones should add tests for:

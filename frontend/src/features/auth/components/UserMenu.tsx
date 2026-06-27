@@ -1,4 +1,4 @@
-import { LogOutIcon, PlusIcon, UserRoundIcon } from "lucide-react";
+import { LogOutIcon, UserRoundIcon } from "lucide-react";
 import { Link } from "react-router";
 
 import { routePaths } from "@/app/router";
@@ -83,9 +83,9 @@ export function UserMenu({
         <p className="truncate text-xs text-muted-foreground">@{user.username}</p>
       </div>
       <Button asChild className={isMobile ? "justify-start" : undefined} variant="outline">
-        <Link onClick={onNavigate} to={routePaths.create}>
-          <PlusIcon aria-hidden="true" data-icon="inline-start" />
-          Crea sfida
+        <Link onClick={onNavigate} to={routePaths.account}>
+          <UserRoundIcon aria-hidden="true" data-icon="inline-start" />
+          Account
         </Link>
       </Button>
       <Button

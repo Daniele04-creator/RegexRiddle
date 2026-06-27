@@ -1,6 +1,6 @@
 # RegexRiddle
 
-RegexRiddle is a Web Technologies exam project scaffold. The repository currently includes the GOAL 08.4 frontend challenge creation UI: PostgreSQL, Prisma schema, deterministic demo seed data, public challenge DTOs, read-only challenge endpoints, public leaderboard, backend auth, an internal server-side RE2-compatible evaluator, `POST /api/challenges`, `POST /api/challenges/:id/attempts`, React/Vite pages connected to the public catalog, challenge detail, leaderboard APIs, real login/register/logout UI, a protected attempt panel on `/challenges/:id`, and a protected authoring form on `/create`. It still has no profile/statistics or edit/delete workflows.
+RegexRiddle is a Web Technologies exam project scaffold. The repository currently includes the GOAL 08.5 final UX milestone: PostgreSQL, Prisma schema, deterministic demo seed data, public challenge DTOs, read-only challenge endpoints, public leaderboard, backend auth, protected current-user account settings, an internal server-side RE2-compatible evaluator, `POST /api/challenges`, `POST /api/challenges/:id/attempts`, React/Vite pages connected to the public catalog, challenge detail, leaderboard APIs, real login/register/logout UI, a public `/how-it-works` walkthrough page, a protected `/account` settings page, a protected attempt panel on `/challenges/:id`, and a protected authoring form on `/create`. It still has no profile/statistics, password/email change, uploads, or edit/delete workflows.
 
 ## Stack
 
@@ -64,10 +64,13 @@ Useful local URLs:
 - Public leaderboard API: http://127.0.0.1:4000/api/leaderboard
 - Same-origin frontend health proxy: http://127.0.0.1:5173/health
 - Frontend public catalog: http://127.0.0.1:5173/challenges
+- Frontend how-it-works page: http://127.0.0.1:5173/how-it-works
 - Frontend public leaderboard: http://127.0.0.1:5173/leaderboard
 - Frontend login: http://127.0.0.1:5173/login
 - Frontend register: http://127.0.0.1:5173/register
 - Frontend protected challenge creation: http://127.0.0.1:5173/create
+- Frontend protected account settings: http://127.0.0.1:5173/account
+- Protected current-user account API: http://127.0.0.1:4000/api/auth/me
 - Protected challenge creation API: http://127.0.0.1:4000/api/challenges
 - Protected attempt API: http://127.0.0.1:4000/api/challenges/{id}/attempts
 - PostgreSQL from host tools: 127.0.0.1:55432
@@ -89,10 +92,13 @@ Docker URLs:
 - Public leaderboard API: http://127.0.0.1:4000/api/leaderboard
 - Same-origin frontend health proxy: http://127.0.0.1:5173/health
 - Frontend public catalog: http://127.0.0.1:5173/challenges
+- Frontend how-it-works page: http://127.0.0.1:5173/how-it-works
 - Frontend public leaderboard: http://127.0.0.1:5173/leaderboard
 - Frontend login: http://127.0.0.1:5173/login
 - Frontend register: http://127.0.0.1:5173/register
 - Frontend protected challenge creation: http://127.0.0.1:5173/create
+- Frontend protected account settings: http://127.0.0.1:5173/account
+- Protected current-user account API: http://127.0.0.1:4000/api/auth/me
 - Protected challenge creation API: http://127.0.0.1:4000/api/challenges
 - Protected attempt API: http://127.0.0.1:4000/api/challenges/{id}/attempts
 - PostgreSQL from host tools: 127.0.0.1:55432
@@ -152,7 +158,7 @@ GOAL 08.0 replaces the smoke screen with the Regex Lab SPA foundation:
 - Tailwind CSS v4 is wired through `@tailwindcss/vite`.
 - shadcn/ui is initialized in `frontend/` with a small component set.
 - `DESIGN.md` is the visual source of truth.
-- React Router provides public routes for `/`, `/challenges`, `/challenges/:id`, `/leaderboard`, `/login`, `/register`, `/create`, and fallback `404`.
+- React Router provides routes for `/`, `/how-it-works`, `/challenges`, `/challenges/:id`, `/leaderboard`, `/login`, `/register`, `/create`, `/account`, and fallback `404`.
 - TanStack Query is configured for server state.
 - React Hook Form, Zod, and `@hookform/resolvers` support the auth, attempt, and authoring forms.
 - Motion for React uses the current `motion` package for subtle UI motion.
@@ -200,6 +206,15 @@ GOAL 08.4 connects the frontend challenge creation experience on `/create`:
 - the browser does not evaluate the secret regex and does not provide a match preview;
 - successful creation resets the form and renders only the public challenge detail DTO.
 
+GOAL 08.5 adds final demo and account polish:
+
+- `/how-it-works` explains creators, solvers, full-match semantics, RE2-compatible regexes, flags `i`/`m`, public examples, secret controls, aggregate feedback, leaderboard ranking, and what stays server-only;
+- `/account` shows a login/register gate for guests and, for authenticated users, a current-user summary plus scoped settings form;
+- authenticated users can update only `displayName`, `bio`, and `avatarUrl`;
+- account updates call `PATCH /api/auth/me` with `credentials: "include"` and `X-RegexRiddle-CSRF: 1`;
+- username, email, password, profile statistics, uploads, and challenge edit/delete are not implemented in this milestone;
+- no Prisma migration or schema change was added.
+
 ## Public leaderboard
 
 The backend exposes the public solver leaderboard and the frontend renders it at `/leaderboard`.
@@ -237,6 +252,7 @@ Use a cookie jar for local smoke tests:
 ```powershell
 curl.exe -i -c .\.tmp-auth-cookies.txt -H "Content-Type: application/json" -d '{"usernameOrEmail":"demo_player","password":"Password123!"}' http://127.0.0.1:4000/api/auth/login
 curl.exe -i -b .\.tmp-auth-cookies.txt http://127.0.0.1:4000/api/auth/me
+curl.exe -i -b .\.tmp-auth-cookies.txt -H "Content-Type: application/json" -H "X-RegexRiddle-CSRF: 1" -X PATCH -d '{"displayName":"Daniele Demo","bio":"Preparazione orale di Tecnologie Web.","avatarUrl":"https://example.com/avatar.png"}' http://127.0.0.1:4000/api/auth/me
 curl.exe -i -b .\.tmp-auth-cookies.txt -c .\.tmp-auth-cookies.txt -X POST http://127.0.0.1:4000/api/auth/logout
 ```
 
@@ -246,8 +262,9 @@ Auth endpoints:
 - `POST /api/auth/login`
 - `POST /api/auth/logout`
 - `GET /api/auth/me`
+- `PATCH /api/auth/me`
 
-The session token is returned only as the `rr_session` cookie. API responses must not include `passwordHash`, `sessionTokenHash`, token values, or cookie values.
+The session token is returned only as the `rr_session` cookie. API responses must not include `passwordHash`, `sessionTokenHash`, token values, or cookie values. Public challenge author and leaderboard DTOs still do not expose email or avatar URL.
 
 Frontend auth requests use same-origin relative paths and `credentials: "include"` through the shared API client. The UI never logs passwords, never puts credentials in URLs, and never persists token material outside the browser-managed HttpOnly cookie.
 
@@ -303,7 +320,7 @@ The frontend must not store auth tokens in `localStorage` or `sessionStorage`, m
 
 ## Safe regex engine
 
-GOAL 04 added an internal backend regex engine based on `re2-wasm`; GOAL 05 uses it from the protected attempt endpoint and GOAL 06 uses it from protected challenge creation. GOAL 07, GOAL 08.0, GOAL 08.1, GOAL 08.2, GOAL 08.3, and GOAL 08.4 do not change regex evaluation.
+GOAL 04 added an internal backend regex engine based on `re2-wasm`; GOAL 05 uses it from the protected attempt endpoint and GOAL 06 uses it from protected challenge creation. GOAL 07, GOAL 08.0, GOAL 08.1, GOAL 08.2, GOAL 08.3, GOAL 08.4, and GOAL 08.5 do not change regex evaluation.
 
 - Evaluation happens server-side only.
 - User candidate patterns are compiled with RE2-compatible semantics, not JavaScript `RegExp`.

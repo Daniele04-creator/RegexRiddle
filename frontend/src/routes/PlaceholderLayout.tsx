@@ -32,10 +32,10 @@ export function PlaceholderLayout({
       </div>
       <Card className="mt-8 bg-card/88">
         <CardHeader>
-          <CardTitle>Foundation contract</CardTitle>
+          <CardTitle>Percorsi disponibili</CardTitle>
           <CardDescription>
-            This route is intentionally useful but not wired to real product
-            workflows yet.
+            Usa un percorso pubblico per rientrare nell'app senza esporre dati
+            sensibili.
           </CardDescription>
         </CardHeader>
         <CardContent>{children}</CardContent>

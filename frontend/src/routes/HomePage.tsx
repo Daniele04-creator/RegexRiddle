@@ -15,9 +15,9 @@ import { Badge } from "@/components/ui/badge";
 
 const howItWorks = [
   {
-    title: "Register, login, or author",
+    title: "Walk through the rules",
     description:
-      "Auth UI and challenge creation use the existing backend session cookie flow.",
+      "The how-it-works page explains full match, RE2-compatible regexes, secret controls, and feedback.",
     icon: FlaskConicalIcon
   },
   {
@@ -27,9 +27,9 @@ const howItWorks = [
     icon: ListChecksIcon
   },
   {
-    title: "Leaderboard rewards precision",
+    title: "Account settings stay scoped",
     description:
-      "The leaderboard renders public aggregate rankings without emails, ids, or private attempt data.",
+      "Authenticated users can update display name, bio, and avatar URL without touching email or password.",
     icon: TrophyIcon
   }
 ];
@@ -67,8 +67,9 @@ export function HomePage() {
             </div>
             <p className="max-w-xl text-sm leading-6 text-muted-foreground">
               The public catalog, challenge detail, leaderboard, login,
-              registration, logout, session restoration, gameplay, and
-              challenge authoring are wired to existing APIs.
+              registration, logout, session restoration, gameplay, challenge
+              authoring, how-it-works, and account settings are wired to
+              existing APIs.
             </p>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
@@ -113,9 +114,9 @@ export function HomePage() {
             Frontend authoring is now connected
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
-            GOAL 08.4 adds the protected challenge creation form on `/create`.
-            Authenticated users can publish challenges through the existing
-            protected API while regex verification stays server-side.
+            GOAL 08.5 adds `/how-it-works` for demo walkthroughs and `/account`
+            for scoped current-user settings. Regex verification, auth sessions,
+            and secret challenge data stay server-side.
           </p>
         </section>
       </PageContainer>

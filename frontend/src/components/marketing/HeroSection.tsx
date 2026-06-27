@@ -1,4 +1,4 @@
-import { ArrowRightIcon, LogInIcon, TrophyIcon } from "lucide-react";
+import { ArrowRightIcon, BookOpenIcon, PlusIcon, TrophyIcon } from "lucide-react";
 import { motion } from "motion/react";
 import { Link } from "react-router";
 
@@ -19,7 +19,7 @@ export function HeroSection() {
           <div className="mb-5 flex flex-wrap items-center gap-2">
             <HealthBadge />
             <span className="rounded-lg border bg-card px-2.5 py-1 text-xs font-medium text-muted-foreground">
-              GOAL 08.4 authoring UI
+              GOAL 08.5 final UX polish
             </span>
           </div>
           <h1 className="max-w-4xl text-5xl font-semibold tracking-normal text-foreground sm:text-6xl lg:text-7xl">
@@ -39,15 +39,21 @@ export function HeroSection() {
               </Link>
             </Button>
             <Button asChild size="lg" variant="outline">
+              <Link to="/how-it-works">
+                <BookOpenIcon aria-hidden="true" data-icon="inline-start" />
+                Come funziona
+              </Link>
+            </Button>
+            <Button asChild size="lg" variant="outline">
               <Link to="/leaderboard">
                 <TrophyIcon aria-hidden="true" data-icon="inline-start" />
                 Guarda classifica
               </Link>
             </Button>
             <Button asChild size="lg" variant="secondary">
-              <Link to="/login">
-                <LogInIcon aria-hidden="true" data-icon="inline-start" />
-                Accedi
+              <Link to="/create">
+                <PlusIcon aria-hidden="true" data-icon="inline-start" />
+                Crea una sfida
               </Link>
             </Button>
           </div>

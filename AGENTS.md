@@ -11,7 +11,9 @@
 - GOAL 08.1 may connect public read-only frontend pages for catalog, challenge detail, and leaderboard because it explicitly requests those existing public APIs.
 - GOAL 08.2 may add real frontend auth forms, logout UI, session restoration, and auth-aware shell/create placeholder because it explicitly requests frontend authentication.
 - GOAL 08.3 may add the frontend attempt/gameplay UI for existing public challenges because it explicitly requests that existing protected attempt API.
-- Do not implement additional authentication endpoints, challenge edit/delete APIs, profile/statistics pages, or real challenge authoring UI until a later goal explicitly requests them.
+- GOAL 08.4 may add real frontend challenge authoring UI because it explicitly requests the existing protected creation API.
+- GOAL 08.5 may add `PATCH /api/auth/me`, `/how-it-works`, `/account`, and final frontend polish because it explicitly requests scoped account settings and the demo walkthrough.
+- Do not implement additional authentication endpoints, challenge edit/delete APIs, profile/statistics pages, password change, email change, avatar upload, or upload storage until a later goal explicitly requests them.
 - Do not introduce large dependencies without a clear goal requirement and human confirmation.
 - Do not commit, push, branch, checkout, stash, or reset unless the user explicitly asks.
 - Do not edit real `.env` files or store secrets in code, logs, tests, documentation, or generated files.

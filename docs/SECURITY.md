@@ -13,9 +13,9 @@
 - Use opaque server-side sessions with `HttpOnly` and `SameSite` cookies when auth is implemented.
 - Use Argon2id when passwords are implemented.
 
-## GOAL 08.4 security posture
+## GOAL 08.5 security posture
 
-GOAL 08.4 connects frontend challenge authoring to the existing protected challenge creation API. The project still has no uploads, no profile/statistics page, and no challenge edit/delete UI.
+GOAL 08.5 adds the public how-it-works route, scoped current-user account settings, and final UI polish. The project still has no uploads, no profile/statistics page, no password/email change workflow, and no challenge edit/delete UI.
 
 Regex engine decisions:
 
@@ -115,6 +115,20 @@ Frontend challenge authoring UI decisions:
 - The frontend does not run JavaScript `RegExp` against the secret regex and does not provide a client-side match preview.
 - Successful creation resets secret form inputs and renders only the public challenge detail DTO.
 - `400`, `401`, `403`, and `422` creation errors map to safe user-facing messages without stack traces or raw response bodies.
+
+Account settings decisions:
+
+- `/account` shows login/register CTAs to guests and does not render settings fields without a current user.
+- Authenticated account updates use `PATCH /api/auth/me`.
+- The route derives the user only from the server-side `rr_session`; there is no route id and no client-provided user id.
+- Account updates require `Content-Type: application/json` and `X-RegexRiddle-CSRF: 1`.
+- The backend accepts only `displayName`, `bio`, and `avatarUrl`.
+- Unknown keys and mass-assignment keys such as `id`, `username`, `email`, `password`, hashes, dates, relation names, and `_count` are rejected before Prisma writes.
+- `bio` and `avatarUrl` empty strings normalize to `null`.
+- Non-empty `avatarUrl` must be `http://` or `https://`; the server stores the URL string and does not fetch external avatar URLs.
+- The account UI may show the authenticated user's own email as read-only data, but the app shell, public challenge author DTOs, and public leaderboard DTOs do not expose email or avatar URL.
+- Account state stays in TanStack Query memory only. The frontend does not read `document.cookie` and does not store auth tokens or account secrets in `localStorage` or `sessionStorage`.
+- No profile statistics, password change, email change, avatar file upload, upload storage, challenge edit/delete, JWT, auth/session semantic change, or regex behavior change is introduced.
 
 Frontend auth UI decisions:
 

@@ -28,6 +28,8 @@ export interface PublicUserDTO {
   username: string;
   email: string;
   displayName: string;
+  bio: string | null;
+  avatarUrl: string | null;
   createdAt: string;
 }
 
@@ -39,6 +41,16 @@ export type AuthMeResponseDTO = AuthUserResponseDTO;
 
 export interface AuthSuccessResponseDTO {
   success: true;
+}
+
+export interface AccountUpdateRequestDTO {
+  displayName?: string;
+  bio?: string | null;
+  avatarUrl?: string | null;
+}
+
+export interface AccountUpdateResponseDTO {
+  user: PublicUserDTO;
 }
 
 export interface PublicChallengeAuthorDTO {

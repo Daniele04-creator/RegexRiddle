@@ -1,4 +1,7 @@
-import type { PublicUserDTO } from "@regexriddle/shared";
+import type {
+  AccountUpdateRequestDTO,
+  PublicUserDTO
+} from "@regexriddle/shared";
 import { vi } from "vitest";
 
 export const demoUser: PublicUserDTO = {
@@ -6,6 +9,8 @@ export const demoUser: PublicUserDTO = {
   username: "demo_player",
   email: "demo_player@example.test",
   displayName: "Demo Player",
+  bio: "Demo solver account with solved and unsolved attempts.",
+  avatarUrl: null,
   createdAt: "2026-06-27T08:00:00.000Z"
 };
 
@@ -36,6 +41,39 @@ export function mockAppFetch({
           service: "regexriddle-api",
           appName: "RegexRiddle",
           environment: "test"
+        });
+      }
+
+      if (path === "/api/auth/me" && init?.method === "PATCH") {
+        if (currentUser === null) {
+          return jsonResponse(
+            { error: "Unauthorized", message: "Authentication required." },
+            401
+          );
+        }
+
+        if (new Headers(init.headers).get("X-RegexRiddle-CSRF") !== "1") {
+          return jsonResponse(
+            { error: "Forbidden", message: "CSRF header is required." },
+            403
+          );
+        }
+
+        const body = JSON.parse(String(init.body)) as AccountUpdateRequestDTO;
+
+        currentUser = {
+          ...currentUser,
+          avatarUrl: body.avatarUrl ?? null,
+          bio: body.bio ?? null,
+          displayName: body.displayName ?? currentUser.displayName
+        };
+
+        return jsonResponse({
+          user: {
+            ...currentUser,
+            passwordHash: "MALICIOUS_PASSWORD_HASH",
+            sessionTokenHash: "MALICIOUS_SESSION_HASH"
+          }
         });
       }
 
@@ -90,6 +128,8 @@ export function mockAppFetch({
           username: body.username,
           email: body.email,
           displayName: body.displayName,
+          bio: null,
+          avatarUrl: null,
           createdAt: "2026-06-27T09:00:00.000Z"
         };
 

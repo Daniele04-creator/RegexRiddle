@@ -1,5 +1,23 @@
 # Difesa orale
 
+## Cosa contiene GOAL 08.5
+
+Nel GOAL 08.5 ho aggiunto la pagina pubblica "Come funziona", utile per la demo e per spiegare al docente full match, dialetto RE2, esempi pubblici, controlli segreti, feedback aggregato e classifica. Ho aggiunto anche una pagina account protetta: l'utente autenticato puo' aggiornare display name, bio e avatar URL, mentre username, email e password non vengono modificati in questo goal. L'aggiornamento usa la sessione rr_session, credentials include e header CSRF. Non uso JWT, non leggo document.cookie e non salvo token in localStorage o sessionStorage. Ho poi fatto un pass finale su responsive e accessibilita' delle pagine principali.
+
+GOAL 08.5 aggiunge:
+
+- route pubblica `/how-it-works`;
+- route protetta `/account`;
+- endpoint protetto `PATCH /api/auth/me`;
+- validazione server-side per `displayName`, `bio` e `avatarUrl`;
+- rifiuto di chiavi sconosciute e mass assignment;
+- update cache TanStack Query del current user;
+- nav pubblica con Home, Come funziona, Sfide, Classifica e Crea;
+- link Account e Logout solo per utenti autenticati;
+- test backend, frontend ed E2E per contratto account, UI, responsive e anti-leak.
+
+Non aggiunge profilo/statistiche, cambio password, cambio email, upload avatar, edit/delete sfide, migration, JWT, storage token nel browser o valutazione regex nel frontend.
+
 ## Cosa contiene GOAL 08.4
 
 Nel GOAL 08.4 ho aggiunto la UI reale di creazione sfide su `/create`. Un utente non autenticato vede il gate login/register; un utente autenticato vede una form protetta per titolo, descrizione, difficolta, regex segreta, flag supportati, esempi pubblici e controlli segreti. Il frontend invia il payload all'endpoint gia' esistente `POST /api/challenges`, con `credentials: include` e header CSRF. La regex segreta non viene valutata nel browser: coerenza di regex, esempi e controlli resta responsabilita' del backend con RE2 full match.
@@ -140,7 +158,7 @@ Il seed crea utenti e sfide demo ripetibili. Serve per provare il progetto e per
 
 Non ci sono ancora profilo/statistiche o edit/delete.
 
-Questa scelta e' intenzionale: GOAL 08.4 chiude l'esperienza di authoring base e lascia profilo e gestione sfide ai goal successivi.
+Questa scelta e' intenzionale: GOAL 08.5 aggiunge solo impostazioni account correnti e lascia profilo/statistiche, cambio password/email, upload avatar e gestione edit/delete sfide ai goal successivi.
 
 ## Punto di sicurezza principale
 

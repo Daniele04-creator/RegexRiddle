@@ -63,7 +63,7 @@ Headings use balanced wrapping. Body copy should stay short, active, and product
 
 - Semantic `header`, `nav`, `main`, and `footer`.
 - Skip link targets `#main-content`.
-- Public navigation includes home, challenges, and leaderboard. Auth actions live in the session area as login/register links for guests and display name, username, create link, and logout for authenticated users.
+- Public navigation includes home, how-it-works, challenges, leaderboard, and create. Auth actions live in the session area as login/register links for guests and display name, username, account link, and logout for authenticated users.
 - Mobile navigation uses shadcn `Sheet` and must not trap keyboard users after close.
 
 ### Buttons
@@ -97,6 +97,7 @@ Headings use balanced wrapping. Body copy should stay short, active, and product
 
 - Auth forms use React Hook Form, Zod, shadcn field composition, explicit labels, autocomplete, field-level errors, and form-level alerts.
 - Attempt forms use React Hook Form, Zod, shadcn field composition, explicit labels, native keyboard-operable flag checkboxes, field-level errors, and form-level alerts.
+- Account settings use React Hook Form, Zod, shadcn field composition, explicit labels, inline errors, `aria-live` success/error alerts, and submit only display name, bio, and avatar URL.
 - Password fields use `type="password"` and must not render password values outside the input.
 - Submit buttons show pending states and remain keyboard-submittable.
 - Server errors are generic and user-facing; they must not expose backend internals or credential details.
@@ -175,3 +176,17 @@ It still does not ship attempt submission UI, challenge creation form UI, profil
 GOAL 08.3 connects the attempt/gameplay panel on `/challenges/:id` to the existing protected attempt endpoint.
 
 It still does not ship challenge creation form UI, profile/statistics, edit/delete, backend API changes, database changes, auth/session changes, regex semantic changes, or frontend regex evaluation.
+
+## GOAL 08.4 Scope
+
+GOAL 08.4 connects the challenge creation form on `/create` to the existing protected creation endpoint.
+
+It still does not ship account settings, profile/statistics, challenge edit/delete, password change, email change, upload storage, backend regex changes, database changes, auth/session changes, or frontend regex evaluation.
+
+## GOAL 08.5 Scope
+
+GOAL 08.5 adds the public `/how-it-works` demo walkthrough, the protected `/account` settings page, and final navigation/responsive/accessibility polish.
+
+The how-it-works page explains creators, solvers, full match, RE2-compatible regexes, supported flags, public examples, server-only secret controls, aggregate feedback, leaderboard ranking, and the recommended demo flow.
+
+The account page shows a guest login/register gate and, for authenticated users, a current-user summary plus editable `displayName`, `bio`, and `avatarUrl`. It deliberately does not add profile statistics, password change, email change, avatar upload, challenge edit/delete, database migrations, auth/session changes, regex semantic changes, or frontend regex evaluation.

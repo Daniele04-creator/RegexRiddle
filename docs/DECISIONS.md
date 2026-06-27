@@ -199,6 +199,22 @@
 - Show only the public creation response after success, reset secret inputs, and prime the created challenge detail query.
 - Keep profile/statistics, challenge edit/delete, backend API changes, database changes, and frontend regex evaluation out of scope.
 
+## GOAL 08.5 decisions
+
+- Add `/how-it-works` as a public demo/oral walkthrough page instead of burying rules only in README copy.
+- Explain full-match semantics, RE2-compatible limitations, supported `i`/`m` flags, public examples, server-only secret controls, aggregate feedback, leaderboard ranking, and the demo flow in UI copy.
+- Add `/account` as a current-user settings page, not as a public profile or statistics page.
+- Add `PATCH /api/auth/me` because `GET /api/auth/me` already represents the current authenticated user and the route avoids user-id parameters.
+- Use the existing `User.displayName`, `User.bio`, and `User.avatarUrl` fields; do not add a Prisma migration or schema change.
+- Require `rr_session`, `Content-Type: application/json`, and `X-RegexRiddle-CSRF: 1` for account updates.
+- Derive the updated user only from the server-side session; do not accept user ids from the route or body.
+- Reject unknown keys and mass-assignment fields before Prisma writes.
+- Allow only `displayName`, `bio`, and `avatarUrl`; do not allow email, username, password, ids, dates, relations, or `_count` changes.
+- Store avatar URLs as strings only; do not fetch external URLs and do not add avatar upload storage.
+- Return the current-user DTO with `bio` and `avatarUrl`; keep public challenge author and leaderboard DTOs limited to `username` and `displayName`.
+- Update the current-user TanStack Query cache after account updates and keep auth/account state in memory only.
+- Keep password change, email change, profile statistics, challenge edit/delete, auth/session changes, regex changes, upload storage, and frontend regex evaluation out of scope.
+
 ## Rejected for GOAL 00
 
 - Prisma schema.

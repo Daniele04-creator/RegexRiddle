@@ -20,6 +20,8 @@ const userResponse = {
     username: "demo_player",
     email: "demo_player@example.test",
     displayName: "Demo Player",
+    bio: "Demo solver account with solved and unsolved attempts.",
+    avatarUrl: null,
     createdAt: "2026-06-27T08:00:00.000Z"
   }
 };

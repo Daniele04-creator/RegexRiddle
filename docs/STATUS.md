@@ -2,7 +2,7 @@
 
 ## Current milestone
 
-GOAL 08.4: frontend challenge creation UI.
+GOAL 08.5: how-it-works page, account settings, and final UI polish.
 
 ## Implemented
 
@@ -24,6 +24,7 @@ GOAL 08.4: frontend challenge creation UI.
 - Backend auth `POST /api/auth/login`.
 - Backend auth `POST /api/auth/logout`.
 - Backend auth `GET /api/auth/me`.
+- Backend auth `PATCH /api/auth/me` for scoped current-user account settings.
 - Argon2id password hashing and opaque server-side sessions.
 - Safe internal regex engine based on `re2-wasm`.
 - Full-match semantics through RE2 `\A...\z` absolute text anchors.
@@ -52,6 +53,8 @@ GOAL 08.4: frontend challenge creation UI.
 - Tailwind CSS v4 configured through `@tailwindcss/vite`.
 - shadcn/ui initialized in `frontend/` with a small component set.
 - React Router SPA shell with public routes for home, challenges, challenge detail, leaderboard, login, register, create, and not found.
+- React Router route for public `/how-it-works`.
+- React Router route for protected `/account`.
 - Semantic app shell with header, nav, main, footer, skip link, and responsive mobile sheet navigation.
 - TanStack Query provider configured for server state.
 - Typed same-origin API client with `credentials: "include"`.
@@ -65,6 +68,8 @@ GOAL 08.4: frontend challenge creation UI.
 - Frontend logout action.
 - Current-session restoration through `GET /api/auth/me`.
 - Auth-aware `/create` gate for guests and protected challenge creation form for authenticated users.
+- Auth-aware `/account` gate for guests and protected account settings form for authenticated users.
+- Current-user account updates limited to `displayName`, `bio`, and `avatarUrl`.
 - Frontend tests for routing, API client credentials, CSRF helper, source security baseline, and reduced-motion CSS.
 - Public `/challenges` frontend page connected to `GET /api/challenges?page=1&limit=9`.
 - Public `/challenges/:id` frontend page connected to `GET /api/challenges/:id`.
@@ -81,11 +86,16 @@ GOAL 08.4: frontend challenge creation UI.
 - Challenge detail attempt panel for guests, authenticated non-authors, and authors.
 - Attempt mutation using `POST /api/challenges/:id/attempts` through the same-origin API client with `credentials: "include"` and `X-RegexRiddle-CSRF: 1`.
 - Attempt feedback for correct, incorrect, invalid regex, already solved, and forbidden author states without rendering secret controls or proposed patterns.
+- Public how-it-works walkthrough explaining creators, solvers, full-match semantics, RE2-compatible regexes, flags, public examples, secret controls, aggregate feedback, leaderboard ranking, and demo flow.
+- Header and mobile navigation with Home, Come funziona, Sfide, Classifica, Crea, plus Account/Logout for authenticated users.
 
 ## Not implemented
 
 - Challenge update or deletion.
 - Profile/statistics UI.
+- Password change.
+- Email change.
+- Avatar file upload or upload storage.
 
 ## Verification status
 
@@ -210,3 +220,24 @@ Verified on 2026-06-27 after GOAL 08.4 implementation:
 - Web Interface Guidelines audit: PASS for the authoring UI after checking labels, focus states, ellipses, control add/remove states, mobile tap behavior, and responsive overflow.
 - Source security audit: PASS through frontend source-security tests; no production frontend `dangerouslySetInnerHTML`, `document.cookie`, browser auth-token storage APIs, JavaScript `RegExp` construction, or raw `fetch` outside the API client boundary.
 - Sensitive-field audit: PASS through frontend, backend, and E2E anti-leak tests; created challenge public detail/catalog responses do not render secret regexes, hidden controls, raw tokens, cookie values, password hashes, or session hashes.
+
+Verified on 2026-06-27 after GOAL 08.5 implementation:
+
+- `docker compose up -d db`: PASS.
+- `pnpm db:seed`: PASS, 3 users, 10 challenges, 60 controls, 4 attempts, 2 solutions.
+- `pnpm db:verify`: PASS, 3 users, 10 challenges, 60 controls, 4 attempts, 2 solutions; no secret values printed.
+- `pnpm lint`: PASS with two pre-existing non-blocking Fast Refresh warnings in generated shadcn `button` and `badge` files.
+- `pnpm typecheck`: PASS.
+- `pnpm test`: PASS, shared 1 test, backend 88 tests, frontend 59 tests.
+- `pnpm build`: PASS, with the existing non-blocking Vite chunk-size warning.
+- `docker compose up --build -d`: PASS, images `regexriddle-api:dev` and `regexriddle-web:dev` rebuilt; db, API, and web containers started.
+- `pnpm db:verify` after Compose rebuild: PASS, 3 users, 10 challenges, 60 controls, 4 attempts, 2 solutions; no secret values printed.
+- `pnpm e2e`: PASS, 56 Playwright tests.
+- `pnpm check`: PASS, includes lint, typecheck, test, build, and 56 E2E tests.
+- `pnpm audit --audit-level=high`: PASS at the high threshold; one moderate advisory remains in transitive tooling dependencies (`@hono/node-server <1.19.13`, GHSA-92pp-h63x-v22m, through Prisma/shadcn tooling).
+- `git diff --check`: PASS.
+- `docker compose ps`: PASS, db healthy and API/web running on the expected ports.
+- Responsive viewport verification: PASS for public how-it-works, guest account, authenticated account, desktop navigation, and mobile `390x844` account flow; no horizontal overflow detected.
+- Web Interface Guidelines audit: PASS for page hierarchy, labels, focusable controls, mobile tap targets, no nested cards, and text wrapping in the new how-it-works and account views.
+- Source security audit: PASS, no production frontend `dangerouslySetInnerHTML`, `document.cookie`, browser auth-token storage APIs, JavaScript `RegExp` construction, `console.*`, or obsolete `apps/*` path references.
+- Sensitive-field and mass-assignment audit: PASS, account updates accept only `displayName`, `bio`, and `avatarUrl`; forbidden sensitive names appear only in docs, tests, shared challenge-creation request contracts, or backend internals.

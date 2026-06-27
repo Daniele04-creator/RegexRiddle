@@ -121,15 +121,19 @@ DONE_TECH:
 
 ## GOAL 08.5
 
-NEXT:
+DONE_TECH:
 
 - Add a how-it-works page for demo/exam walkthroughs.
-- Polish profile/account-facing UI without adding protected profile statistics unless explicitly scoped.
+- Add scoped current-user account settings without adding protected profile statistics.
+- Add `PATCH /api/auth/me` for `displayName`, `bio`, and `avatarUrl` only.
+- Preserve public DTO boundaries, server-side sessions, CSRF guard, and regex semantics.
 - Run a final responsive and accessibility pass across the frontend.
 
 ## GOAL 09
 
-- Expand gameplay-oriented E2E coverage.
+NEXT:
+
+- Expand gameplay-oriented E2E coverage and prepare a demo runbook.
 
 ## GOAL 10
 

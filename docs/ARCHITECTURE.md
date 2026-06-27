@@ -51,6 +51,8 @@ Challenge routes must return public DTOs only. They must not return raw Prisma c
 
 Auth routes must return public user DTOs only. They use opaque session cookies and store only hashed session tokens in PostgreSQL.
 
+Current-user account updates are handled by `PATCH /api/auth/me`. The route derives the user only from `rr_session`, applies the protected JSON mutation guard, validates a strict allowlist of `displayName`, `bio`, and `avatarUrl`, and calls an account service with an explicit Prisma `select`. It does not accept user ids, email, username, password, relation fields, or profile statistics.
+
 Regex helpers must return aggregate result DTOs only. They must not return secret patterns, candidate patterns, or per-control values.
 
 Attempt submission uses a route/service/DTO split. The route handles auth, CSRF v1, route/body validation, and status mapping. The service loads secret controls with explicit Prisma `select`, evaluates the candidate through `re2-wasm`, stores `Attempt`, creates `Solution` only on success, and returns an aggregate DTO that excludes `Attempt.proposedPattern`.
@@ -69,10 +71,11 @@ Leaderboard routes are public read-only. `GET /api/leaderboard` validates only `
 - `frontend/src/features/challenges`: public challenge catalog/detail API functions, query hooks, cards, examples, stats, difficulty badges, and pagination controls.
 - `frontend/src/features/leaderboard`: public leaderboard API function, query hook, desktop table, and mobile stacked list.
 - `frontend/src/features/auth`: auth API functions, current-user query, login/register/logout mutations, Zod schemas, forms, and session menu.
+- `frontend/src/features/account`: current-user settings API function, mutation hook, Zod schema, account gate, summary card, avatar preview, and settings form.
 - `frontend/src/features/challenge-authoring`: protected challenge creation API function, mutation hook, Zod schema, authoring form, guest gate, secret-control editor, and public success card.
 - `frontend/src/features/attempts`: protected attempt API function, mutation hook, Zod schema, candidate form, flag selector, aggregate feedback card, and guest/author gate cards.
 - `frontend/src/lib`: API client, CSRF helper, route metadata, and class merge utility.
-- `frontend/src/routes`: public SPA routes, public read-only data pages, real auth pages, challenge detail gameplay, and protected challenge authoring.
+- `frontend/src/routes`: public SPA routes, how-it-works walkthrough, public read-only data pages, real auth pages, challenge detail gameplay, protected challenge authoring, and protected account settings.
 - `frontend/src/styles/globals.css`: Tailwind v4 import, shadcn theme variables, Regex Lab tokens, focus, reduced-motion, and touch defaults.
 
 The frontend API client accepts same-origin paths only, sends `credentials: "include"`, supports JSON responses, and has a small CSRF header helper for future protected mutations. It does not read cookies and does not use browser storage for auth.
@@ -85,7 +88,9 @@ GOAL 08.3 connects attempt gameplay on `/challenges/:id`. Guests see login/regis
 
 GOAL 08.4 connects challenge authoring on `/create`. Guests see login/register CTAs, and authenticated users submit title, description, difficulty, supported `i`/`m` flags, public examples, a secret regex, and secret controls to `POST /api/challenges` through the same-origin API client. The mutation uses `protectedMutation: true`, so `credentials: "include"` and `X-RegexRiddle-CSRF: 1` are applied at the client boundary. On success, challenge list queries are invalidated, the created detail query is primed with the public response, and the form resets secret inputs.
 
-The frontend still does not render user ids, hidden challenge controls to solver clients, `Attempt.proposedPattern`, password hashes, session hashes, raw tokens, or cookie values. Header and mobile navigation display public `displayName` and `username` only, not email. Candidate regex text and authoring secret inputs stay in normal form state only and are not placed in URLs or browser storage. Regex validation remains server-side; the browser does not evaluate user regexes with JavaScript `RegExp`.
+GOAL 08.5 adds `/how-it-works` and `/account`. `/how-it-works` is a public static walkthrough route for the demo/oral flow and does not call product mutation APIs. `/account` reuses `GET /api/auth/me` for guest/authenticated state and submits only `displayName`, `bio`, and `avatarUrl` to `PATCH /api/auth/me` through the same-origin API client with `protectedMutation: true`. On success, the current-user query is updated in memory. No browser storage, cookie reads, upload storage, profile statistics, password/email change, or challenge management views are introduced.
+
+The frontend still does not render user ids outside current-user account context, hidden challenge controls to solver clients, `Attempt.proposedPattern`, password hashes, session hashes, raw tokens, or cookie values. Header and mobile navigation display `displayName` and `username` only, not email. The account page may show the authenticated user's own email as read-only data, but public challenge author and leaderboard DTOs do not expose email or avatar URL. Candidate regex text and authoring secret inputs stay in normal form state only and are not placed in URLs or browser storage. Regex validation remains server-side; the browser does not evaluate user regexes with JavaScript `RegExp`.
 
 ## Future architecture notes
 

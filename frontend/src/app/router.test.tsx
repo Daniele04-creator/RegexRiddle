@@ -32,9 +32,17 @@ describe("app routing foundation", () => {
       "href",
       "/challenges"
     );
+    expect(screen.getAllByRole("link", { name: "Come funziona" })[0]).toHaveAttribute(
+      "href",
+      "/how-it-works"
+    );
     expect(screen.getAllByRole("link", { name: "Classifica" })[0]).toHaveAttribute(
       "href",
       "/leaderboard"
+    );
+    expect(screen.getAllByRole("link", { name: "Crea" })[0]).toHaveAttribute(
+      "href",
+      "/create"
     );
     expect(await screen.findByRole("link", { name: "Registrati" })).toHaveAttribute(
       "href",
@@ -50,9 +58,9 @@ describe("app routing foundation", () => {
     renderRoute("/missing-page");
 
     expect(
-      screen.getByRole("heading", { level: 1, name: "Page not found" })
+      screen.getByRole("heading", { level: 1, name: "Pagina non trovata" })
     ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Return home" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Torna alla home" })).toHaveAttribute(
       "href",
       "/"
     );

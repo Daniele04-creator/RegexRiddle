@@ -18,8 +18,12 @@ interface AuthUserResponseBody {
     username: string;
     email: string;
     displayName: string;
+    bio: string | null;
+    avatarUrl: string | null;
   };
 }
+
+type AccountUpdateResponseBody = AuthUserResponseBody;
 
 interface AttemptSubmissionResponseBody {
   attempt: {
@@ -68,6 +72,8 @@ interface LeaderboardResponseBody {
 }
 
 const demoPlayerId = "22222222-2222-4222-8222-222222222222";
+const demoPlayerDisplayName = "Demo Player";
+const demoPlayerBio = "Demo solver account with solved and unsolved attempts.";
 const attemptChallengeId = "aaaaaaaa-0006-4000-8000-000000000006";
 const correctAttemptChallengeId = "aaaaaaaa-0007-4000-8000-000000000007";
 const csrfHeaderName = "X-RegexRiddle-CSRF";
@@ -207,8 +213,20 @@ async function loginDemoPlayerThroughUi(page: Page): Promise<void> {
   await page.getByRole("button", { name: "Accedi" }).click();
 
   await expect(page).toHaveURL(/\/challenges$/);
-  await expect(page.getByText("Demo Player").first()).toBeVisible();
-  await expect(page.getByText("@demo_player").first()).toBeVisible();
+  if ((page.viewportSize()?.width ?? 1024) < 1024) {
+    await page.getByRole("button", { name: "Open navigation menu" }).click();
+    const mobileNavigation = page.getByRole("navigation", {
+      name: "Mobile navigation"
+    });
+    await expect(mobileNavigation.getByText("Demo Player")).toBeVisible();
+    await expect(mobileNavigation.getByText("@demo_player")).toBeVisible();
+    await page.keyboard.press("Escape");
+    return;
+  }
+
+  const banner = page.getByRole("banner");
+  await expect(banner.getByText("Demo Player")).toBeVisible();
+  await expect(banner.getByText("@demo_player")).toBeVisible();
 }
 
 async function loginDanieleThroughUi(page: Page): Promise<void> {
@@ -255,6 +273,17 @@ async function cleanupE2EAttemptData(): Promise<void> {
   });
   await prisma.session.deleteMany({
     where: { userId: demoPlayerId }
+  });
+}
+
+async function resetDemoPlayerProfile(): Promise<void> {
+  await prisma.user.update({
+    where: { id: demoPlayerId },
+    data: {
+      avatarUrl: null,
+      bio: demoPlayerBio,
+      displayName: demoPlayerDisplayName
+    }
   });
 }
 
@@ -477,6 +506,7 @@ test.beforeEach(async () => {
   await cleanupE2ELeaderboardData();
   await cleanupE2EChallengeCreateData();
   await cleanupE2EAttemptData();
+  await resetDemoPlayerProfile();
 });
 
 test.afterAll(async () => {
@@ -484,16 +514,47 @@ test.afterAll(async () => {
   await cleanupE2ELeaderboardData();
   await cleanupE2EChallengeCreateData();
   await cleanupE2EAttemptData();
+  await resetDemoPlayerProfile();
   await prisma.$disconnect();
 });
 
 test("web app renders the Regex Lab landing foundation", async ({ page }) => {
   await page.goto("/");
+  const main = page.locator("#main-content");
 
   await expect(page.getByRole("heading", { name: "RegexRiddle" })).toBeVisible();
   await expect(page.getByRole("link", { name: /Esplora sfide/ })).toBeVisible();
+  await expect(main.getByRole("link", { name: /Come funziona/ })).toBeVisible();
   await expect(page.getByRole("link", { name: /Guarda classifica/ })).toBeVisible();
-  await expect(page.getByText("GOAL 08.4 adds")).toBeVisible();
+  await expect(page.getByText("GOAL 08.5 adds")).toBeVisible();
+});
+
+test("how-it-works loads publicly and exposes demo CTAs", async ({ page }) => {
+  await page.goto("/how-it-works");
+
+  await expect(
+    page.getByRole("heading", { name: "RegexRiddle spiegato per la demo" })
+  ).toBeVisible();
+  await expect(page.getByText(/full-string/)).toBeVisible();
+  await expect(page.getByText(/RE2-compatible/).first()).toBeVisible();
+  await expect(page.getByText(/server-only/)).toBeVisible();
+  await expect(page.getByText(/feedback aggregato/i).first()).toBeVisible();
+  await expect(page.getByText(/più sfide risolte/i)).toBeVisible();
+  await expectNoForbiddenRenderedFrontendStrings(await page.content());
+
+  await page.getByRole("link", { name: /Esplora sfide/ }).click();
+  await expect(page).toHaveURL(/\/challenges$/);
+  await expect(page.getByRole("heading", { name: "Catalogo sfide" })).toBeVisible();
+
+  await page.goto("/how-it-works");
+  await page.getByRole("link", { name: /Guarda classifica/ }).click();
+  await expect(page).toHaveURL(/\/leaderboard$/);
+  await expect(page.getByRole("heading", { name: "Classifica solver" })).toBeVisible();
+
+  await page.goto("/how-it-works");
+  await page.getByRole("link", { name: "Crea una sfida" }).click();
+  await expect(page).toHaveURL(/\/create$/);
+  await expect(page.getByText("Accedi per creare una sfida")).toBeVisible();
 });
 
 test("landing CTA navigates to the public challenge catalog", async ({ page }) => {
@@ -509,24 +570,34 @@ test("landing CTA navigates to the public challenge catalog", async ({ page }) =
 test("desktop SPA navigation reaches public read routes", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
+  const banner = page.getByRole("banner");
+  const primaryNavigation = page.getByRole("navigation", {
+    name: "Primary navigation"
+  });
 
-  await page.getByRole("link", { exact: true, name: "Sfide" }).click();
+  await primaryNavigation.getByRole("link", { exact: true, name: "Come funziona" }).click();
+  await expect(page).toHaveURL(/\/how-it-works$/);
+  await expect(
+    page.getByRole("heading", { name: "RegexRiddle spiegato per la demo" })
+  ).toBeVisible();
+
+  await primaryNavigation.getByRole("link", { exact: true, name: "Sfide" }).click();
   await expect(page).toHaveURL(/\/challenges$/);
   await expect(page.getByRole("heading", { name: "Catalogo sfide" })).toBeVisible();
 
-  await page.getByRole("link", { exact: true, name: "Classifica" }).click();
+  await primaryNavigation.getByRole("link", { exact: true, name: "Classifica" }).click();
   await expect(page).toHaveURL(/\/leaderboard$/);
   await expect(page.getByRole("heading", { name: "Classifica solver" })).toBeVisible();
 
-  await page.getByRole("link", { exact: true, name: "Accedi" }).click();
+  await banner.getByRole("link", { exact: true, name: "Accedi" }).click();
   await expect(page).toHaveURL(/\/login$/);
   await expect(page.getByRole("heading", { name: "Login" })).toBeVisible();
 
-  await page.getByRole("link", { exact: true, name: "Registrati" }).click();
+  await banner.getByRole("link", { exact: true, name: "Registrati" }).click();
   await expect(page).toHaveURL(/\/register$/);
   await expect(page.getByRole("heading", { name: "Register" })).toBeVisible();
 
-  await page.goto("/create");
+  await primaryNavigation.getByRole("link", { exact: true, name: "Crea" }).click();
   await expect(page).toHaveURL(/\/create$/);
   await expect(page.getByRole("heading", { name: "Crea una sfida" })).toBeVisible();
   await expect(page.getByText("Accedi per creare una sfida")).toBeVisible();
@@ -539,6 +610,18 @@ test("mobile navigation opens and routes to public pages", async ({ page }) => {
   await page.getByRole("button", { name: "Open navigation menu" }).click();
   await expect(page.getByRole("navigation", { name: "Mobile navigation" })).toBeVisible();
 
+  await expect(
+    page.getByRole("link", { exact: true, name: "Come funziona" })
+  ).toBeVisible();
+  await expect(page.getByRole("link", { exact: true, name: "Crea" })).toBeVisible();
+
+  await page.getByRole("link", { exact: true, name: "Come funziona" }).click();
+  await expect(page).toHaveURL(/\/how-it-works$/);
+  await expect(
+    page.getByRole("heading", { name: "RegexRiddle spiegato per la demo" })
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: "Open navigation menu" }).click();
   await page.getByRole("link", { exact: true, name: "Classifica" }).click();
   await expect(page).toHaveURL(/\/leaderboard$/);
   await expect(page.getByRole("heading", { name: "Classifica solver" })).toBeVisible();
@@ -565,6 +648,7 @@ test("mobile navigation exposes guest and authenticated auth actions", async ({
   await expect(
     page.getByRole("navigation", { name: "Mobile navigation" })
   ).toContainText("Demo Player");
+  await expect(page.getByRole("link", { exact: true, name: "Account" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Logout" })).toBeVisible();
 });
 
@@ -595,6 +679,89 @@ test("login restores current session in UI and logout clears it", async ({
 
   await expect(page.getByRole("link", { exact: true, name: "Accedi" })).toBeVisible();
   await expect(page.getByText("Demo Player")).toHaveCount(0);
+  await expectNoAuthStorage(page);
+});
+
+test("logged-out account page shows login and register gate", async ({ page }) => {
+  await page.goto("/account");
+  const main = page.locator("#main-content");
+
+  await expect(
+    page.getByRole("heading", { name: "Impostazioni account" })
+  ).toBeVisible();
+  await expect(page.getByText("Accedi per gestire l'account")).toBeVisible();
+  await expect(main.getByRole("link", { exact: true, name: "Accedi" })).toHaveAttribute(
+    "href",
+    "/login"
+  );
+  await expect(
+    main.getByRole("link", { exact: true, name: "Registrati" })
+  ).toHaveAttribute("href", "/register");
+  await expectNoAuthStorage(page);
+});
+
+test("authenticated account page updates profile and remains leak-free", async ({
+  page
+}) => {
+  await loginDemoPlayerThroughUi(page);
+  await page.goto("/account");
+
+  await expect(page.getByLabel("Nome visibile")).toHaveValue("Demo Player");
+  await expect(page.getByLabel("Bio")).toHaveValue(demoPlayerBio);
+  await expect(page.getByLabel("Avatar URL")).toHaveValue("");
+
+  await page.getByLabel("Nome visibile").fill("E2E Account Player");
+  await page
+    .getByLabel("Bio")
+    .fill("Profilo demo aggiornato per il goal 08.5.");
+  await page
+    .getByLabel("Avatar URL")
+    .fill("https://example.com/e2e-avatar.png");
+  await page.getByRole("button", { name: "Salva impostazioni" }).click();
+
+  await expect(page.getByText("Impostazioni account aggiornate.")).toBeVisible();
+  await expect(page.getByText("E2E Account Player").first()).toBeVisible();
+  await expect(page.getByText("Profilo demo aggiornato per il goal 08.5.")).toBeVisible();
+  await expect(page.getByText("demo_player@example.test")).toBeVisible();
+  await expectNoForbiddenRenderedFrontendStrings(await page.content());
+  await expectNoAuthStorage(page);
+  await expectNoSecretStorage(page, [
+    ...forbiddenAttemptChallengeControlValues,
+    ...forbiddenCorrectChallengeControlValues
+  ]);
+
+  await page.getByRole("button", { name: "Logout" }).click();
+  await page.goto("/account");
+
+  await expect(page.getByText("Accedi per gestire l'account")).toBeVisible();
+  await expectNoAuthStorage(page);
+});
+
+test("mobile how-it-works and account stay within the viewport", async ({
+  page
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/how-it-works");
+
+  await expect(
+    page.getByRole("heading", { name: "RegexRiddle spiegato per la demo" })
+  ).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth
+    )
+  ).toBe(false);
+
+  await loginDemoPlayerThroughUi(page);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/account");
+
+  await expect(page.getByLabel("Nome visibile")).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth > document.documentElement.clientWidth
+    )
+  ).toBe(false);
   await expectNoAuthStorage(page);
 });
 
@@ -1033,12 +1200,14 @@ test("rendered frontend shell does not leak sensitive field names or auth tokens
 }) => {
   for (const path of [
     "/",
+    "/how-it-works",
     "/challenges",
     "/challenges/aaaaaaaa-0010-4000-8000-000000000010",
     "/leaderboard",
     "/login",
     "/register",
-    "/create"
+    "/create",
+    "/account"
   ]) {
     await page.goto(path);
     await expectNoForbiddenRenderedFrontendStrings(await page.content());
@@ -1465,7 +1634,126 @@ test("auth API logs in a demo user and returns me", async ({ request }) => {
   const meBody = (await meResponse.json()) as AuthUserResponseBody;
 
   expect(meBody.user.username).toBe("demo_player");
+  expect(meBody.user.bio).toBe(demoPlayerBio);
+  expect(meBody.user.avatarUrl).toBeNull();
   expectNoSensitiveKeys(meBody, sessionToken);
+});
+
+test("account API rejects unauthenticated and missing CSRF updates", async ({
+  request
+}) => {
+  const unauthenticatedResponse = await request.patch(
+    `${apiBaseUrl()}/api/auth/me`,
+    {
+      headers: {
+        [csrfHeaderName]: csrfHeaderValue
+      },
+      data: {
+        displayName: "No Session"
+      }
+    }
+  );
+  const unauthenticatedBody = await unauthenticatedResponse.json();
+  const { cookie, sessionToken } = await loginDemoPlayer(request);
+  const missingCsrfResponse = await request.patch(`${apiBaseUrl()}/api/auth/me`, {
+    headers: {
+      cookie
+    },
+    data: {
+      displayName: "No CSRF"
+    }
+  });
+  const missingCsrfBody = await missingCsrfResponse.json();
+
+  expect(unauthenticatedResponse.status()).toBe(401);
+  expect(unauthenticatedBody).toEqual({
+    error: "Unauthorized",
+    message: "Authentication required."
+  });
+  expect(missingCsrfResponse.status()).toBe(403);
+  expect(missingCsrfBody).toEqual({
+    error: "Forbidden",
+    message: "CSRF header is required."
+  });
+  expectNoSensitiveKeys(unauthenticatedBody);
+  expectNoSensitiveKeys(missingCsrfBody, sessionToken);
+});
+
+test("account API updates only allowed current-user fields", async ({
+  request
+}) => {
+  const { cookie, sessionToken } = await loginDemoPlayer(request);
+  const response = await request.patch(`${apiBaseUrl()}/api/auth/me`, {
+    headers: {
+      cookie,
+      [csrfHeaderName]: csrfHeaderValue
+    },
+    data: {
+      displayName: "E2E API Player",
+      bio: "Account API profile update.",
+      avatarUrl: "https://example.com/api-avatar.png"
+    }
+  });
+  const body = (await response.json()) as AccountUpdateResponseBody;
+  const storedUser = await prisma.user.findUnique({
+    where: { id: demoPlayerId },
+    select: {
+      avatarUrl: true,
+      bio: true,
+      displayName: true,
+      email: true,
+      username: true
+    }
+  });
+
+  expect(response.status()).toBe(200);
+  expect(body.user).toMatchObject({
+    username: "demo_player",
+    email: "demo_player@example.test",
+    displayName: "E2E API Player",
+    bio: "Account API profile update.",
+    avatarUrl: "https://example.com/api-avatar.png"
+  });
+  expect(storedUser).toEqual({
+    username: "demo_player",
+    email: "demo_player@example.test",
+    displayName: "E2E API Player",
+    bio: "Account API profile update.",
+    avatarUrl: "https://example.com/api-avatar.png"
+  });
+  expectNoSensitiveKeys(body, sessionToken);
+});
+
+test("account API rejects invalid avatar and mass-assignment keys", async ({
+  request
+}) => {
+  const { cookie } = await loginDemoPlayer(request);
+  const invalidAvatarResponse = await request.patch(`${apiBaseUrl()}/api/auth/me`, {
+    headers: {
+      cookie,
+      [csrfHeaderName]: csrfHeaderValue
+    },
+    data: {
+      avatarUrl: "ftp://example.com/avatar.png"
+    }
+  });
+  const invalidAvatarBody = await invalidAvatarResponse.json();
+  const massAssignmentResponse = await request.patch(`${apiBaseUrl()}/api/auth/me`, {
+    headers: {
+      cookie,
+      [csrfHeaderName]: csrfHeaderValue
+    },
+    data: {
+      displayName: "Mass Assignment",
+      email: "attacker@example.test"
+    }
+  });
+  const massAssignmentBody = await massAssignmentResponse.json();
+
+  expect(invalidAvatarResponse.status()).toBe(400);
+  expect(massAssignmentResponse.status()).toBe(400);
+  expectNoSensitiveKeys(invalidAvatarBody, "ftp://example.com/avatar.png");
+  expectNoSensitiveKeys(massAssignmentBody, "attacker@example.test");
 });
 
 test("auth API logs out and invalidates the session", async ({ request }) => {

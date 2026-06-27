@@ -1,16 +1,20 @@
 # Design
 
-## GOAL 00 visual identity
+The visual source of truth for GOAL 08.0 is the root `DESIGN.md`.
 
-The initial identity is "Regex Lab": simple, technical, and readable. The current web page is only a smoke screen that proves React and Vite are wired correctly.
+## GOAL 08.0 summary
 
-## Future UI direction
+Regex Lab is now documented as a technical, playful, precise, exam-ready frontend foundation.
 
-Future milestones may introduce Tailwind CSS, shadcn/ui, Framer Motion, and selected React Bits or Magic UI patterns. These are intentionally not installed in GOAL 00 to avoid shipping a heavy template before product workflows exist.
+The implemented design system defines:
 
-## UX principles
+- product personality and lab-console metaphor;
+- semantic color tokens for background, foreground, surface, border, muted, primary, accent, success, warning, and danger;
+- typography scale and pattern-chip rules;
+- spacing, radius, and shadow rules;
+- app shell, buttons, cards, badges, forms, feedback panel, and pattern display rules;
+- subtle Motion for React rules with reduced-motion support;
+- accessibility baseline for landmarks, heading hierarchy, keyboard navigation, focus states, and contrast;
+- security-aware UI rules that prohibit secret rendering, browser token storage, client regex evaluation, and `dangerouslySetInnerHTML`.
 
-- Keep puzzle state understandable.
-- Never reveal secret regexes or secret checks to solvers.
-- Make validation errors clear without exposing internals.
-- Keep responsive layouts simple enough for exam demonstration.
+GOAL 08.0 does not introduce React Bits or Magic UI. Those remain possible later polish choices only after the base is maintainable and explainable.

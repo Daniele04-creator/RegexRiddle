@@ -76,6 +76,13 @@ const e2eChallengeTitlePrefix = "E2E Challenge Create";
 const e2eLeaderboardUserPrefix = "e2e_lb_";
 const e2eLeaderboardChallengeTitlePrefix = "E2E Leaderboard Challenge";
 const e2eLeaderboardPasswordHash = "e2e-leaderboard-password-hash";
+const forbiddenRenderedFrontendStrings = [
+  "secretPattern",
+  "ChallengeControl.value",
+  "proposedPattern",
+  "passwordHash",
+  "sessionTokenHash"
+];
 
 function apiBaseUrl(): string {
   const apiPort = Number(process.env.API_PORT ?? 4000);
@@ -131,6 +138,12 @@ function expectNoLeaderboardSensitiveKeys(value: unknown): void {
 
   for (const forbiddenKey of forbiddenLeaderboardKeys) {
     expect(keys.has(forbiddenKey)).toBe(false);
+  }
+}
+
+async function expectNoForbiddenRenderedFrontendStrings(pageContent: string): Promise<void> {
+  for (const forbiddenString of forbiddenRenderedFrontendStrings) {
+    expect(pageContent).not.toContain(forbiddenString);
   }
 }
 
@@ -340,11 +353,81 @@ test.afterAll(async () => {
   await prisma.$disconnect();
 });
 
-test("web app renders the RegexRiddle scaffold", async ({ page }) => {
+test("web app renders the Regex Lab landing foundation", async ({ page }) => {
   await page.goto("/");
 
   await expect(page.getByRole("heading", { name: "RegexRiddle" })).toBeVisible();
-  await expect(page.getByText("RegexRiddle scaffold is running")).toBeVisible();
+  await expect(page.getByRole("link", { name: /Esplora sfide/ })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Guarda classifica/ })).toBeVisible();
+  await expect(page.getByText("GOAL 08.0 frontend foundation")).toBeVisible();
+});
+
+test("desktop SPA navigation reaches placeholder routes", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+
+  await page.getByRole("link", { exact: true, name: "Sfide" }).click();
+  await expect(page).toHaveURL(/\/challenges$/);
+  await expect(page.getByRole("heading", { name: "Challenge catalog" })).toBeVisible();
+
+  await page.getByRole("link", { exact: true, name: "Classifica" }).click();
+  await expect(page).toHaveURL(/\/leaderboard$/);
+  await expect(page.getByRole("heading", { name: "Solver leaderboard" })).toBeVisible();
+
+  await page.getByRole("link", { exact: true, name: "Accedi" }).click();
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(page.getByRole("heading", { name: "Login" })).toBeVisible();
+
+  await page.getByRole("link", { exact: true, name: "Registrati" }).click();
+  await expect(page).toHaveURL(/\/register$/);
+  await expect(page.getByRole("heading", { name: "Register" })).toBeVisible();
+
+  await page.getByRole("link", { name: "Crea una sfida" }).first().click();
+  await expect(page).toHaveURL(/\/create$/);
+  await expect(page.getByRole("heading", { name: "Create a challenge" })).toBeVisible();
+});
+
+test("mobile navigation opens and routes to public pages", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/");
+
+  await page.getByRole("button", { name: "Open navigation menu" }).click();
+  await expect(page.getByRole("navigation", { name: "Mobile navigation" })).toBeVisible();
+
+  await page.getByRole("link", { exact: true, name: "Classifica" }).click();
+  await expect(page).toHaveURL(/\/leaderboard$/);
+  await expect(page.getByRole("heading", { name: "Solver leaderboard" })).toBeVisible();
+});
+
+test("frontend proxy exposes health through same-origin path", async ({ page }) => {
+  const response = await page.request.get("/health");
+  const body = await response.json();
+
+  expect(response.ok()).toBe(true);
+  expect(body).toMatchObject({
+    status: "ok",
+    service: "regexriddle-api",
+    appName: "RegexRiddle"
+  });
+});
+
+test("rendered frontend shell does not leak sensitive field names or auth tokens", async ({
+  page
+}) => {
+  await page.goto("/");
+
+  await expectNoForbiddenRenderedFrontendStrings(await page.content());
+
+  const storageKeys = await page.evaluate(() => ({
+    localStorageKeys: Object.keys(window.localStorage),
+    sessionStorageKeys: Object.keys(window.sessionStorage)
+  }));
+  const joinedKeys = [
+    ...storageKeys.localStorageKeys,
+    ...storageKeys.sessionStorageKeys
+  ].join(" ");
+
+  expect(joinedKeys).not.toMatch(/auth|token|session|rr_session/i);
 });
 
 test("attempt API rejects unauthenticated submissions", async ({ request }) => {

@@ -39,6 +39,7 @@ services:
       dockerfile: frontend/Dockerfile
     environment:
       NODE_ENV: production
+      API_ORIGIN: http://api:4000
     ports:
       - "5173:4173"
     depends_on:

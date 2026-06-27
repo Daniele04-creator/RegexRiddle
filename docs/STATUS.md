@@ -2,12 +2,12 @@
 
 ## Current milestone
 
-GOAL 07: public solver leaderboard.
+GOAL 08.0: Regex Lab design system and frontend foundation.
 
 ## Implemented
 
 - pnpm workspace root.
-- `frontend` React/Vite/TypeScript smoke app.
+- `frontend` React/Vite/TypeScript SPA foundation.
 - `backend` Fastify/TypeScript health API, Prisma, auth, and regex engine.
 - `e2e` Playwright smoke, public API, auth API, and attempt API tests.
 - `packages/shared` shared constants and public API DTO types.
@@ -48,18 +48,33 @@ GOAL 07: public solver leaderboard.
 - Already-solved attempt block.
 - Invalid or unsupported submitted regex rejection without attempt persistence.
 - Local Docker image tags `regexriddle-api:dev` and `regexriddle-web:dev`.
+- Regex Lab visual system documented in root `DESIGN.md`.
+- Tailwind CSS v4 configured through `@tailwindcss/vite`.
+- shadcn/ui initialized in `frontend/` with a small component set.
+- React Router SPA shell with public routes for home, challenges, challenge detail placeholder, leaderboard, login, register, create, and not found.
+- Semantic app shell with header, nav, main, footer, skip link, and responsive mobile sheet navigation.
+- TanStack Query provider configured for server state.
+- Typed same-origin API client with `credentials: "include"`.
+- CSRF helper for future protected mutations.
+- Optional frontend health badge backed by `/health`.
+- Vite dev proxy for `/api/*` and `/health`.
+- Docker frontend server proxy for `/api/*` and `/health` through `API_ORIGIN`.
+- Compose web service sets `API_ORIGIN=http://api:4000`.
+- Disabled, clearly marked placeholder pages for future auth, registration, challenge creation, challenge detail, catalog, and leaderboard UI.
+- Frontend tests for routing, API client credentials, CSRF helper, source security baseline, and reduced-motion CSS.
 
 ## Not implemented
 
-- Frontend authentication UI.
+- Real frontend authentication forms.
 - Frontend attempt UI.
-- Frontend challenge creation UI.
-- Frontend leaderboard UI.
+- Real frontend challenge creation UI.
+- Frontend leaderboard data UI.
+- Frontend challenge catalog data UI.
 - Challenge update or deletion.
 
 ## Verification status
 
-Verified on 2026-06-27:
+Verified on 2026-06-27 before GOAL 08.0 implementation:
 
 - `git switch main`: PASS, already on `main`.
 - `git pull --ff-only`: PASS, already up to date.
@@ -88,3 +103,17 @@ Smoke leaderboard response summary:
 - Deterministic test data confirmed ranking by solved count descending, average attempts ascending, then username ascending.
 
 The leaderboard response did not include user ids, emails, avatar URLs, `secretPattern`, `ChallengeControl.value`, `controls`, `proposedPattern`, `passwordHash`, `sessionTokenHash`, token values, or cookie values.
+
+Verified on 2026-06-27 after GOAL 08.0 implementation:
+
+- `docker compose up -d db`: PASS.
+- `pnpm db:seed`: PASS, 3 users, 10 challenges, 60 controls, 4 attempts, 2 solutions.
+- `pnpm db:verify`: PASS, 3 users, 10 challenges, 60 controls, 4 attempts, 2 solutions; no secret values printed.
+- `pnpm lint`: PASS with two non-blocking Fast Refresh warnings in generated shadcn `button` and `badge` files.
+- `pnpm typecheck`: PASS.
+- `pnpm test`: PASS, shared 1 test, frontend 11 tests, backend 79 tests.
+- `pnpm build`: PASS, with a non-blocking Vite chunk-size warning after adding React Router, Motion, TanStack Query, and shadcn/ui.
+- `docker compose up --build -d`: PASS, images `regexriddle-api:dev` and `regexriddle-web:dev` rebuilt; db, API, and web containers started.
+- `pnpm e2e`: PASS, 24 Playwright tests.
+- `pnpm check`: PASS, includes lint, typecheck, test, build, and 24 E2E tests.
+- Visual viewport verification: PASS for desktop `1440x900`, tablet `768x1024`, mobile `390x844`, and mobile nav; no horizontal overflow detected.

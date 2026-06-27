@@ -11,10 +11,10 @@
 ## Runtime shape
 
 ```text
-browser -> frontend -> backend -> PostgreSQL
+browser -> frontend SPA -> same-origin proxy -> backend -> PostgreSQL
 ```
 
-GOAL 07 keeps the GOAL 05.5 delivery directory layout and adds the public solver leaderboard. PostgreSQL is present in Docker Compose and Prisma manages the versioned schema under `backend/prisma`. The regex evaluation engine remains backend-only and is reachable only through authorized service logic.
+GOAL 08.0 keeps the GOAL 05.5 delivery directory layout and adds the Regex Lab frontend foundation. PostgreSQL is present in Docker Compose and Prisma manages the versioned schema under `backend/prisma`. The regex evaluation engine remains backend-only and is reachable only through authorized service logic.
 
 ## Build shape
 
@@ -24,6 +24,8 @@ GOAL 07 keeps the GOAL 05.5 delivery directory layout and adds the public solver
 - The web app builds static assets to `frontend/dist`.
 - E2E starts the API and web development servers through Playwright `webServer`.
 - The Docker web container serves `frontend/dist` with a small Node static server, avoiding runtime dependency on Vite or pnpm.
+- The Vite dev server proxies `/api/*` and `/health` to `http://127.0.0.1:4000`.
+- The Docker web server proxies `/api/*` and `/health` to `API_ORIGIN`, which Compose sets to `http://api:4000`.
 
 ## Data layer
 
@@ -56,6 +58,21 @@ Attempt submission uses a route/service/DTO split. The route handles auth, CSRF 
 Challenge creation uses the same route/service/DTO split. `POST /api/challenges` requires a valid `rr_session`, `Content-Type: application/json`, and `X-RegexRiddle-CSRF: 1`. The route rejects unknown body keys and mass-assignment attempts before calling the service. The service derives `authorId` only from the authenticated session user, validates the secret regex, public examples, and secret controls with the server-side RE2 full-match engine, then creates `Challenge` and `ChallengeControl` rows transactionally. The response uses the existing public challenge detail DTO and never includes `Challenge.secretPattern` or control values.
 
 Leaderboard routes are public read-only. `GET /api/leaderboard` validates only `page` and `limit`, aggregates `Solution` rows by `userId`, fetches only `User.username` and `User.displayName`, sorts by solved count descending, average attempts ascending, and username ascending, then returns a paginated public DTO. The leaderboard service does not read challenge secrets, control values, submitted patterns, password hashes, session hashes, or user emails.
+
+## Frontend layering
+
+- `frontend/src/app`: provider and router composition.
+- `frontend/src/components/layout`: app shell, header, mobile nav, footer, skip link, and page container.
+- `frontend/src/components/marketing`: landing-page foundation components.
+- `frontend/src/components/ui`: shadcn/ui source components.
+- `frontend/src/features/health`: optional health query using TanStack Query.
+- `frontend/src/lib`: API client, CSRF helper, route metadata, and class merge utility.
+- `frontend/src/routes`: public SPA routes and safe placeholders.
+- `frontend/src/styles/globals.css`: Tailwind v4 import, shadcn theme variables, Regex Lab tokens, focus, reduced-motion, and touch defaults.
+
+The frontend API client accepts same-origin paths only, sends `credentials: "include"`, supports JSON responses, and has a small CSRF header helper for future protected mutations. It does not read cookies and does not use browser storage for auth.
+
+GOAL 08.0 routes are foundation routes only. They do not fetch or render real challenge catalog rows, leaderboard rows, attempt data, auth forms, or challenge creation workflows.
 
 ## Future architecture notes
 

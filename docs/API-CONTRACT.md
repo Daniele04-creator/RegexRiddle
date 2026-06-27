@@ -15,6 +15,19 @@ Response `200 application/json`:
 }
 ```
 
+## Frontend same-origin boundary
+
+GOAL 08.0 adds a frontend API client foundation without changing backend endpoint behavior.
+
+Frontend rules:
+
+- Browser calls use same-origin relative paths such as `/health` and `/api/challenges`.
+- Vite dev server proxies `/api/*` and `/health` to `http://127.0.0.1:4000`.
+- Docker web server proxies `/api/*` and `/health` to `API_ORIGIN`.
+- All frontend API calls send `credentials: "include"` for future cookie-authenticated flows.
+- A CSRF header helper exists for future protected mutations: `X-RegexRiddle-CSRF: 1`.
+- GOAL 08.0 does not implement real mutation UI and does not change any backend auth, challenge, attempt, or leaderboard contract.
+
 ## GOAL 01 note
 
 GOAL 01 added the database layer only. It did not add public domain endpoints and did not expose `secretPattern` or `ChallengeControl.value`.

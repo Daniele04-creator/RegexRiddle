@@ -1,5 +1,26 @@
 # Difesa orale
 
+## Cosa contiene GOAL 08.0
+
+Nel GOAL 08.0 ho trasformato il frontend da semplice smoke app a vera base SPA. Ho configurato Tailwind, shadcn/ui, routing client-side, TanStack Query e un proxy same-origin verso il backend. Il design system si chiama Regex Lab ed e' documentato in DESIGN.md. Non ho ancora implementato login, tentativi o creazione sfide: ho preparato la struttura in modo sicuro, responsive e accessibile. L'autenticazione resta basata su cookie HttpOnly, quindi il frontend non salva token in localStorage o sessionStorage.
+
+GOAL 08.0 aggiunge:
+
+- design system Regex Lab documentato in `DESIGN.md`;
+- Tailwind CSS v4 tramite `@tailwindcss/vite`;
+- shadcn/ui inizializzato dentro `frontend/`;
+- routing SPA con React Router;
+- provider TanStack Query;
+- API client same-origin con `credentials: "include"`;
+- proxy Vite per `/api/*` e `/health`;
+- proxy Docker del server web verso `API_ORIGIN`;
+- app shell con header, nav, main, footer e skip link;
+- landing page fondativa e pagine placeholder;
+- baseline responsive e accessibile;
+- test frontend e E2E per routing, proxy, anti-leak e storage auth.
+
+Non aggiunge UI reale di login, registrazione, tentativi, creazione sfide, catalogo dati o leaderboard dati. Quelle parti restano per i GOAL 08.x successivi.
+
 ## Cosa contiene GOAL 07
 
 GOAL 07 aggiunge la leaderboard pubblica dei solutori sopra i dati di soluzione gia' presenti.

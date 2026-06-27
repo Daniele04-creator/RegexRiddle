@@ -13,9 +13,9 @@
 - Use opaque server-side sessions with `HttpOnly` and `SameSite` cookies when auth is implemented.
 - Use Argon2id when passwords are implemented.
 
-## GOAL 07 security posture
+## GOAL 08.0 security posture
 
-GOAL 07 adds a public solver leaderboard. The project still has no frontend auth UI, no frontend challenge authoring UI, no frontend leaderboard UI, no uploads, and no profile/statistics page.
+GOAL 08.0 adds the frontend foundation. The project still has no real frontend auth forms, no frontend challenge authoring workflow, no real frontend leaderboard data UI, no frontend attempt UI, no uploads, and no profile/statistics page.
 
 Regex engine decisions:
 
@@ -64,6 +64,20 @@ Leaderboard endpoint decisions:
 - It fetches only `User.username` and `User.displayName` for public identity.
 - It never returns user ids, emails, avatar URLs, secret regexes, control values, submitted patterns, password hashes, session hashes, token values, or cookie values.
 - It does not read challenge secret fields, challenge controls, attempt proposed patterns, password hashes, or session token hashes.
+
+Frontend foundation decisions:
+
+- The frontend uses same-origin relative API paths.
+- The frontend API client always sends `credentials: "include"` so cookie auth can work without browser-readable tokens.
+- Vite dev server proxies `/api/*` and `/health` to the backend.
+- Docker web server proxies `/api/*` and `/health` to `API_ORIGIN`.
+- The frontend does not store auth tokens in `localStorage` or `sessionStorage`.
+- The frontend does not read `document.cookie` for auth.
+- The frontend does not introduce JWT.
+- The frontend does not evaluate user regex with JavaScript `RegExp`.
+- The frontend does not use `dangerouslySetInnerHTML`.
+- Placeholder pages avoid rendering sensitive field names in the DOM.
+- Disabled placeholder forms are clearly marked as not active and do not submit data.
 
 Authentication decisions:
 

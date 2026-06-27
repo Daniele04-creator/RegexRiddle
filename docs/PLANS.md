@@ -73,13 +73,23 @@ DONE_TECH:
 - Keep leaderboard responses aggregate-only and public-identity-only.
 - Keep frontend leaderboard UI out of scope.
 
-## GOAL 08
+## GOAL 08.0
 
-- Improve responsive UI and accessibility.
+DONE_TECH:
+
+- Add Regex Lab design system and frontend foundation.
+- Configure Tailwind CSS v4, shadcn/ui, React Router, TanStack Query, Motion for React, and same-origin API proxy.
+- Add responsive app shell, accessible navigation, landing foundation, and safe placeholder routes.
+- Keep real auth UI, attempt UI, challenge creation UI, challenge catalog data UI, and leaderboard data UI out of scope.
+
+## GOAL 08.1
+
+- Connect public challenge catalog and leaderboard UI to existing read APIs.
+- Keep secret regexes and hidden controls server-only.
 
 ## GOAL 09
 
-- Expand E2E coverage toward the final 10-test requirement.
+- Expand gameplay-oriented E2E coverage beyond the frontend foundation.
 
 ## GOAL 10
 

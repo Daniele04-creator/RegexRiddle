@@ -127,6 +127,26 @@
 - Do not return user ids, emails, avatar URLs, secret regexes, control values, submitted patterns, password hashes, session hashes, token values, or cookie values.
 - Do not add a Prisma migration because the existing `Solution` table already supports leaderboard aggregates.
 
+## GOAL 08.0 decisions
+
+- Add the Regex Lab frontend foundation without changing backend API behavior, database schema, auth/session/cookie semantics, or regex semantics.
+- Use Tailwind CSS v4 through the official `@tailwindcss/vite` plugin.
+- Initialize shadcn/ui inside the existing `frontend/` Vite app, not a nested app path.
+- Use a small shadcn component set: button, card, badge, separator, input, label, textarea, sheet, and skeleton.
+- Use React Router for public SPA routing.
+- Use TanStack Query for server state and a conservative default query policy.
+- Install React Hook Form, Zod, and `@hookform/resolvers` for later form goals, but do not implement real forms in GOAL 08.0.
+- Use the current Motion for React package name `motion`; this is the current Framer Motion successor/name for React imports such as `motion/react`.
+- Keep animation subtle and respect reduced-motion preferences.
+- Use same-origin frontend API calls with relative paths only.
+- In development, Vite proxies `/api/*` and `/health` to `http://127.0.0.1:4000`.
+- In Docker, the frontend Node server proxies `/api/*` and `/health` to `API_ORIGIN`; Compose sets `API_ORIGIN=http://api:4000`.
+- Always send `credentials: "include"` from the frontend API client because auth is cookie-based.
+- Provide a CSRF header helper for future protected mutations without building mutation UI yet.
+- Do not store auth tokens in `localStorage` or `sessionStorage`, do not read `document.cookie`, and do not introduce JWT.
+- Do not evaluate regex in the frontend and do not use `dangerouslySetInnerHTML`.
+- Keep `/challenges`, `/leaderboard`, `/login`, `/register`, `/create`, and `/challenges/:id` as useful placeholders until later GOAL 08.x work.
+
 ## Rejected for GOAL 00
 
 - Prisma schema.

@@ -82,6 +82,21 @@ pnpm check
 - Current backend test count after GOAL 07: 79 tests.
 - Current E2E count after GOAL 07: 20 tests.
 
+## GOAL 08.0 frontend foundation checks
+
+- Frontend unit tests cover landing render, public navigation link targets, not-found route, API client same-origin credentials, protected-mutation CSRF helper, source security baseline, and reduced-motion CSS.
+- E2E UI tests cover the landing foundation, desktop SPA navigation, mobile sheet navigation, same-origin `/health` proxy, rendered sensitive-string anti-leak checks, and browser storage auth-token checks.
+- GOAL 08.0 must keep backend API, database schema, auth/session/cookie behavior, and regex semantics unchanged.
+- Required audits:
+  - no frontend `dangerouslySetInnerHTML`;
+  - no frontend JavaScript `RegExp` construction for user regex;
+  - no frontend `localStorage`, `sessionStorage`, or `document.cookie` auth usage;
+  - no rendered sensitive field names in the UI;
+  - no obsolete nested app-directory references.
+
+Current frontend test count after GOAL 08.0: 11 tests.
+Current E2E count after GOAL 08.0: 24 tests.
+
 ## Final delivery target
 
 The final project must include at least 10 meaningful E2E tests. Later milestones should add tests for:

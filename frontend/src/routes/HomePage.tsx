@@ -1,59 +1,50 @@
 import {
-  BrainCircuitIcon,
-  CheckCircle2Icon,
-  FlaskConicalIcon,
-  LockKeyholeIcon,
-  MessageSquareTextIcon,
-  MousePointerClickIcon,
+  ArrowRightIcon,
+  EyeIcon,
+  LightbulbIcon,
   PencilLineIcon,
-  SearchIcon,
   TrophyIcon
 } from "lucide-react";
 import { motion } from "motion/react";
 import { Link } from "react-router";
 
 import { PageContainer } from "@/components/layout/PageContainer";
-import { FeatureCard } from "@/components/marketing/FeatureCard";
 import { HeroSection } from "@/components/marketing/HeroSection";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from "@/components/ui/card";
 
-const quickFlow = [
-  {
-    title: "Scegli una sfida",
-    description: "Apri il catalogo e trova un enigma adatto al tuo ritmo.",
-    icon: MousePointerClickIcon
-  },
-  {
-    title: "Studia gli indizi",
-    description: "Confronta esempi accettati e rifiutati prima di scrivere.",
-    icon: SearchIcon
-  },
-  {
-    title: "Prova la regex",
-    description: "Invia un tentativo e misura quante prove hai superato.",
-    icon: PencilLineIcon
-  }
-];
+const recommendedChallenge = {
+  accepted: "regex-riddle-2026",
+  difficulty: "Difficile",
+  href: "/challenges/aaaaaaaa-0010-4000-8000-000000000010",
+  rejected: "-regex-riddle",
+  title: "Slug URL"
+};
 
-const funCards = [
+const playSteps = [
   {
-    title: "Pochi indizi, tanta logica",
-    description:
-      "Ogni enigma lascia abbastanza tracce per ragionare, ma non abbastanza per andare a caso.",
-    icon: BrainCircuitIcon
+    description: "Parti da cosa passa e cosa resta fuori.",
+    icon: EyeIcon,
+    title: "Osserva gli esempi"
   },
   {
-    title: "Feedback dopo ogni tentativo",
-    description:
-      "Dopo una prova scopri quante stringhe giuste hai coperto e quanti falsi positivi hai lasciato passare.",
-    icon: MessageSquareTextIcon
+    description: "Scrivi una soluzione che copra tutta la stringa.",
+    icon: PencilLineIcon,
+    title: "Scrivi la regex"
   },
   {
-    title: "Sfida gli altri solver",
-    description:
-      "Risolvi piu enigmi con meno tentativi e sali nella classifica pubblica.",
-    icon: TrophyIcon
+    description: "Leggi gli indizi, correggi il pattern e chiudi l'enigma.",
+    icon: LightbulbIcon,
+    title: "Usa gli indizi"
   }
 ];
 
@@ -61,82 +52,116 @@ export function HomePage() {
   return (
     <>
       <HeroSection />
-      <PageContainer className="py-12 sm:py-16">
-        <section aria-labelledby="flow-title">
-          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <Badge variant="outline">Pronto in 5 secondi</Badge>
-              <h2 id="flow-title" className="mt-3 text-3xl font-semibold">
-                Dal primo indizio alla soluzione
-              </h2>
-            </div>
+      <PageContainer className="py-10 sm:py-12">
+        <section
+          aria-labelledby="recommended-title"
+          className="grid gap-5 lg:grid-cols-[0.78fr_1.22fr] lg:items-stretch"
+        >
+          <div className="flex flex-col justify-center gap-3">
+            <p className="text-sm font-semibold uppercase tracking-normal text-primary">
+              Sfida consigliata
+            </p>
+            <h2 id="recommended-title" className="text-3xl font-semibold">
+              Apri un enigma e inizia dai casi visibili
+            </h2>
             <p className="max-w-xl text-sm leading-6 text-muted-foreground">
-              Scegli una sfida, leggi gli esempi pubblici, scrivi la tua regex
-              e usa gli indizi per avvicinarti alla risposta.
+              Una sfida concreta basta per capire il gioco: confronti esempi,
+              provi una regex e usi gli indizi per arrivare alla soluzione.
             </p>
           </div>
-          <div className="grid gap-4 md:grid-cols-3">
-            {quickFlow.map((item, index) => (
-              <motion.div
-                initial={{ opacity: 0, y: 16 }}
-                key={item.title}
-                transition={{ delay: index * 0.06, duration: 0.35 }}
+
+          <Card className="bg-card/90">
+            <CardHeader>
+              <CardTitle>{recommendedChallenge.title}</CardTitle>
+              <CardDescription>
+                Trova il pattern giusto per uno slug leggibile.
+              </CardDescription>
+              <CardAction>
+                <Badge>{recommendedChallenge.difficulty}</Badge>
+              </CardAction>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="rounded-lg border bg-background/80 p-3">
+                  <p className="text-xs text-muted-foreground">Esempio accettato</p>
+                  <p className="mt-2 font-mono text-sm">
+                    {recommendedChallenge.accepted}
+                  </p>
+                </div>
+                <div className="rounded-lg border bg-background/80 p-3">
+                  <p className="text-xs text-muted-foreground">Esempio rifiutato</p>
+                  <p className="mt-2 font-mono text-sm">
+                    {recommendedChallenge.rejected}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className="justify-end">
+              <Button asChild>
+                <Link to={recommendedChallenge.href}>
+                  Gioca questa
+                  <ArrowRightIcon aria-hidden="true" data-icon="inline-end" />
+                </Link>
+              </Button>
+            </CardFooter>
+          </Card>
+        </section>
+
+        <section aria-labelledby="steps-title" className="mt-10">
+          <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+            <h2 id="steps-title" className="text-3xl font-semibold">
+              Come si gioca
+            </h2>
+            <p className="max-w-lg text-sm leading-6 text-muted-foreground">
+              Tre mosse, poi contano logica e tentativi.
+            </p>
+          </div>
+          <ol className="grid gap-4 md:grid-cols-3">
+            {playSteps.map((step, index) => (
+              <motion.li
+                initial={{ opacity: 0, y: 14 }}
+                key={step.title}
+                transition={{ delay: index * 0.05, duration: 0.28 }}
                 viewport={{ once: true, margin: "-80px" }}
                 whileInView={{ opacity: 1, y: 0 }}
               >
-                <FeatureCard {...item} />
-              </motion.div>
+                <Card className="h-full bg-card/86">
+                  <CardHeader>
+                    <div className="mb-2 flex items-center gap-3">
+                      <Badge variant="secondary">{index + 1}</Badge>
+                      <div className="flex size-10 items-center justify-center rounded-lg border bg-muted text-primary">
+                        <step.icon aria-hidden="true" />
+                      </div>
+                    </div>
+                    <CardTitle>{step.title}</CardTitle>
+                    <CardDescription>{step.description}</CardDescription>
+                  </CardHeader>
+                </Card>
+              </motion.li>
             ))}
-          </div>
-        </section>
-
-        <section aria-labelledby="fun-title" className="mt-14">
-          <div className="grid gap-8 lg:grid-cols-[0.78fr_1.22fr] lg:items-start">
-            <div>
-              <Badge variant="secondary">
-                <FlaskConicalIcon aria-hidden="true" data-icon="inline-start" />
-                Perche e divertente
-              </Badge>
-              <h2 id="fun-title" className="mt-3 text-3xl font-semibold">
-                Un gioco di deduzione, non una pagina di teoria
-              </h2>
-              <p className="mt-4 text-sm leading-6 text-muted-foreground">
-                Le prove nascoste impediscono scorciatoie: devi capire il
-                pattern, non solo copiare gli esempi.
-              </p>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-3">
-              {funCards.map((item) => (
-                <FeatureCard key={item.title} {...item} />
-              ))}
-            </div>
-          </div>
+          </ol>
         </section>
 
         <section
-          aria-labelledby="cta-title"
-          className="mt-14 overflow-hidden rounded-lg border bg-card/82 p-6"
+          aria-labelledby="leaderboard-title"
+          className="mt-10 rounded-lg border bg-card/88 p-5"
         >
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <Badge variant="outline">
-                <LockKeyholeIcon aria-hidden="true" data-icon="inline-start" />
-                Prove nascoste
-              </Badge>
-              <h2 id="cta-title" className="mt-3 text-2xl font-semibold">
-                Ogni soluzione deve superare tutto l'enigma
-              </h2>
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-muted-foreground">
-                La tua regex deve coprire tutta la stringa e battere anche i
-                casi che non vedi. Quando ci riesci, il risultato finisce in
-                classifica.
-              </p>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-3">
+              <div className="flex size-11 items-center justify-center rounded-lg border bg-muted text-primary">
+                <TrophyIcon aria-hidden="true" />
+              </div>
+              <div>
+                <h2 id="leaderboard-title" className="text-2xl font-semibold">
+                  Classifica
+                </h2>
+                <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                  Risolvi piu enigmi con meno tentativi.
+                </p>
+              </div>
             </div>
-            <Button asChild>
-              <Link to="/challenges">
-                <CheckCircle2Icon aria-hidden="true" data-icon="inline-start" />
-                Trova una sfida
-              </Link>
+            <Button asChild variant="outline">
+              <Link to="/leaderboard">Vedi classifica</Link>
             </Button>
           </div>
         </section>

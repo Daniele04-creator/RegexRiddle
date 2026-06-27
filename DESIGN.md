@@ -211,3 +211,18 @@ GOAL 08.6 turns the public UX from a technical demo into the Regex Lab Arcade pr
 It updates the app shell, home, how-it-works, challenge catalog, challenge detail, leaderboard, login, register, create, account, and fallback copy so unauthenticated users see a game narrative instead of implementation details. It adds a stronger hero, puzzle preview, arcade-grid accents, regex chips, top-three leaderboard podium, friendlier loading/error/empty states, and game-like attempt feedback.
 
 It deliberately does not change backend APIs, auth/session behavior, database schema, regex evaluation semantics, challenge contracts, or frontend regex evaluation. Technical security details remain documented in repository docs and tests, while public UI copy stays player-facing.
+
+## GOAL 08.7 Scope
+
+GOAL 08.7 sharpens only the landing page and removes internal theme labels from public home copy.
+
+Landing rules:
+
+- hero title is "Trova la regex nascosta";
+- hero has one primary CTA, "Gioca una sfida", and one secondary CTA, "Come funziona";
+- the home header hides the extra desktop "Gioca ora" action so the hero CTA owns the first decision;
+- the hero preview is a scripted "Sfida lampo" with public examples, a visual regex field, three hidden-test locks, a progress result, and a real link to `/challenges`;
+- below the hero, use only three blocks: recommended seeded challenge, three-step play flow, and a light leaderboard prompt;
+- remove decorative pills such as "Pronto in 5 secondi" and internal theme labels from rendered public UI.
+
+GOAL 08.7 does not change backend APIs, auth/session behavior, database schema, DTO contracts, regex semantics, or frontend regex evaluation.

@@ -22,6 +22,8 @@ vi.mock("@/features/leaderboard/api", () => leaderboardApiMocks);
 
 const forbiddenPublicCopy = [
   "API",
+  "endpoint",
+  "backend",
   "GET /api",
   "POST /api",
   "GOAL",
@@ -30,15 +32,18 @@ const forbiddenPublicCopy = [
   "HttpOnly",
   "CSRF",
   "DTO",
+  "token",
   "token storage",
   "Fastify",
   "Prisma",
-  "Docker"
+  "Docker",
+  "Regex Lab Arcade",
+  "Pronto in 5 secondi"
 ] as const;
 
 const publicPages = [
   {
-    heading: "Risolvi enigmi nascosti con una sola regex",
+    heading: "Trova la regex nascosta",
     path: "/"
   },
   {

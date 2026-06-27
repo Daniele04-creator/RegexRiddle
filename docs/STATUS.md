@@ -2,7 +2,7 @@
 
 ## Current milestone
 
-GOAL 08.6: public UX cleanup and Regex Lab Arcade visual redesign.
+GOAL 08.7: landing page 10/10 polish.
 
 ## Implemented
 
@@ -91,6 +91,8 @@ GOAL 08.6: public UX cleanup and Regex Lab Arcade visual redesign.
 - Regex Lab Arcade public redesign across shell, home, how-it-works, catalog, challenge detail, leaderboard, auth, create, account, and fallback views.
 - Player-facing public copy that removes implementation jargon from user-facing screens while keeping technical security details in repository docs and tests.
 - Public copy guard test covering `/`, `/how-it-works`, `/challenges`, `/leaderboard`, `/login`, and `/register`.
+- GOAL 08.7 landing polish with a shorter "Trova la regex nascosta" hero, two CTA hierarchy, scripted "Sfida lampo" preview, static seeded recommended challenge, three-step play flow, and compact leaderboard prompt.
+- Home header behavior that avoids duplicating the primary play CTA on `/`.
 
 ## Not implemented
 
@@ -273,3 +275,28 @@ GOAL 08.6 screenshots are stored in `docs/screenshots/goal-08-6/`:
 - `login-{desktop,tablet,mobile}.png`
 - `register-{desktop,tablet,mobile}.png`
 - `create-guest-{desktop,tablet,mobile}.png`
+
+Verified on 2026-06-27 after GOAL 08.7 implementation:
+
+- `pnpm --dir frontend typecheck`: PASS.
+- `pnpm --dir frontend test -- --run`: PASS, 18 frontend test files and 65 tests.
+- `pnpm lint`: PASS with two pre-existing non-blocking Fast Refresh warnings in generated shadcn `button` and `badge` files.
+- `pnpm typecheck`: PASS.
+- `pnpm test`: PASS, shared 1 test, backend 88 tests, frontend 65 tests.
+- `pnpm build`: PASS, with the existing non-blocking Vite chunk-size warning.
+- `docker compose up --build -d`: PASS, images rebuilt and db, API, and web containers started.
+- `pnpm e2e`: PASS, 57 Playwright tests.
+- `pnpm check`: PASS, includes lint, typecheck, test, build, and 57 E2E tests.
+- `pnpm audit --audit-level=high`: PASS at the high threshold; one moderate advisory remains in transitive tooling dependencies.
+- `git diff --check`: PASS.
+- `docker compose ps`: PASS, db healthy and API/web running on the expected ports.
+- Public landing copy audit: PASS, production landing/header copy no longer renders `Regex Lab Arcade`, `Pronto in 5 secondi`, backend/API/security implementation jargon, or the removed decorative pill.
+- Source security audit: PASS for GOAL 08.7 scope; landing preview remains scripted and does not introduce frontend regex evaluation.
+- Responsive screenshot verification: PASS, desktop `1440x900`, tablet `768x1024`, mobile `390x844`, and scrolled next-section desktop screenshots were produced for `/`.
+
+GOAL 08.7 screenshots are stored in `docs/screenshots/goal-08-7/`:
+
+- `home-desktop.png`
+- `home-tablet.png`
+- `home-mobile.png`
+- `home-next-section-desktop.png`

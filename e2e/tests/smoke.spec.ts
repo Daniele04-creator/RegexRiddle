@@ -93,6 +93,18 @@ const forbiddenRenderedFrontendStrings = [
   "sessionTokenHash",
   "rr_session="
 ];
+const forbiddenLandingCopy = [
+  "Regex Lab Arcade",
+  "Pronto in 5 secondi",
+  "API",
+  "GOAL",
+  "server-side",
+  "RE2",
+  "HttpOnly",
+  "CSRF",
+  "DTO",
+  "token"
+];
 const forbiddenAttemptChallengeControlValues = [
   "AA-0000",
   "ZX-9876",
@@ -518,17 +530,22 @@ test.afterAll(async () => {
   await prisma.$disconnect();
 });
 
-test("web app renders the Regex Lab landing foundation", async ({ page }) => {
+test("web app renders the polished landing foundation", async ({ page }) => {
   await page.goto("/");
   const main = page.locator("#main-content");
 
   await expect(
-    page.getByRole("heading", { name: "Risolvi enigmi nascosti con una sola regex" })
+    page.getByRole("heading", { name: "Trova la regex nascosta" })
   ).toBeVisible();
-  await expect(page.getByRole("link", { name: /Inizia una sfida/ })).toBeVisible();
-  await expect(main.getByRole("link", { name: /Scopri come si gioca/ })).toBeVisible();
-  await expect(page.getByRole("link", { name: /Guarda classifica/ })).toBeVisible();
-  await expect(page.getByText("Puzzle preview")).toBeVisible();
+  await expect(page.getByRole("link", { name: /Gioca una sfida/ })).toBeVisible();
+  await expect(main.getByRole("link", { name: /^Come funziona$/ })).toBeVisible();
+  await expect(page.getByText("Sfida lampo")).toBeVisible();
+  await expect(page.getByText("Sfida consigliata")).toBeVisible();
+  const renderedText = await page.locator("body").innerText();
+
+  for (const forbidden of forbiddenLandingCopy) {
+    expect(renderedText).not.toContain(forbidden);
+  }
 });
 
 test("how-it-works loads publicly and exposes demo CTAs", async ({ page }) => {
@@ -563,13 +580,35 @@ test("how-it-works loads publicly and exposes demo CTAs", async ({ page }) => {
 test("landing CTA navigates to the public challenge catalog", async ({ page }) => {
   await page.goto("/");
 
-  await page.getByRole("link", { name: /Inizia una sfida/ }).click();
+  await page.getByRole("link", { name: /Gioca una sfida/ }).click();
 
   await expect(page).toHaveURL(/\/challenges$/);
   await expect(
     page.getByRole("heading", { name: "Scegli il tuo prossimo enigma" })
   ).toBeVisible();
   await expect(page.getByRole("heading", { name: "Slug URL" })).toBeVisible();
+});
+
+test("landing stays sharp on desktop tablet and mobile", async ({ page }) => {
+  for (const viewport of [
+    { height: 900, width: 1440 },
+    { height: 1024, width: 768 },
+    { height: 844, width: 390 }
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto("/");
+
+    await expect(
+      page.getByRole("heading", { name: "Trova la regex nascosta" })
+    ).toBeVisible();
+    await expect(page.getByRole("link", { name: /Gioca una sfida/ })).toBeVisible();
+    await expect(page.getByText("Sfida lampo")).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth > document.documentElement.clientWidth
+      )
+    ).toBe(false);
+  }
 });
 
 test("desktop SPA navigation reaches public read routes", async ({ page }) => {

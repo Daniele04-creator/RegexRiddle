@@ -1,5 +1,15 @@
 # Difesa orale
 
+## Cosa contiene GOAL 08.7
+
+Nel GOAL 08.7 ho rifinito solo la landing page. L'obiettivo era far capire il gioco in pochi secondi: ci sono sfide regex, guardo esempi pubblici, provo una soluzione, ricevo indizi e provo a salire in classifica.
+
+La home ora apre con "Trova la regex nascosta", due CTA soltanto e una mini "Sfida lampo" piu' concreta. La preview non valuta regex nel browser: mostra dati hard-coded, esempi accettati/rifiutati, prove nascoste bloccate e un risultato visuale. Il bottone "Prova" porta al catalogo, quindi non sembra un controllo morto.
+
+Ho tolto dalla UI pubblica parole che suonavano da presentazione tecnica, come il nome interno del tema visuale e "Pronto in 5 secondi". Sotto la hero ho ridotto la pagina a tre blocchi: sfida consigliata, tre passi di gioco e richiamo classifica.
+
+La sicurezza non cambia: niente backend/API nuovi, niente modifica a sessioni o DTO, niente RegExp JavaScript per valutare input utente, niente segreti renderizzati, niente localStorage/sessionStorage per token e niente document.cookie.
+
 ## Cosa contiene GOAL 08.6
 
 Nel GOAL 08.6 ho trasformato la parte pubblica da demo tecnica a esperienza di gioco. La nuova direzione si chiama "Regex Lab Arcade": l'utente capisce subito che sceglie una sfida, studia esempi accettati e rifiutati, prova una regex, riceve indizi numerici e sale in classifica.

@@ -19,13 +19,15 @@ describe("app routing foundation", () => {
     expect(
       await screen.findByRole("heading", {
         level: 1,
-        name: "Risolvi enigmi nascosti con una sola regex"
+        name: "Trova la regex nascosta"
       })
     ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /Inizia una sfida/ })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: /Gioca una sfida/ })).toHaveAttribute(
       "href",
       "/challenges"
     );
+    expect(document.body).not.toHaveTextContent("Regex Lab Arcade");
+    expect(document.body).not.toHaveTextContent("Pronto in 5 secondi");
   });
 
   it("exposes public navigation and logged-out auth links", async () => {

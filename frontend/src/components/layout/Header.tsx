@@ -1,5 +1,5 @@
 import { FlaskConicalIcon } from "lucide-react";
-import { Link, NavLink } from "react-router";
+import { Link, NavLink, useLocation } from "react-router";
 
 import { MobileNav } from "@/components/layout/MobileNav";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,9 @@ import { publicNavItems } from "@/lib/routes";
 import { cn } from "@/lib/utils";
 
 export function Header() {
+  const location = useLocation();
+  const isHome = location.pathname === "/";
+
   return (
     <header className="sticky top-0 z-40 border-b bg-background/86 backdrop-blur-md">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
@@ -40,9 +43,11 @@ export function Header() {
         </nav>
 
         <div className="hidden items-center gap-2 lg:flex">
-          <Button asChild size="sm">
-            <Link to="/challenges">Gioca ora</Link>
-          </Button>
+          {!isHome ? (
+            <Button asChild size="sm">
+              <Link to="/challenges">Gioca ora</Link>
+            </Button>
+          ) : null}
           <UserMenu />
         </div>
 

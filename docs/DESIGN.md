@@ -1,6 +1,34 @@
 # Design
 
-The visual source of truth for GOAL 08.6 is the root `DESIGN.md`.
+The visual source of truth for GOAL 08.7 is the root `DESIGN.md`.
+
+## GOAL 08.7 landing direction
+
+GOAL 08.7 sharpens only the landing page. The public UI no longer uses the label "Regex Lab Arcade"; that remains a design note, not a user-facing promise.
+
+Landing hierarchy:
+
+- hero title: "Trova la regex nascosta";
+- primary CTA: "Gioca una sfida";
+- secondary CTA: "Come funziona";
+- no third hero CTA;
+- desktop header hides the extra "Gioca ora" action on Home to avoid CTA duplication;
+- first viewport centers on a scripted "Sfida lampo" preview with examples, visual regex input, hidden-test locks, and a real `/challenges` link.
+
+Below the hero, the landing uses at most three focused blocks:
+
+- "Sfida consigliata": a concrete seeded challenge preview with accepted/rejected examples and "Gioca questa";
+- "Come si gioca": three steps only, observe examples, write the regex, use clues;
+- "Classifica": a light reminder that fewer attempts matter, with "Vedi classifica".
+
+Design constraints:
+
+- keep the first viewport compact enough that the next section is hinted on desktop;
+- keep mobile hero readable without forcing a long first-screen scroll;
+- use a darker, higher-contrast preview panel for memorability;
+- keep regex chips controlled and sparse;
+- avoid decorative pills that do not add product meaning;
+- do not introduce frontend regex evaluation, new UI libraries, or backend/API changes.
 
 ## GOAL 08.6 summary
 

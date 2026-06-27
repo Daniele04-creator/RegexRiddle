@@ -119,6 +119,14 @@ DONE_TECH:
 - Preserve server-side secret handling, regex evaluation, and CSRF/mutation guards.
 - Keep profile/statistics and edit/delete out of scope unless explicitly requested.
 
+## GOAL 08.5
+
+NEXT:
+
+- Add a how-it-works page for demo/exam walkthroughs.
+- Polish profile/account-facing UI without adding protected profile statistics unless explicitly scoped.
+- Run a final responsive and accessibility pass across the frontend.
+
 ## GOAL 09
 
 - Expand gameplay-oriented E2E coverage.

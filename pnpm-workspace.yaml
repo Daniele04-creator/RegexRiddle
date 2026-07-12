@@ -1,0 +1,16 @@
+packages:
+  - "backend"
+  - "frontend"
+  - "e2e"
+  - "shared"
+allowBuilds:
+  "@parcel/watcher": true
+  "@prisma/engines": true
+  argon2: true
+  esbuild: true
+  lmdb: true
+  msgpackr-extract: true
+  prisma: true
+overrides:
+  "@babel/core": 7.29.7
+  "@hono/node-server": 1.19.13

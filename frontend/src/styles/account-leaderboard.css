@@ -1,0 +1,313 @@
+.leader-heading {
+  margin-bottom: 2rem;
+}
+
+.leader-card {
+  overflow-x: auto;
+}
+
+.leader-card table {
+  width: 100%;
+  min-width: 42rem;
+  border-collapse: collapse;
+}
+
+.leader-card th,
+.leader-card td {
+  border-bottom: 1px solid var(--border);
+  padding: 1rem 1.25rem;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.leader-card th:first-child,
+.leader-card td:first-child {
+  width: 4.8rem;
+  text-align: center;
+}
+
+.leader-card th {
+  background: rgba(26, 23, 48, 0.3);
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.leader-card tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.mobile-leaderboard {
+  display: none;
+}
+
+.mobile-leaderboard dl {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.45rem 0.75rem;
+  margin: 0;
+  border-bottom: 1px solid var(--border);
+  padding: 1rem;
+}
+
+.mobile-leaderboard dl:last-child {
+  border-bottom: 0;
+}
+
+.mobile-leaderboard dt {
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.mobile-leaderboard dd {
+  margin: 0;
+  min-width: 0;
+  text-align: right;
+  word-break: break-word;
+}
+
+.leader-row.me {
+  background: rgba(124, 58, 237, 0.08);
+}
+
+.leader-row.me td:first-child {
+  border-left: 2px solid var(--primary);
+}
+
+.rank-medal {
+  --medal-fill: var(--amber);
+  --medal-ink: #2d1800;
+  position: relative;
+  isolation: isolate;
+  display: inline-grid;
+  width: 1.35rem;
+  height: 1.4rem;
+  place-items: end center;
+  vertical-align: middle;
+}
+
+.rank-medal::before,
+.rank-medal::after {
+  position: absolute;
+  top: 0.02rem;
+  z-index: 0;
+  width: 0.44rem;
+  height: 0.78rem;
+  border-radius: 0.24rem 0.24rem 0.12rem 0.12rem;
+  background: linear-gradient(180deg, #60a5fa 0%, #2563eb 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+  content: "";
+}
+
+.rank-medal::before {
+  left: 0.28rem;
+  transform: rotate(-36deg);
+}
+
+.rank-medal::after {
+  right: 0.28rem;
+  transform: rotate(36deg);
+}
+
+.rank-medal-disc {
+  position: absolute;
+  bottom: 0;
+  z-index: 1;
+  display: grid;
+  width: 0.78rem;
+  height: 0.78rem;
+  place-items: center;
+  border-radius: 999px;
+  background: linear-gradient(
+    145deg,
+    #ffd56a 0%,
+    var(--medal-fill) 58%,
+    #b86d00 100%
+  );
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+    0 0.18rem 0.35rem rgba(0, 0, 0, 0.22);
+  color: var(--medal-ink);
+  font-family: var(--font-sans);
+  font-size: 0.48rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.rank-medal-silver {
+  --medal-fill: #cbd5e1;
+  --medal-ink: #334155;
+}
+
+.rank-medal-silver .rank-medal-disc {
+  background: linear-gradient(
+    145deg,
+    #f8fafc 0%,
+    var(--medal-fill) 58%,
+    #94a3b8 100%
+  );
+}
+
+.rank-medal-bronze {
+  --medal-fill: #c08457;
+  --medal-ink: #3b1d10;
+}
+
+.rank-medal-bronze .rank-medal-disc {
+  background: linear-gradient(
+    145deg,
+    #f0b37e 0%,
+    var(--medal-fill) 58%,
+    #8a4b2a 100%
+  );
+}
+
+.leader-player {
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.leader-player span {
+  min-width: 0;
+}
+
+.leader-player strong,
+.leader-player em {
+  display: block;
+}
+
+.leader-player em {
+  color: var(--primary);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-style: normal;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 18rem minmax(0, 1fr);
+  gap: 1.5rem;
+}
+
+.how-cta {
+  margin-top: 1.5rem;
+}
+
+.profile-card {
+  min-width: 0;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.avatar-wrap {
+  position: relative;
+  justify-content: center;
+  width: max-content;
+  margin: 0 auto 1rem;
+}
+
+.avatar-camera,
+.avatar-remove {
+  position: absolute;
+  bottom: 0;
+  display: grid;
+  width: 1.7rem;
+  height: 1.7rem;
+  place-items: center;
+  border: 2px solid var(--background);
+  border-radius: 999px;
+  color: white;
+}
+
+.avatar-camera {
+  right: 0;
+  background: var(--primary);
+}
+
+.avatar-remove {
+  left: 0;
+  background: var(--red);
+}
+
+.profile-edit {
+  display: grid;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.profile-edit input {
+  min-width: 0;
+}
+
+.auth-page {
+  display: grid;
+  min-height: calc(100svh - 3.5rem);
+  place-items: center;
+  padding: 3rem 1rem;
+}
+
+.auth-card {
+  width: min(100%, 24rem);
+  padding: 1.75rem;
+}
+
+.auth-head {
+  text-align: center;
+}
+
+.auth-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin: 0 auto 0.8rem;
+  border-radius: 0.8rem;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 0.25rem;
+  border-radius: 0.75rem;
+  background: var(--muted);
+  margin: 1.5rem 0 1.25rem;
+  padding: 0.25rem;
+}
+
+.auth-tabs button {
+  flex: 1;
+  border: 0;
+  border-radius: 0.58rem;
+  background: transparent;
+  color: var(--muted-foreground);
+  padding: 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.auth-tabs button.active {
+  background: var(--card);
+  color: var(--foreground);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+}
+
+.auth-form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.auth-form .field {
+  margin-top: 0;
+}
+
+.auth-submit {
+  width: 100%;
+  margin-top: 0.2rem;
+}
+
+.signed-card {
+  display: grid;
+  justify-items: center;
+  gap: 0.8rem;
+  text-align: center;
+}

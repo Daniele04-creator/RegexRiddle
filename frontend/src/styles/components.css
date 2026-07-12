@@ -1,0 +1,291 @@
+.content-section {
+  padding: 5rem 0 0;
+}
+
+.page-title-row h1,
+.detail-header h1,
+.leader-heading h1,
+.form-heading h1,
+.profile-card h1,
+.center-panel h1,
+.auth-head h1 {
+  margin: 0;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.leader-heading h1 {
+  text-align: center;
+  font-size: 2.6rem;
+}
+
+.leader-heading p,
+.form-heading p,
+.page-title-row p {
+  color: var(--muted-foreground);
+}
+
+.leader-heading {
+  text-align: center;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-top: 3rem;
+}
+
+.feature-card,
+.panel,
+.challenge-card,
+.auth-card,
+.profile-card,
+.leader-card {
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: var(--card);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.16);
+}
+
+.feature-card {
+  display: block;
+  padding: 1.5rem;
+  outline: none;
+  translate: 0 0;
+  transition:
+    border-color 160ms ease,
+    translate 160ms ease;
+}
+
+.feature-card > div {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border-radius: 0.75rem;
+  background: rgba(8, 7, 14, 0.6);
+}
+
+.feature-card.violet {
+  border-color: rgba(124, 58, 237, 0.2);
+}
+
+.feature-card.violet > div,
+.violet-text {
+  color: #a78bfa;
+}
+
+.feature-card.amber {
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.feature-card.amber > div,
+.amber-text {
+  color: #f59e0b;
+}
+
+.feature-card.green {
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.feature-card:hover,
+.feature-card:focus-visible {
+  border-color: rgba(124, 58, 237, 0.52);
+  translate: 0 -2px;
+}
+
+.feature-card.green > div,
+.green-text {
+  color: #34d399;
+}
+
+.red-text {
+  color: #f87171;
+}
+
+.feature-card h3,
+.challenge-card h3,
+.panel h2,
+.attempt-history h3 {
+  margin: 1rem 0 0.5rem;
+  font-size: 1rem;
+}
+
+.feature-card p,
+.challenge-card p,
+.panel p,
+.empty-state p,
+.profile-card p {
+  color: var(--muted-foreground);
+  font-size: 0.9rem;
+  line-height: 1.65;
+}
+
+.page-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.back-link {
+  gap: 0.35rem;
+  border: 0;
+  background: none;
+  color: var(--primary);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.card-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.catalog-grid {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.challenge-card {
+  display: flex;
+  min-height: 13rem;
+  flex-direction: column;
+  padding: 1.25rem;
+  text-align: left;
+  translate: 0 0;
+  transition:
+    border-color 160ms ease,
+    translate 160ms ease;
+}
+
+.challenge-card:hover,
+.challenge-card:focus-visible {
+  border-color: rgba(124, 58, 237, 0.52);
+  translate: 0 -2px;
+}
+
+.card-head {
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.diff {
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+  border: 1px solid;
+  border-radius: 0.45rem;
+  padding: 0.15rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.diff.easy {
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.1);
+  color: #34d399;
+}
+
+.diff.medium {
+  border-color: rgba(245, 158, 11, 0.3);
+  background: rgba(245, 158, 11, 0.1);
+  color: #fbbf24;
+}
+
+.diff.hard {
+  border-color: rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.1);
+  color: #f87171;
+}
+
+.challenge-card p {
+  margin: 0;
+}
+
+.challenge-meta {
+  gap: 0.8rem;
+  margin-top: auto;
+  color: var(--muted-foreground);
+  font-size: 0.78rem;
+}
+
+.challenge-meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.challenge-meta span:last-child {
+  margin-left: auto;
+  font-family: var(--font-mono);
+}
+
+.filters-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 1.8rem 0;
+}
+
+.field input,
+.field textarea,
+.field select,
+.regex-field,
+.profile-edit input,
+.control-column input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 0.8rem;
+  background: var(--card);
+  color: var(--foreground);
+  padding: 0.75rem 0.9rem;
+  outline: none;
+}
+
+.field input:focus,
+.field textarea:focus,
+.field select:focus,
+.regex-field:focus-within,
+.profile-edit input:focus,
+.control-column input:focus {
+  border-color: rgba(124, 58, 237, 0.6);
+}
+
+.difficulty-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.tab {
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background: transparent;
+  color: var(--muted-foreground);
+  padding: 0.62rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.tab.active {
+  background: var(--primary);
+  color: white;
+}
+
+.tab.active.easy {
+  background: var(--green);
+  color: #052e1d;
+}
+
+.tab.active.medium {
+  background: var(--amber);
+  color: #3a2200;
+}
+
+.tab.active.hard {
+  background: var(--red);
+  color: #3b0606;
+}

@@ -1,71 +1,56 @@
-# RegexRiddle
-
-RegexRiddle è una piattaforma web full-stack dedicata a sfide basate sulle
-espressioni regolari. Gli utenti registrati possono creare enigmi con una regex
-segreta, esempi pubblici e stringhe di controllo private. Gli altri utenti
-propongono una propria regex e ricevono soltanto il numero di controlli positivi
-e negativi superati, senza visualizzare la soluzione o i dati segreti.
-
-## Tecnologie utilizzate
-
-- Back-end: Node.js, TypeScript, Fastify, Prisma ORM e PostgreSQL.
-- Sicurezza: Argon2id per le password, sessioni server-side con cookie
-  `HttpOnly` e `SameSite`, RE2 tramite `re2-wasm` per valutare le regex.
-- Front-end: Angular 21, TypeScript, Angular Router, Angular Forms, Signals,
-  RxJS, HTML5 e CSS3 responsive.
-- Test End-to-End: Playwright, con 5 scenari desktop e 5 scenari mobile.
-- Esecuzione: workspace pnpm, Docker e Docker Compose.
-
-## Struttura del progetto
-
-```text
-RegexRiddle/
-|- backend/             API, autenticazione, logica applicativa e Prisma
-|- frontend/            Single Page Application Angular
-|- shared/              costanti, DTO e contratti condivisi
-|- e2e/                 10 test End-to-End Playwright
-|- docker-compose.yml   stack Docker completa
-|- .env.example         configurazione locale di esempio
-|- package.json         comandi principali del workspace
-`- README.md            istruzioni del progetto
-```
-
 ## Requisiti
+
+Installare:
 
 - Node.js `>=24.14.0`
 - pnpm `>=11.7.0`
-- Docker Desktop, consigliato per PostgreSQL e necessario per avviare l'intero
-  stack tramite Docker Compose
+- Docker Desktop
 
-## Configurazione iniziale
+Verificare le versioni:
 
-Installare le dipendenze dalla directory principale:
+```powershell
+node --version
+pnpm --version
+docker --version
+docker compose version
+```
+
+## 1. Installazione delle dipendenze
+
+Aprire PowerShell nella directory principale `RegexRiddle` ed eseguire:
 
 ```powershell
 pnpm install
 ```
 
-Creare i file di configurazione locale partendo dall'esempio:
+Il comando installa le dipendenze dei package `backend`, `frontend`, `shared` ed
+`e2e` definiti nel workspace pnpm.
+
+## 2. Configurazione dell'ambiente
+
+Creare i file locali partendo da `.env.example`:
 
 ```powershell
 Copy-Item .env.example .env
 Copy-Item .env.example backend/.env
 ```
 
-Il file `.env` nella root viene usato da Docker Compose e dai test E2E. Il file
-`backend/.env` viene caricato quando il back-end viene avviato dalla propria
-directory. Entrambi sono esclusi da Git e non devono contenere credenziali da
-condividere o pubblicare.
+La configurazione di esempio usa:
 
-## Avvio locale per lo sviluppo
+- PostgreSQL su `127.0.0.1:55432`
+- back-end su `127.0.0.1:4000`
+- front-end locale su `127.0.0.1:5173`
 
-Avviare PostgreSQL:
+## 3. Preparazione del database
+
+Avviare PostgreSQL tramite Docker:
 
 ```powershell
 docker compose up -d db
 ```
 
-Generare Prisma Client, applicare le migrazioni e inserire i dati dimostrativi:
+Attendere che il container `regexriddle-db` risulti disponibile, quindi
+generare Prisma Client, applicare le migrazioni e inserire i dati dimostrativi:
 
 ```powershell
 pnpm db:generate
@@ -73,60 +58,51 @@ pnpm db:migrate
 pnpm db:seed
 ```
 
-Avviare il back-end:
+Il seed prepara utenti, sfide, tentativi, soluzioni e classifica necessari per
+la demo.
+
+## 4. Avvio del back-end
+
+Dal terminale aperto nella directory principale eseguire:
 
 ```powershell
 pnpm dev:backend
 ```
 
-In un secondo terminale avviare il front-end:
+Il server Fastify viene avviato su:
+
+```text
+http://127.0.0.1:4000
+```
+
+Per verificare che il back-end sia disponibile, aprire:
+
+```text
+http://127.0.0.1:4000/health
+```
+
+Lasciare questo terminale aperto durante l'utilizzo dell'applicazione.
+
+## 5. Avvio del front-end
+
+Aprire un secondo terminale nella directory principale ed eseguire:
 
 ```powershell
 pnpm dev:frontend
 ```
 
-Indirizzi predefiniti:
+La Single Page Application Angular viene avviata su:
 
-- front-end: `http://127.0.0.1:5173`
-- back-end: `http://127.0.0.1:4000`
-- health check API: `http://127.0.0.1:4000/health`
-
-Durante lo sviluppo Angular inoltra `/api` e `/health` al back-end tramite il
-proxy configurato in `frontend/proxy.conf.cjs`.
-
-## Avvio completo con Docker
-
-Per compilare e avviare database, migrazioni, back-end e front-end:
-
-```powershell
-docker compose up --build -d
+```text
+http://127.0.0.1:5173
 ```
 
-Al primo avvio, inserire i dati dimostrativi nel database Docker:
+Durante lo sviluppo, il proxy Angular inoltra automaticamente le richieste
+`/api` e `/health` al back-end in esecuzione sulla porta `4000`.
 
-```powershell
-docker compose run --rm migrate pnpm --dir backend db:seed
-```
+## 6. Account dimostrativi
 
-Aprire `http://127.0.0.1:5174`. Il back-end non è esposto direttamente
-all'esterno della rete Compose: il front-end inoltra le richieste `/api` e
-`/health` allo specifico servizio interno.
-
-Per arrestare i container:
-
-```powershell
-docker compose down
-```
-
-Il comando seguente elimina anche il volume PostgreSQL e tutti i dati locali:
-
-```powershell
-docker compose down -v
-```
-
-## Account dimostrativi
-
-Il seed crea tre utenti italiani con la stessa password:
+Tutti gli account creati dal seed usano la password `Password123!`.
 
 | Username | Password |
 | --- | --- |
@@ -134,39 +110,76 @@ Il seed crea tre utenti italiani con la stessa password:
 | `luca_bianchi` | `Password123!` |
 | `davide_mancini` | `Password123!` |
 
-Il database viene popolato anche con sfide, tentativi, soluzioni e dati della
-classifica, in modo da rendere la demo riproducibile.
+## Avvio alternativo con Docker Compose
 
-## Verifica del progetto
+In alternativa all'avvio locale, è possibile eseguire database, migrazioni,
+back-end e front-end tramite Docker.
 
-Controlli disponibili:
-
-```powershell
-pnpm typecheck
-pnpm build
-pnpm e2e
-```
-
-`pnpm test` è un alias di `pnpm e2e`.
-
-Prima della consegna eseguire il controllo completo:
+Assicurarsi che nella directory principale esista il file `.env`, quindi
+eseguire:
 
 ```powershell
-pnpm check
+docker compose up --build -d
 ```
 
-Il comando esegue audit delle dipendenze, typecheck, build di tutti i package e
-i 10 test End-to-End. Gli E2E usano uno schema PostgreSQL isolato denominato
-`e2e`, ricreato e popolato automaticamente prima della suite.
+Al primo avvio inserire i dati dimostrativi nel database Docker:
 
-## Sicurezza
+```powershell
+docker compose run --rm migrate pnpm --dir backend db:seed
+```
 
-- La regex originale e le stringhe di controllo non vengono restituite ai
-  client.
-- Le password vengono salvate esclusivamente come hash Argon2id.
-- Le sessioni sono server-side e usano cookie opachi `HttpOnly` e `SameSite`.
-- Le regex inserite dagli utenti vengono valutate lato server con RE2.
-- Gli endpoint protetti richiedono autenticazione e validano gli input.
-- Password, token, cookie, session ID e dati segreti delle sfide non devono
-  essere inseriti nei log o nel repository.
+Aprire l'applicazione all'indirizzo:
 
+```text
+http://127.0.0.1:5174
+```
+
+In questa modalità il back-end rimane interno alla rete Docker ed è raggiunto
+dal proxy del front-end.
+
+Per visualizzare lo stato dei container:
+
+```powershell
+docker compose ps
+```
+
+Per arrestare l'intero stack:
+
+```powershell
+docker compose down
+```
+
+Per eliminare anche il volume PostgreSQL e tutti i dati locali:
+
+```powershell
+docker compose down -v
+```
+
+## Risoluzione dei problemi
+
+### Il back-end non si avvia
+
+Verificare che:
+
+- `backend/.env` esista;
+- `DATABASE_URL` punti a PostgreSQL sulla porta `55432`;
+- il container del database sia attivo con `docker compose ps`;
+- le migrazioni siano state applicate con `pnpm db:migrate`.
+
+### Il front-end non carica i dati
+
+Verificare che il back-end sia attivo aprendo
+`http://127.0.0.1:4000/health`. Se il back-end non risponde, riavviarlo con
+`pnpm dev:backend`.
+
+### Una porta è già occupata
+
+Le porte predefinite sono:
+
+- `5173` per il front-end locale;
+- `5174` per il front-end Docker;
+- `4000` per il back-end locale;
+- `55432` per PostgreSQL.
+
+Arrestare il processo o il container che sta usando la porta, quindi ripetere
+il comando di avvio.

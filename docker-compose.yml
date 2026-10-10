@@ -1,0 +1,70 @@
+services:
+  db:
+    container_name: regexriddle-db
+    image: postgres:18.1-bookworm
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?Set POSTGRES_USER in your local .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in your local .env}
+      POSTGRES_DB: ${POSTGRES_DB:?Set POSTGRES_DB in your local .env}
+    ports:
+      - "127.0.0.1:55432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  migrate:
+    container_name: regexriddle-migrate
+    image: regexriddle-backend-migrate:dev
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+      target: build
+    command: ["pnpm", "--dir", "backend", "exec", "prisma", "migrate", "deploy"]
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:?Set POSTGRES_USER in your local .env}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in your local .env}@db:5432/${POSTGRES_DB:?Set POSTGRES_DB in your local .env}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  backend:
+    container_name: regexriddle-backend
+    image: regexriddle-backend:dev
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    environment:
+      NODE_ENV: production
+      API_HOST: 0.0.0.0
+      API_PORT: 4000
+      AUTH_COOKIE_SECURE: "true"
+      DATABASE_URL: postgresql://${POSTGRES_USER:?Set POSTGRES_USER in your local .env}:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in your local .env}@db:5432/${POSTGRES_DB:?Set POSTGRES_DB in your local .env}
+    expose:
+      - "4000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  frontend:
+    container_name: regexriddle-frontend
+    image: regexriddle-frontend:dev
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    environment:
+      NODE_ENV: production
+      WEB_HOST: 0.0.0.0
+      WEB_PORT: 4173
+      API_ORIGIN: http://backend:4000
+    ports:
+      - "5174:4173"
+    depends_on:
+      backend:
+        condition: service_started
+
+volumes:
+  postgres-data:

@@ -1,0 +1,18 @@
+packages:
+  - "backend"
+  - "frontend"
+  - "e2e"
+  - "shared"
+allowBuilds:
+  "@parcel/watcher": true
+  "@prisma/engines": true
+  argon2: true
+  esbuild: true
+  lmdb: true
+  msgpackr-extract: true
+  prisma: true
+# Temporary security fixes for versions still pinned by Prisma 7.
+# Remove each scoped override when its upstream dependency includes the patched version.
+overrides:
+  "prisma>mysql2": 3.23.1
+  "@prisma/config>deepmerge-ts": 8.0.2

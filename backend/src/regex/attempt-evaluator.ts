@@ -64,8 +64,13 @@ export function matchesAllControls(
   regex: CompiledSafeRegex,
   controls: ChallengeControlInput[]
 ): boolean {
-  const { positiveMatched, positiveTotal, negativeMatched } =
-    countControlMatches(regex, controls);
+  for (const control of controls) {
+    const matched = regex.test(control.value);
 
-  return positiveMatched === positiveTotal && negativeMatched === 0;
+    if (matched !== (control.kind === "POSITIVE")) {
+      return false;
+    }
+  }
+
+  return true;
 }

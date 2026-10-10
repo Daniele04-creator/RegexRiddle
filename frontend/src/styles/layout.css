@@ -1,0 +1,25 @@
+.page,
+.page-narrow,
+.page-wide,
+.page-form,
+.page-board,
+.profile-page {
+  width: min(100% - 2rem, 72rem);
+  margin: 0 auto;
+}
+
+.page-narrow {
+  max-width: 46rem;
+  padding: 3rem 0;
+}
+
+.page-wide {
+  padding: 2.5rem 0 5rem;
+}
+
+.page-form,
+.page-board,
+.profile-page {
+  max-width: 54rem;
+  padding: 3rem 0;
+}
